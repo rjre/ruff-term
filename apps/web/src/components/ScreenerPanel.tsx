@@ -17,7 +17,13 @@ function formatSignedPct(value: number): string {
 
 type SortKey = keyof Pick<
   ScreenerRow,
-  "changePct1d" | "changePct1w" | "changePct1m" | "changePct3m" | "changePctYtd" | "pctFrom52wHigh" | "pctFrom52wLow"
+  | "changePct1d"
+  | "changePct1w"
+  | "changePct1m"
+  | "changePct3m"
+  | "changePctYtd"
+  | "pctFrom52wHigh"
+  | "pctFrom52wLow"
 >;
 
 const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
@@ -30,9 +36,14 @@ const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
   { key: "pctFrom52wLow", label: "% from 52w low" },
 ];
 
-export function ScreenerPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function ScreenerPanel({ onSelectTicker }: Props) {
   const [rows, setRows] = useState<ScreenerRow[] | null>(null);
   const [sector, setSector] = useState<string>("All");
+  const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("changePctYtd");
   const [descending, setDescending] = useState(true);
 
@@ -49,9 +60,22 @@ export function ScreenerPanel() {
 
   const filtered = useMemo(() => {
     if (!rows) return [];
-    const scoped = sector === "All" ? rows : rows.filter((r) => r.sector === sector);
-    return scoped.slice().sort((a, b) => (descending ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]));
-  }, [rows, sector, sortKey, descending]);
+    let scoped =
+      sector === "All" ? rows : rows.filter((r) => r.sector === sector);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      scoped = scoped.filter(
+        (r) =>
+          r.ticker.toLowerCase().includes(q) ||
+          r.name.toLowerCase().includes(q),
+      );
+    }
+    return scoped
+      .slice()
+      .sort((a, b) =>
+        descending ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey],
+      );
+  }, [rows, sector, query, sortKey, descending]);
 
   return (
     <div className="module-view">
@@ -59,14 +83,22 @@ export function ScreenerPanel() {
         <div>
           <div className="module-banner-title">Screener</div>
           <div className="module-banner-sub">
-            Momentum screener over a curated ~65-name liquid large-cap universe, live Yahoo Finance
-            prices. No valuation metrics (P/E, market cap, dividend yield) — those require a paid
-            fundamentals feed, not free/keyless.
+            Momentum screener over a curated ~65-name liquid large-cap universe,
+            live Yahoo Finance prices. No valuation metrics (P/E, market cap,
+            dividend yield) — those require a paid fundamentals feed, not
+            free/keyless.
           </div>
         </div>
       </div>
 
       <div className="screener-toolbar">
+        <input
+          className="search-input"
+          style={{ maxWidth: 200 }}
+          placeholder="Filter ticker/name…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
         <label className="guide-select-label" htmlFor="screener-sector">
           Sector
         </label>
@@ -110,7 +142,20 @@ export function ScreenerPanel() {
           disabled={!rows}
           onClick={() =>
             downloadCsv("screener", [
-              ["Ticker", "Name", "Sector", "Exchange", "Last", "%1D", "%1W", "%1M", "%3M", "%YTD", "%52wHigh", "%52wLow"],
+              [
+                "Ticker",
+                "Name",
+                "Sector",
+                "Exchange",
+                "Last",
+                "%1D",
+                "%1W",
+                "%1M",
+                "%3M",
+                "%YTD",
+                "%52wHigh",
+                "%52wLow",
+              ],
               ...filtered.map((r) => [
                 r.ticker,
                 r.name,
@@ -131,7 +176,9 @@ export function ScreenerPanel() {
           Export CSV
         </button>
 
-        {rows && <span className="screener-count">{filtered.length} names</span>}
+        {rows && (
+          <span className="screener-count">{filtered.length} names</span>
+        )}
       </div>
 
       {rows === null ? (
@@ -155,7 +202,15 @@ export function ScreenerPanel() {
           </thead>
           <tbody>
             {filtered.map((r) => (
-              <tr key={r.ticker}>
+              <tr
+                key={r.ticker}
+                className={
+                  onSelectTicker ? "screener-row-clickable" : undefined
+                }
+                onClick={
+                  onSelectTicker ? () => onSelectTicker(r.ticker) : undefined
+                }
+              >
                 <td className="ticker-cell">
                   {r.ticker}
                   <span className="ticker-exchange">{r.exchange}</span>
@@ -163,20 +218,36 @@ export function ScreenerPanel() {
                 <td className="short-name-cell">{r.name}</td>
                 <td className="short-name-cell">{r.sector}</td>
                 <td className="num-cell">{r.lastPrice.toFixed(2)}</td>
-                <td className={`num-cell ${pctClass(r.changePct1d)}`}>{formatSignedPct(r.changePct1d)}</td>
-                <td className={`num-cell ${pctClass(r.changePct1w)}`}>{formatSignedPct(r.changePct1w)}</td>
-                <td className={`num-cell ${pctClass(r.changePct1m)}`}>{formatSignedPct(r.changePct1m)}</td>
-                <td className={`num-cell ${pctClass(r.changePct3m)}`}>{formatSignedPct(r.changePct3m)}</td>
-                <td className={`num-cell ${pctClass(r.changePctYtd)}`}>{formatSignedPct(r.changePctYtd)}</td>
-                <td className={`num-cell ${pctClass(r.pctFrom52wHigh)}`}>{formatSignedPct(r.pctFrom52wHigh)}</td>
-                <td className={`num-cell ${pctClass(r.pctFrom52wLow)}`}>{formatSignedPct(r.pctFrom52wLow)}</td>
+                <td className={`num-cell ${pctClass(r.changePct1d)}`}>
+                  {formatSignedPct(r.changePct1d)}
+                </td>
+                <td className={`num-cell ${pctClass(r.changePct1w)}`}>
+                  {formatSignedPct(r.changePct1w)}
+                </td>
+                <td className={`num-cell ${pctClass(r.changePct1m)}`}>
+                  {formatSignedPct(r.changePct1m)}
+                </td>
+                <td className={`num-cell ${pctClass(r.changePct3m)}`}>
+                  {formatSignedPct(r.changePct3m)}
+                </td>
+                <td className={`num-cell ${pctClass(r.changePctYtd)}`}>
+                  {formatSignedPct(r.changePctYtd)}
+                </td>
+                <td className={`num-cell ${pctClass(r.pctFrom52wHigh)}`}>
+                  {formatSignedPct(r.pctFrom52wHigh)}
+                </td>
+                <td className={`num-cell ${pctClass(r.pctFrom52wLow)}`}>
+                  {formatSignedPct(r.pctFrom52wLow)}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      <SourceFooter sources={["Yahoo Finance (live prices, curated universe)"]} />
+      <SourceFooter
+        sources={["Yahoo Finance (live prices, curated universe)"]}
+      />
     </div>
   );
 }

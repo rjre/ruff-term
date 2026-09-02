@@ -338,7 +338,7 @@ export function App() {
       )}
       {view === "screener" && (
         <div className="app-body-scroll">
-          <ScreenerPanel />
+          <ScreenerPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "cftcPositioning" && (
