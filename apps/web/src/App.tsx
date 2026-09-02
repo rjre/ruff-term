@@ -141,18 +141,18 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div className="app-brand">
-          <img
-            className="app-logo-mark"
-            src="/brand/ruffer-logo.png"
-            alt="Ruffer"
-          />
+        <button
+          className="app-brand app-brand-btn"
+          onClick={() => setView("morningBrief")}
+          title="Go to Morning Brief"
+        >
+          <img className="app-logo-mark" src="/brand/ruffer-logo.png" alt="Ruffer" />
           <div className="app-brand-divider" />
           <div>
             <div className="app-title">Ruff Term</div>
             <div className="app-tagline">Internal terminal</div>
           </div>
-        </div>
+        </button>
         <TickerSearch ref={searchInputRef} onSelect={goToMarkets} />
         <button
           className="command-palette-trigger"

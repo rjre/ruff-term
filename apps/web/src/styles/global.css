@@ -149,6 +149,14 @@ body {
   gap: 8px;
 }
 
+.app-brand-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
 .app-logo-mark {
   height: 26px;
   width: auto;
