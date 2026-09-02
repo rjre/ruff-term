@@ -919,3 +919,67 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Guide to Global Markets */
+
+.guide-select-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.guide-select-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+.guide-sections-heading {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 28px 0 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.guide-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.guide-section-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ruffer-green-light);
+  border-radius: 4px;
+  padding: 10px 14px 12px;
+}
+
+.guide-section-card.guide-section-wide {
+  grid-column: 1 / -1;
+}
+
+.guide-section-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ruffer-green-deep);
+  margin-bottom: 6px;
+}
+
+.guide-section-text {
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 68ch;
+  white-space: pre-line;
+}

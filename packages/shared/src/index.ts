@@ -135,6 +135,11 @@ export interface FxSnapshot {
   g10: G10Line[];
 }
 
+export interface GuideSection {
+  label: string;
+  text: string;
+}
+
 export interface GlobalMarketsGuideCountry {
   name: string;
   region: string | null;
@@ -143,6 +148,7 @@ export interface GlobalMarketsGuideCountry {
   primaryExchange: string | null;
   website: string | null;
   hours: string | null;
+  hoursSections: GuideSection[];
   primaryEquityIndex: string | null;
   bloombergTicker: string | null;
 }
