@@ -302,7 +302,7 @@ export function App() {
       )}
       {view === "navMonitoring" && (
         <div className="app-body-scroll">
-          <NavMonitoringPanel />
+          <NavMonitoringPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "podcastMonitor" && (
