@@ -21,7 +21,12 @@ function formatNet(line: MacroLine): string {
   return `${sign}${line.netChange1d.toFixed(2)}`;
 }
 
-export function InstrumentPanelGrid({ panels }: { panels: MacroPanel[] }) {
+interface Props {
+  panels: MacroPanel[];
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function InstrumentPanelGrid({ panels, onSelectTicker }: Props) {
   return (
     <div className="macro-grid">
       {panels.map((panel) => (
@@ -42,13 +47,26 @@ export function InstrumentPanelGrid({ panels }: { panels: MacroPanel[] }) {
             </thead>
             <tbody>
               {panel.lines.map((line) => (
-                <tr key={line.ticker} title={line.label}>
+                <tr
+                  key={line.ticker}
+                  title={line.label}
+                  className={
+                    onSelectTicker ? "screener-row-clickable" : undefined
+                  }
+                  onClick={
+                    onSelectTicker
+                      ? () => onSelectTicker(line.ticker)
+                      : undefined
+                  }
+                >
                   <td className="ticker-cell">{line.label}</td>
                   <td className="num-cell">{formatLast(line)}</td>
                   <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                     {formatSignedPct(line.changePct1d)}
                   </td>
-                  <td className={`num-cell ${pctClass(line.netChange1d)}`}>{formatNet(line)}</td>
+                  <td className={`num-cell ${pctClass(line.netChange1d)}`}>
+                    {formatNet(line)}
+                  </td>
                   <td className={`num-cell ${pctClass(line.changePctMtd)}`}>
                     {formatSignedPct(line.changePctMtd)}
                   </td>

@@ -232,12 +232,12 @@ export function App() {
       )}
       {view === "macro" && (
         <div className="app-body-scroll">
-          <MacroMonitor />
+          <MacroMonitor onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "commodities" && (
         <div className="app-body-scroll">
-          <CommoditiesPanel />
+          <CommoditiesPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "rns" && (

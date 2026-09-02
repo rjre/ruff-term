@@ -6,7 +6,11 @@ import { SourceFooter } from "./SourceFooter";
 
 const POLL_MS = 30_000;
 
-export function CommoditiesPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function CommoditiesPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<MacroSnapshot | null>(null);
 
   useEffect(() => {
@@ -43,7 +47,10 @@ export function CommoditiesPanel() {
       {snapshot === null ? (
         <div className="empty-state">Loading commodities…</div>
       ) : (
-        <InstrumentPanelGrid panels={snapshot.panels} />
+        <InstrumentPanelGrid
+          panels={snapshot.panels}
+          onSelectTicker={onSelectTicker}
+        />
       )}
       <SourceFooter sources={["Yahoo Finance (live futures prices)"]} />
     </div>

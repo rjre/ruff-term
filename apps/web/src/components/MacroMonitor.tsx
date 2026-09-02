@@ -110,7 +110,11 @@ function InflationExpectationsTable({
   );
 }
 
-export function MacroMonitor() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function MacroMonitor({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<MacroSnapshot | null>(null);
   const [gilts, setGilts] = useState<UkGiltYieldSnapshot | null | "error">(
     null,
@@ -165,7 +169,10 @@ export function MacroMonitor() {
       {snapshot === null ? (
         <div className="empty-state">Loading macro data…</div>
       ) : (
-        <InstrumentPanelGrid panels={snapshot.panels} />
+        <InstrumentPanelGrid
+          panels={snapshot.panels}
+          onSelectTicker={onSelectTicker}
+        />
       )}
       <div className="macro-grid" style={{ marginTop: 14 }}>
         <GiltYieldTable gilts={gilts} />
