@@ -5,6 +5,7 @@ import { BondAuctionsPanel } from "./components/BondAuctionsPanel";
 import { CentralBankBalanceSheetsPanel } from "./components/CentralBankBalanceSheetsPanel";
 import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
+import { CommandPalette } from "./components/CommandPalette";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
 import { CorrelationMatrixPanel } from "./components/CorrelationMatrixPanel";
@@ -57,6 +58,7 @@ export function App() {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(initialTicker);
   const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/health")
@@ -100,9 +102,15 @@ export function App() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // "/" focuses the ticker search from anywhere, like Slack/Linear/GitHub —
-  // unless the user is already typing somewhere else on the page.
+  // unless the user is already typing somewhere else on the page. Ctrl/Cmd+K
+  // opens the tab jump-to palette, the fast path across 38 top-level tabs.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setPaletteOpen(true);
+        return;
+      }
       if (e.key !== "/") return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
@@ -126,11 +134,19 @@ export function App() {
           </div>
         </div>
         <TickerSearch ref={searchInputRef} onSelect={goToMarkets} />
+        <button
+          className="command-palette-trigger"
+          onClick={() => setPaletteOpen(true)}
+          title="Jump to any tab"
+        >
+          Jump to tab <kbd>⌘K</kbd>
+        </button>
         <div style={{ marginLeft: "auto" }}>
           {dataSource ? <span className="data-source-badge">{dataSource} data</span> : null}
         </div>
       </header>
       <NavTabs active={view} onSelect={setView} />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onSelect={setView} />
 
       {view === "morningBrief" && (
         <div className="app-body-scroll">
