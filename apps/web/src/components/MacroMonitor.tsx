@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
-import type { InflationExpectationsSnapshot, MacroSnapshot, UkGiltYieldSnapshot } from "@ruff-term/shared";
-import { fetchInflationExpectations, fetchMacro, fetchUkGiltYields } from "../api/client";
+import type {
+  InflationExpectationsSnapshot,
+  MacroSnapshot,
+  UkGiltYieldSnapshot,
+} from "@ruff-term/shared";
+import {
+  fetchInflationExpectations,
+  fetchMacro,
+  fetchUkGiltYields,
+} from "../api/client";
 import { InstrumentPanelGrid } from "./InstrumentPanelGrid";
 import { SourceFooter } from "./SourceFooter";
 
@@ -10,16 +18,26 @@ function pctClass(value: number): string {
   return "pct-flat";
 }
 
-function GiltYieldTable({ gilts }: { gilts: UkGiltYieldSnapshot | null | "error" }) {
+function GiltYieldTable({
+  gilts,
+}: {
+  gilts: UkGiltYieldSnapshot | null | "error";
+}) {
   if (gilts === "error") {
-    return <div className="empty-state">Bank of England yield curve fetch failed.</div>;
+    return (
+      <div className="empty-state">
+        Bank of England yield curve fetch failed.
+      </div>
+    );
   }
   if (gilts === null) {
     return <div className="empty-state">Loading UK gilt yields…</div>;
   }
   return (
     <div className="macro-panel-card">
-      <div className="macro-panel-title">UK Gilt Yields — BoE spot curve ({gilts.asOfDate})</div>
+      <div className="macro-panel-title">
+        UK Gilt Yields — BoE spot curve ({gilts.asOfDate})
+      </div>
       <table className="macro-table">
         <thead>
           <tr>
@@ -45,16 +63,26 @@ function GiltYieldTable({ gilts }: { gilts: UkGiltYieldSnapshot | null | "error"
   );
 }
 
-function InflationExpectationsTable({ snapshot }: { snapshot: InflationExpectationsSnapshot | null | "error" }) {
+function InflationExpectationsTable({
+  snapshot,
+}: {
+  snapshot: InflationExpectationsSnapshot | null | "error";
+}) {
   if (snapshot === "error") {
-    return <div className="empty-state">FRED inflation expectations fetch failed.</div>;
+    return (
+      <div className="empty-state">
+        FRED inflation expectations fetch failed.
+      </div>
+    );
   }
   if (snapshot === null) {
     return <div className="empty-state">Loading inflation expectations…</div>;
   }
   return (
     <div className="macro-panel-card">
-      <div className="macro-panel-title">US Inflation Expectations — TIPS breakevens (FRED)</div>
+      <div className="macro-panel-title">
+        US Inflation Expectations — TIPS breakevens (FRED)
+      </div>
       <table className="macro-table">
         <thead>
           <tr>
@@ -84,13 +112,14 @@ function InflationExpectationsTable({ snapshot }: { snapshot: InflationExpectati
 
 export function MacroMonitor() {
   const [snapshot, setSnapshot] = useState<MacroSnapshot | null>(null);
-  const [gilts, setGilts] = useState<UkGiltYieldSnapshot | null | "error">(null);
-  const [inflation, setInflation] = useState<InflationExpectationsSnapshot | null | "error">(null);
+  const [gilts, setGilts] = useState<UkGiltYieldSnapshot | null | "error">(
+    null,
+  );
+  const [inflation, setInflation] = useState<
+    InflationExpectationsSnapshot | null | "error"
+  >(null);
 
   useEffect(() => {
-    fetchMacro()
-      .then(setSnapshot)
-      .catch(() => setSnapshot(null));
     fetchUkGiltYields()
       .then(setGilts)
       .catch(() => setGilts("error"));
@@ -99,14 +128,37 @@ export function MacroMonitor() {
       .catch(() => setInflation("error"));
   }, []);
 
+  // Futures/indices/FX/rates move intraday — poll those, but not the gilt
+  // yield curve or inflation breakevens above, which only update daily.
+  useEffect(() => {
+    let cancelled = false;
+    async function poll() {
+      try {
+        const data = await fetchMacro();
+        if (!cancelled) setSnapshot(data);
+      } catch {
+        // keep showing the last good snapshot
+      }
+    }
+    poll();
+    const interval = setInterval(poll, 30_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <div className="module-view">
       <div className="module-banner">
         <div>
           <div className="module-banner-title">Macro Monitor</div>
           <div className="module-banner-sub">
-            Global futures, indices, FX, rates and UK gilts in one sheet.
-            {snapshot ? ` As of ${new Date(snapshot.asOf).toLocaleTimeString()}.` : ""}
+            Global futures, indices, FX, rates and UK gilts in one sheet,
+            refreshing every 30s.
+            {snapshot
+              ? ` Last update ${new Date(snapshot.asOf).toLocaleTimeString()}.`
+              : ""}
           </div>
         </div>
       </div>

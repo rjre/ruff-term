@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import type { ChartsOfTheDaySnapshot, RegimeBarometerLine } from "@ruff-term/shared";
+import type {
+  ChartsOfTheDaySnapshot,
+  RegimeBarometerLine,
+} from "@ruff-term/shared";
 import { fetchChartsOfTheDay } from "../api/client";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 
@@ -54,9 +57,21 @@ export function ChartsOfTheDayPanel() {
   const [snapshot, setSnapshot] = useState<ChartsOfTheDaySnapshot | null>(null);
 
   useEffect(() => {
-    fetchChartsOfTheDay()
-      .then(setSnapshot)
-      .catch(() => setSnapshot(null));
+    let cancelled = false;
+    async function poll() {
+      try {
+        const data = await fetchChartsOfTheDay();
+        if (!cancelled) setSnapshot(data);
+      } catch {
+        // keep showing the last good snapshot
+      }
+    }
+    poll();
+    const interval = setInterval(poll, 30_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   if (!snapshot) {
@@ -67,9 +82,16 @@ export function ChartsOfTheDayPanel() {
     );
   }
 
-  const growthLines = snapshot.regimeBarometer.filter((l) => l.group === "Growth");
-  const protectionLines = snapshot.regimeBarometer.filter((l) => l.group === "Protection");
-  const themeLines = snapshot.newsThemes.map((t) => ({ label: t.theme, pct: t.count }));
+  const growthLines = snapshot.regimeBarometer.filter(
+    (l) => l.group === "Growth",
+  );
+  const protectionLines = snapshot.regimeBarometer.filter(
+    (l) => l.group === "Protection",
+  );
+  const themeLines = snapshot.newsThemes.map((t) => ({
+    label: t.theme,
+    pct: t.count,
+  }));
 
   return (
     <div className="module-view">
@@ -77,8 +99,9 @@ export function ChartsOfTheDayPanel() {
         <div>
           <div className="module-banner-title">Charts of the Day</div>
           <div className="module-banner-sub">
-            Today's growth-vs-protection regime, read through Ruffer's own public asset-allocation
-            categories, plus what the portfolio newsflow is actually about.
+            Today's growth-vs-protection regime, read through Ruffer's own
+            public asset-allocation categories, plus what the portfolio newsflow
+            is actually about. Refreshes every 30s.
           </div>
         </div>
       </div>
@@ -98,7 +121,9 @@ export function ChartsOfTheDayPanel() {
         </div>
         <div className="kpi-tile">
           <div className="kpi-label">Signal</div>
-          <div className="kpi-value">{regimeSignal(snapshot.growthAvgPct, snapshot.protectionAvgPct)}</div>
+          <div className="kpi-value">
+            {regimeSignal(snapshot.growthAvgPct, snapshot.protectionAvgPct)}
+          </div>
         </div>
       </div>
 
@@ -113,14 +138,21 @@ export function ChartsOfTheDayPanel() {
         </section>
 
         <section className="portfolio-section">
-          <h3 className="section-heading">What's the newsflow actually about</h3>
-          <MagnitudeBarList lines={themeLines} hue="var(--ruffer-green-light)" unit="" />
+          <h3 className="section-heading">
+            What's the newsflow actually about
+          </h3>
+          <MagnitudeBarList
+            lines={themeLines}
+            hue="var(--ruffer-green-light)"
+            unit=""
+          />
         </section>
       </div>
 
       <div className="source-footer">
-        Growth/protection proxies are liquid ETFs (SPY, QQQ, EEM, EFA vs GLD, TLT, IEF, FXY), live via
-        Yahoo Finance. News themes are keyword-classified from today's portfolio newsflow.
+        Growth/protection proxies are liquid ETFs (SPY, QQQ, EEM, EFA vs GLD,
+        TLT, IEF, FXY), live via Yahoo Finance. News themes are
+        keyword-classified from today's portfolio newsflow.
       </div>
     </div>
   );
