@@ -366,6 +366,22 @@ body {
   align-items: center;
 }
 
+.watchlist-selector {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.watchlist-select {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  max-width: 160px;
+}
+
 .icon-btn {
   background: transparent;
   border: 1px solid var(--border);

@@ -3,18 +3,39 @@ import type { WatchlistQuote } from "@ruff-term/shared";
 import { fetchWatchlist } from "../api/client";
 import { TickerSearch } from "./TickerSearch";
 
-const STORAGE_KEY = "ruff-term:watchlist";
+const LEGACY_KEY = "ruff-term:watchlist";
+const LISTS_KEY = "ruff-term:watchlists";
+const ACTIVE_KEY = "ruff-term:activeWatchlist";
+const DEFAULT_LIST_NAME = "Default";
 const POLL_MS = 30_000;
 
-function loadStoredTickers(): string[] | null {
+function loadLists(): Record<string, string[]> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : null;
+    const raw = localStorage.getItem(LISTS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+    }
   } catch {
-    return null;
+    // fall through to legacy migration
   }
+  // Migrate a pre-multi-watchlist single list, if one exists.
+  try {
+    const legacyRaw = localStorage.getItem(LEGACY_KEY);
+    if (legacyRaw) {
+      const legacy = JSON.parse(legacyRaw);
+      if (Array.isArray(legacy)) return { [DEFAULT_LIST_NAME]: legacy };
+    }
+  } catch {
+    // ignore
+  }
+  return { [DEFAULT_LIST_NAME]: [] };
+}
+
+function loadActiveList(lists: Record<string, string[]>): string {
+  const stored = localStorage.getItem(ACTIVE_KEY);
+  if (stored && stored in lists) return stored;
+  return Object.keys(lists)[0] ?? DEFAULT_LIST_NAME;
 }
 
 function formatPrice(value: number): string {
@@ -39,31 +60,53 @@ interface Props {
 }
 
 export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: Props) {
-  const [tickers, setTickers] = useState<string[]>(() => loadStoredTickers() ?? []);
+  const [lists, setLists] = useState<Record<string, string[]>>(() => loadLists());
+  const [activeList, setActiveList] = useState<string>(() => loadActiveList(loadLists()));
   const [quotes, setQuotes] = useState<WatchlistQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const prevPrices = useRef<Map<string, number>>(new Map());
   const [flashes, setFlashes] = useState<Map<string, "up" | "down">>(new Map());
   const initialized = useRef(false);
 
-  // Load default watchlist from server once, then persist locally.
+  const tickers = lists[activeList] ?? [];
+
+  function updateActiveTickers(next: string[]) {
+    setLists((prev) => ({ ...prev, [activeList]: next }));
+  }
+
+  // First-ever run only: no lists exist with any tickers yet, seed from the
+  // server's default watchlist.
   useEffect(() => {
-    if (tickers.length > 0) return;
+    const anyTickers = Object.values(lists).some((l) => l.length > 0);
+    if (anyTickers) return;
     fetchWatchlist()
-      .then((data) => setTickers(data.map((q) => q.ticker)))
+      .then((data) => setLists((prev) => ({ ...prev, [activeList]: data.map((q) => q.ticker) })))
       .catch(() => {});
-  }, [tickers.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (tickers.length === 0) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickers));
+    localStorage.setItem(LISTS_KEY, JSON.stringify(lists));
+  }, [lists]);
+
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_KEY, activeList);
+  }, [activeList]);
+
+  useEffect(() => {
     onTickersChange?.(tickers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickers, onTickersChange]);
 
   useEffect(() => {
-    if (tickers.length === 0) return;
+    if (tickers.length === 0) {
+      setQuotes([]);
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
+    initialized.current = false;
 
     async function poll() {
       try {
@@ -102,18 +145,57 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
   }, [tickers]);
 
   function addTicker(ticker: string) {
-    setTickers((prev) => (prev.includes(ticker) ? prev : [...prev, ticker]));
+    if (!tickers.includes(ticker)) updateActiveTickers([...tickers, ticker]);
     onSelectTicker(ticker);
   }
 
   function removeTicker(ticker: string) {
-    setTickers((prev) => prev.filter((t) => t !== ticker));
+    updateActiveTickers(tickers.filter((t) => t !== ticker));
+  }
+
+  function createList() {
+    const name = window.prompt("New watchlist name:")?.trim();
+    if (!name || name in lists) return;
+    setLists((prev) => ({ ...prev, [name]: [] }));
+    setActiveList(name);
+  }
+
+  function deleteList() {
+    const names = Object.keys(lists);
+    if (names.length <= 1) return;
+    if (!window.confirm(`Delete watchlist "${activeList}"?`)) return;
+    const { [activeList]: _removed, ...rest } = lists;
+    setLists(rest);
+    setActiveList(Object.keys(rest)[0]);
   }
 
   return (
     <div className="panel">
       <div className="panel-header">
-        <span>Watchlist</span>
+        <div className="watchlist-selector">
+          <select
+            className="search-input watchlist-select"
+            value={activeList}
+            onChange={(e) => setActiveList(e.target.value)}
+          >
+            {Object.keys(lists).map((name) => (
+              <option key={name} value={name}>
+                {name} ({lists[name].length})
+              </option>
+            ))}
+          </select>
+          <button className="icon-btn" onClick={createList} title="New watchlist">
+            +
+          </button>
+          <button
+            className="icon-btn"
+            onClick={deleteList}
+            title="Delete this watchlist"
+            disabled={Object.keys(lists).length <= 1}
+          >
+            −
+          </button>
+        </div>
         <div className="watchlist-toolbar">
           <div className="search-box">
             <TickerSearch onSelect={addTicker} compact />
