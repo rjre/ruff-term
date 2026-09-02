@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ColorType, createChart, type IChartApi, type UTCTimestamp } from "lightweight-charts";
+import { SourceFooter } from "./SourceFooter";
 
 function seededRandom(seed: string): () => number {
   let h = 1779033703 ^ seed.length;
@@ -103,6 +104,7 @@ export function HistoricPricingPanel() {
         </div>
       </div>
       <div ref={containerRef} style={{ width: "100%", height: 420 }} />
+      <SourceFooter sources={["Dummy data — intended source: Aladdin"]} />
     </div>
   );
 }

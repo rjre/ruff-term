@@ -5,6 +5,8 @@ export type View =
   | "impact"
   | "chartsOfTheDay"
   | "macro"
+  | "commodities"
+  | "rns"
   | "activity"
   | "ustActivity"
   | "dividends"
@@ -24,6 +26,8 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "impact", label: "Ruffer Impact" },
   { id: "chartsOfTheDay", label: "Charts of the Day" },
   { id: "macro", label: "Macro" },
+  { id: "commodities", label: "Commodities" },
+  { id: "rns", label: "RNS Newsfeed" },
   { id: "activity", label: "Portfolio Activity" },
   { id: "ustActivity", label: "UST Activity" },
   { id: "dividends", label: "Dividends & Corp Actions" },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FxSnapshot } from "@ruff-term/shared";
 import { fetchFx } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 
 const POLL_MS = 20_000;
 
@@ -100,6 +101,12 @@ export function FxPanel() {
           ))}
         </tbody>
       </table>
+      <SourceFooter
+        sources={[
+          "Yahoo Finance (G10 spot, live)",
+          "Vol surface pending — intended source: rjre/fx-data (Citi Velocity)",
+        ]}
+      />
     </div>
   );
 }

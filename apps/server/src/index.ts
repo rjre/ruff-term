@@ -10,12 +10,14 @@ import {
   search,
 } from "./marketData.js";
 import { getChartsOfTheDay } from "./chartsOfTheDay.js";
+import { getCommoditiesSnapshot } from "./commodities.js";
 import { getFxSnapshot } from "./fx.js";
 import { getPortfolioImpact } from "./impact.js";
 import { getMacroSnapshot } from "./macro.js";
 import { getPortfolioSnapshot } from "./portfolio.js";
 import { getPortfolioActivity } from "./portfolioActivity.js";
 import { getResearch } from "./research.js";
+import { getRnsFeed } from "./rns.js";
 import { getUstActivity } from "./ustActivity.js";
 
 const app = Fastify({ logger: true });
@@ -82,6 +84,10 @@ app.get("/api/charts-of-the-day", async () => getChartsOfTheDay());
 app.get("/api/ust-activity", async () => getUstActivity());
 
 app.get("/api/fx", async () => getFxSnapshot());
+
+app.get("/api/commodities", async () => getCommoditiesSnapshot());
+
+app.get("/api/rns", async () => getRnsFeed());
 
 const port = Number(process.env.PORT ?? 4000);
 app

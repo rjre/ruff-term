@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 const CATEGORIES = [
   "Real-time Market Data",
   "Market Calendar",
@@ -40,6 +42,7 @@ export function FmpMarketDataPanel() {
           </div>
         ))}
       </div>
+      <SourceFooter sources={["Category catalog only — not a live data pull"]} />
     </div>
   );
 }

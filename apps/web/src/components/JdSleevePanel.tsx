@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 interface SleeveHolding {
   ticker: string;
   name: string;
@@ -51,6 +53,7 @@ export function JdSleevePanel() {
         Note: use Hannah's demo from the AI show &amp; tell about how each holding is impacted by
         different scenarios — not yet incorporated here.
       </div>
+      <SourceFooter sources={["Demo data — real tickers, fabricated weights/values"]} />
     </div>
   );
 }

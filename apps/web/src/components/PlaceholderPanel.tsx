@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 interface Props {
   title: string;
 }
@@ -11,6 +13,7 @@ export function PlaceholderPanel({ title }: Props) {
         </div>
       </div>
       <div className="tbc-placeholder">TBC</div>
+      <SourceFooter sources={["TBC — no source yet"]} />
     </div>
   );
 }

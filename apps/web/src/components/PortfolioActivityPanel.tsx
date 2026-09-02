@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { PortfolioActivitySnapshot } from "@ruff-term/shared";
 import { fetchPortfolioActivity } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("en-GB", {
@@ -90,6 +91,7 @@ export function PortfolioActivityPanel() {
           </table>
         </>
       )}
+      <SourceFooter sources={["Demo data — no external source"]} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AladdinExplorePanel } from "./components/AladdinExplorePanel";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
+import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
@@ -17,6 +18,7 @@ import { PortfolioActivityPanel } from "./components/PortfolioActivityPanel";
 import { PortfolioPanel } from "./components/PortfolioPanel";
 import { PriceChart } from "./components/PriceChart";
 import { ResearchPanel } from "./components/ResearchPanel";
+import { RnsFeedPanel } from "./components/RnsFeedPanel";
 import { TickerSearch } from "./components/TickerSearch";
 import { UstActivityPanel } from "./components/UstActivityPanel";
 import { Watchlist } from "./components/Watchlist";
@@ -67,6 +69,7 @@ export function App() {
             <PriceChart ticker={selectedTicker} />
             <NewsFeed ticker={selectedTicker} watchlistTickers={watchlistTickers} />
           </div>
+          <div className="app-body-footer">Source: Yahoo Finance</div>
         </div>
       )}
       {view === "research" && (
@@ -92,6 +95,16 @@ export function App() {
       {view === "macro" && (
         <div className="app-body-scroll">
           <MacroMonitor />
+        </div>
+      )}
+      {view === "commodities" && (
+        <div className="app-body-scroll">
+          <CommoditiesPanel />
+        </div>
+      )}
+      {view === "rns" && (
+        <div className="app-body-scroll">
+          <RnsFeedPanel />
         </div>
       )}
       {view === "activity" && (

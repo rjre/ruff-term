@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ImpactedNewsItem } from "@ruff-term/shared";
 import { fetchImpact } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -55,6 +56,13 @@ export function ImpactPanel() {
           ))}
         </ul>
       )}
+      <SourceFooter
+        sources={[
+          "Yahoo Finance (news)",
+          "Ruffer Portfolio snapshot (ruffer.co.uk)",
+          "impact text: Claude when ANTHROPIC_API_KEY is set, else rule-based heuristic",
+        ]}
+      />
     </div>
   );
 }

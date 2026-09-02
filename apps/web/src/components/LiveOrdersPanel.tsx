@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 export function LiveOrdersPanel() {
   return (
     <div className="module-view">
@@ -24,6 +26,7 @@ export function LiveOrdersPanel() {
         <tbody />
       </table>
       <div className="empty-state">No live order feed connected yet.</div>
+      <SourceFooter sources={["Pending — no order feed connected yet"]} />
     </div>
   );
 }

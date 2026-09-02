@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import type { MacroSnapshot } from "@ruff-term/shared";
-import { fetchMacro } from "../api/client";
+import { fetchCommodities } from "../api/client";
 import { InstrumentPanelGrid } from "./InstrumentPanelGrid";
 import { SourceFooter } from "./SourceFooter";
 
-export function MacroMonitor() {
+export function CommoditiesPanel() {
   const [snapshot, setSnapshot] = useState<MacroSnapshot | null>(null);
 
   useEffect(() => {
-    fetchMacro()
+    fetchCommodities()
       .then(setSnapshot)
       .catch(() => setSnapshot(null));
   }, []);
@@ -17,24 +17,19 @@ export function MacroMonitor() {
     <div className="module-view">
       <div className="module-banner">
         <div>
-          <div className="module-banner-title">Macro Monitor</div>
+          <div className="module-banner-title">Commodities</div>
           <div className="module-banner-sub">
-            Global futures, indices, FX, rates and UK gilts in one sheet.
+            Energy, metals and agriculture futures.
             {snapshot ? ` As of ${new Date(snapshot.asOf).toLocaleTimeString()}.` : ""}
           </div>
         </div>
       </div>
       {snapshot === null ? (
-        <div className="empty-state">Loading macro data…</div>
+        <div className="empty-state">Loading commodities…</div>
       ) : (
         <InstrumentPanelGrid panels={snapshot.panels} />
       )}
-      <SourceFooter
-        sources={[
-          "Yahoo Finance (live)",
-          "UK gilt yields/prices: no free real-time ticker exists — the ETF proxies above are a live stand-in; for authoritative data see the UK DMO (dmo.gov.uk/data/gilt-market) or Bank of England yield curves",
-        ]}
-      />
+      <SourceFooter sources={["Yahoo Finance (live futures prices)"]} />
     </div>
   );
 }

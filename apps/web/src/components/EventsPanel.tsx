@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 export function EventsPanel() {
   return (
     <div className="module-view">
@@ -20,6 +22,7 @@ export function EventsPanel() {
         <tbody />
       </table>
       <div className="empty-state">No events sourced yet.</div>
+      <SourceFooter sources={["Pending — no source connected yet"]} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ResearchItem } from "@ruff-term/shared";
 import { fetchResearch } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
@@ -43,6 +44,7 @@ export function ResearchPanel() {
           ))
         )}
       </div>
+      <SourceFooter sources={["Demo content — no external source"]} />
     </div>
   );
 }

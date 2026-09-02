@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 export function DividendsPanel() {
   return (
     <div className="module-view">
@@ -24,6 +26,7 @@ export function DividendsPanel() {
         <tbody />
       </table>
       <div className="empty-state">No data yet — pending Aladdin integration.</div>
+      <SourceFooter sources={["Pending — intended source: Aladdin"]} />
     </div>
   );
 }

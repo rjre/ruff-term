@@ -30,7 +30,9 @@ placeholder sections requested along the way.
 | Ruffer Portfolio | TM Ruffer Portfolio Fund snapshot, sourced from ruffer.co.uk's public monthly factsheet (manually refreshed, not a live feed) |
 | Ruffer Impact | Portfolio newsflow reframed against the fund's disclosed allocation/holdings (Claude if `ANTHROPIC_API_KEY` set, else heuristic) |
 | Charts of the Day | Growth-vs-protection regime barometer (live ETF proxies) + newsflow theme breakdown |
-| Macro | Multi-panel futures/indices/FX/rates/commodities monitor, live via Yahoo |
+| Macro | Multi-panel futures/indices/FX/US rates/UK gilts monitor, live via Yahoo |
+| Commodities | Energy, metals and agriculture futures, live via Yahoo |
+| RNS Newsfeed | UK-listed company news via Yahoo — not the official LSE RNS feed (no free/keyless RNS API exists; real regulatory filings need a licensed source like LSEG RNS, ticker.app, or Investegate's API) |
 | Portfolio Activity | Demo week-to-date trading actions log |
 | UST Activity | Live Treasury ETF proxies + illustrative FINRA TRACE-style volume breakdown |
 | Dividends & Corp Actions | Placeholder — to source from Aladdin |
@@ -39,10 +41,23 @@ placeholder sections requested along the way.
 | FX | Live G10 spot grid; vol surface is a placeholder (needs Citi Velocity credentials via `rjre/fx-data`) |
 | FMP Market Data | Catalog of data categories available under Ruffer's existing FMP subscription |
 | Events | Placeholder for earnings/trading statements/calls |
+| Historic Pricing | Dummy MSFT chart back to Nov 2021 — intended source: Aladdin |
+| Live Orders | Placeholder order blotter — dataset used elsewhere, dashboard replica |
 | Nic Perot's Chart | Placeholder (TBC) |
 
 Anything marked "demo" or "placeholder" is clearly labeled in the UI itself,
-not just here.
+not just here. Every tab also shows a "Source(s):" line at the bottom stating
+exactly what powers it.
+
+### On UK gilts
+
+There's no free, real-time UK gilt yield ticker (unlike `^TNX` for US
+Treasuries). For authoritative data, use the UK Debt Management Office
+(dmo.gov.uk/data/gilt-market) or Bank of England yield curves — both free,
+official, but not a simple JSON API (CSV/XML downloads). The Macro tab uses
+UK gilt UCITS ETFs (`IGLS.L`, `IGLT.L`, `GLTY.L`, `INXG.L`) as a free, live
+price proxy by duration bucket, same pattern as the US Treasury ETF proxies
+on UST Activity.
 
 ## Project layout
 

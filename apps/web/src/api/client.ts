@@ -74,3 +74,11 @@ export function fetchUstActivity(): Promise<UstActivitySnapshot> {
 export function fetchFx(): Promise<FxSnapshot> {
   return getJson("/api/fx");
 }
+
+export function fetchCommodities(): Promise<MacroSnapshot> {
+  return getJson("/api/commodities");
+}
+
+export function fetchRns(): Promise<NewsItem[]> {
+  return getJson("/api/rns");
+}

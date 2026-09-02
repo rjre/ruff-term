@@ -134,9 +134,18 @@ body {
 .app-body {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: 1fr auto;
   gap: 1px;
   background: var(--border);
   overflow: hidden;
+}
+
+.app-body-footer {
+  grid-column: 1 / -1;
+  background: var(--panel-bg);
+  color: var(--text-faint);
+  font-size: 11px;
+  padding: 5px 12px;
 }
 
 .panel {

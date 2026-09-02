@@ -1,3 +1,5 @@
+import { SourceFooter } from "./SourceFooter";
+
 const SECTIONS = ["Portfolio views", "Attribution", "Holdings charts"];
 
 export function AladdinExplorePanel() {
@@ -22,6 +24,7 @@ export function AladdinExplorePanel() {
           </div>
         ))}
       </div>
+      <SourceFooter sources={["Pending — intended source: Aladdin Explore"]} />
     </div>
   );
 }
