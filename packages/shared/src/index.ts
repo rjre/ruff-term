@@ -259,8 +259,6 @@ export interface PortfolioActivitySnapshot {
 export interface ImpactedNewsItem extends NewsItem {
   /** 1-2 sentence take on what this headline means for the Ruffer portfolio. */
   impact: string;
-  /** Whether the impact text came from a live model call or a rule-based fallback. */
-  impactSource: "claude" | "heuristic";
 }
 
 export interface ScreenerRow {

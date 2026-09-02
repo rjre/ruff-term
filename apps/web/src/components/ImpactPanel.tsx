@@ -43,9 +43,6 @@ export function ImpactPanel() {
                 <a href={item.url} target="_blank" rel="noreferrer" className="impact-headline">
                   {item.headline}
                 </a>
-                <span className={`impact-badge impact-badge-${item.impactSource}`}>
-                  {item.impactSource === "claude" ? "Claude" : "Rule-based"}
-                </span>
               </div>
               <div className="news-meta">
                 {item.source} · {timeAgo(item.publishedAt)}
@@ -60,7 +57,7 @@ export function ImpactPanel() {
         sources={[
           "Yahoo Finance (news)",
           "Ruffer Portfolio snapshot (ruffer.co.uk)",
-          "impact text: Claude when ANTHROPIC_API_KEY is set, else rule-based heuristic",
+          "impact text: rule-based heuristic",
         ]}
       />
     </div>

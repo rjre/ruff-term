@@ -10,7 +10,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1",
     "@fastify/cors": "^10.0.1",
     "@ruff-term/shared": "*",
     "adm-zip": "^0.6.0",

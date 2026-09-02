@@ -22,9 +22,9 @@ placeholder sections requested along the way.
   not tick-by-tick real-time. Once a market's closed, the price holds at the
   last print and gets a small "c" (close) suffix once the quote is more than
   20 minutes old, so a closed market reads as a close, not a stale live tick.
-- **Optional:** set `ANTHROPIC_API_KEY` to unlock live Claude-generated
-  "Ruffer Impact" news reframing; without it, a rule-based heuristic fallback
-  is used.
+- **Self-sufficient by design:** no external API keys or paid services
+  required to run it — "Ruffer Impact" news reframing runs on an in-repo
+  rule-based heuristic, not a model call.
 - **Not yet built:** auth/user accounts, real Ruffer holdings integration
   (Aladdin), FINRA TRACE / Citi Velocity credentials.
 - **UK gilt yields are real**, not a proxy: `apps/server/src/ukGilts.ts` pulls
@@ -39,7 +39,7 @@ placeholder sections requested along the way.
 | Markets | Global watchlist, candlestick chart, per-ticker/market news |
 | Ruffer Research | Demo research notes — not real Ruffer output |
 | Ruffer Portfolio | TM Ruffer Portfolio Fund snapshot, sourced from ruffer.co.uk's public monthly factsheet (manually refreshed, not a live feed) |
-| Ruffer Impact | Portfolio newsflow reframed against the fund's disclosed allocation/holdings (Claude if `ANTHROPIC_API_KEY` set, else heuristic) |
+| Ruffer Impact | Portfolio newsflow reframed against the fund's disclosed allocation/holdings via an in-repo rule-based heuristic |
 | Charts of the Day | Growth-vs-protection regime barometer (live ETF proxies) + newsflow theme breakdown |
 | Macro | Multi-panel futures/indices/FX/US rates/UK gilts monitor, live via Yahoo |
 | Commodities | Energy, metals and agriculture futures, live via Yahoo |
