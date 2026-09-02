@@ -1,21 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchNews, fetchWatchlist } from "../api/client";
-
-interface PriceAlert {
-  id: string;
-  kind: "price";
-  ticker: string;
-  condition: "above" | "below";
-  threshold: number;
-}
-
-interface NewsAlert {
-  id: string;
-  kind: "news";
-  keyword: string;
-}
-
-type Alert = PriceAlert | NewsAlert;
+import {
+  type Alert,
+  type NewsAlert,
+  type PriceAlert,
+  loadAlerts,
+  saveAlerts,
+} from "../lib/alerts";
 
 interface TriggeredEvent {
   id: string;
@@ -24,17 +15,8 @@ interface TriggeredEvent {
   url?: string;
 }
 
-const ALERTS_KEY = "ruffterm.alerts";
 const TRIGGERED_KEY = "ruffterm.alerts.triggered";
 const POLL_MS = 30_000;
-
-function loadAlerts(): Alert[] {
-  try {
-    return JSON.parse(localStorage.getItem(ALERTS_KEY) ?? "[]");
-  } catch {
-    return [];
-  }
-}
 
 function loadTriggered(): TriggeredEvent[] {
   try {
@@ -42,10 +24,6 @@ function loadTriggered(): TriggeredEvent[] {
   } catch {
     return [];
   }
-}
-
-function saveAlerts(alerts: Alert[]) {
-  localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts));
 }
 
 function saveTriggered(events: TriggeredEvent[]) {

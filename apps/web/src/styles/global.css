@@ -273,6 +273,12 @@ body {
   margin-left: auto;
 }
 
+.chart-alert-confirmation {
+  color: var(--up);
+  font-size: 11px;
+  margin-left: 4px;
+}
+
 .chart-compare-chip {
   display: inline-flex;
   align-items: center;

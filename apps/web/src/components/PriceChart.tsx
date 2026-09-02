@@ -10,6 +10,7 @@ import {
 } from "lightweight-charts";
 import type { PriceBar } from "@ruff-term/shared";
 import { fetchHistory } from "../api/client";
+import { addPriceAlert } from "../lib/alerts";
 import { downloadCsv } from "../lib/exportCsv";
 import { addRecentTicker, getRecentTickers } from "../lib/recentTickers";
 import { cssVar } from "../lib/theme";
@@ -111,6 +112,9 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
 
   const [recentTickers, setRecentTickers] =
     useState<string[]>(getRecentTickers);
+  const [alertConfirmation, setAlertConfirmation] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!ticker) return;
@@ -391,6 +395,22 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     ]);
   }
 
+  function promptSetAlert() {
+    if (!ticker) return;
+    const lastClose = primaryBars[primaryBars.length - 1]?.close;
+    const raw = window.prompt(
+      `Alert me when ${ticker} crosses what price?${lastClose ? ` (last: ${lastClose.toFixed(2)})` : ""}`,
+    );
+    if (raw === null) return;
+    const threshold = Number(raw);
+    if (!Number.isFinite(threshold)) return;
+    const condition =
+      lastClose !== undefined && threshold < lastClose ? "below" : "above";
+    addPriceAlert(ticker, condition, threshold);
+    setAlertConfirmation(`Alert set: ${ticker} ${condition} ${threshold}`);
+    setTimeout(() => setAlertConfirmation(null), 3000);
+  }
+
   return (
     <div className="panel">
       <div className="panel-header">
@@ -489,12 +509,20 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
             )}
           </div>
           <div className="chart-toolbar-group">
+            <button className="icon-btn" onClick={promptSetAlert}>
+              Set Alert
+            </button>
             <button className="icon-btn" onClick={exportPng}>
               PNG
             </button>
             <button className="icon-btn" onClick={exportOhlcCsv}>
               CSV
             </button>
+            {alertConfirmation && (
+              <span className="chart-alert-confirmation">
+                {alertConfirmation}
+              </span>
+            )}
           </div>
         </div>
       )}
