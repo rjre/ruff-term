@@ -171,7 +171,7 @@ to CSV.
 ## Navigating
 
 - Press **/** anywhere to jump into the ticker search (same convention as
-  Slack/Linear/GitHub).
+  Slack/Linear/GitHub), or **?** to see the full shortcuts list.
 - Press **Ctrl/Cmd+K** (or click "Jump to tab" in the header) to open a
   fuzzy-filterable command palette listing all 38 top-level tabs — the fast
   path since the nav bar itself needs horizontal scrolling to reach the
