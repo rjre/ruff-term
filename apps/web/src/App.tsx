@@ -20,6 +20,7 @@ import { ImpactPanel } from "./components/ImpactPanel";
 import { JdSleevePanel } from "./components/JdSleevePanel";
 import { LiveOrdersPanel } from "./components/LiveOrdersPanel";
 import { MacroMonitor } from "./components/MacroMonitor";
+import { MorningBriefPanel } from "./components/MorningBriefPanel";
 import { NavMonitoringPanel } from "./components/NavMonitoringPanel";
 import { NavTabs, type View } from "./components/NavTabs";
 import { NewsFeed } from "./components/NewsFeed";
@@ -40,7 +41,7 @@ import { UstActivityPanel } from "./components/UstActivityPanel";
 import { Watchlist } from "./components/Watchlist";
 
 export function App() {
-  const [view, setView] = useState<View>("markets");
+  const [view, setView] = useState<View>("morningBrief");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
@@ -75,6 +76,11 @@ export function App() {
       </header>
       <NavTabs active={view} onSelect={setView} />
 
+      {view === "morningBrief" && (
+        <div className="app-body-scroll">
+          <MorningBriefPanel />
+        </div>
+      )}
       {view === "markets" && (
         <div className="app-body">
           <Watchlist
