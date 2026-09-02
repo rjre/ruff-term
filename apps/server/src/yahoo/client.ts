@@ -4,8 +4,16 @@ import type { NewsItem, PriceBar, SearchResult } from "@ruff-term/shared";
 // but Yahoo's edge blocks requests without a browser-like User-Agent.
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
-async function yahooGet<T>(url: string): Promise<T> {
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function yahooGet<T>(url: string, attempt = 0): Promise<T> {
   const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "application/json" } });
+  if (res.status === 429 && attempt < 2) {
+    await sleep(400 * (attempt + 1));
+    return yahooGet<T>(url, attempt + 1);
+  }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Yahoo request failed: ${res.status} ${body.slice(0, 200)}`);

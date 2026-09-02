@@ -15,17 +15,17 @@ export function PriceChart({ ticker }: Props) {
 
     const chart = createChart(containerRef.current, {
       layout: {
-        background: { type: ColorType.Solid, color: "#0f1712" },
-        textColor: "#96a89c",
+        background: { type: ColorType.Solid, color: "#ffffff" },
+        textColor: "#57604f",
         fontFamily: "'Roboto Mono', monospace",
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "#182119" },
-        horzLines: { color: "#182119" },
+        vertLines: { color: "#eef1ee" },
+        horzLines: { color: "#eef1ee" },
       },
-      rightPriceScale: { borderColor: "#1c2921" },
-      timeScale: { borderColor: "#1c2921" },
+      rightPriceScale: { borderColor: "#e2e5e1" },
+      timeScale: { borderColor: "#e2e5e1" },
       width: containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
     });
@@ -50,11 +50,11 @@ export function PriceChart({ ticker }: Props) {
     if (!chart || !ticker) return;
 
     const series = chart.addCandlestickSeries({
-      upColor: "#3ddc73",
-      downColor: "#ff5c5c",
+      upColor: "#0ca30c",
+      downColor: "#d03b3b",
       borderVisible: false,
-      wickUpColor: "#3ddc73",
-      wickDownColor: "#ff5c5c",
+      wickUpColor: "#0ca30c",
+      wickDownColor: "#d03b3b",
     });
 
     let cancelled = false;

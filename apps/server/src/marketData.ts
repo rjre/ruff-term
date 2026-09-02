@@ -10,6 +10,7 @@ import {
   mockSearch,
   NEWS_QUERIES,
 } from "./mockData.js";
+import { includesWord } from "./textMatch.js";
 import * as yahoo from "./yahoo/client.js";
 import type { PriceBar } from "@ruff-term/shared";
 
@@ -129,10 +130,7 @@ function filterRelevant(items: NewsItem[], query: string): NewsItem[] {
     .split(/\s+/)
     .filter((w) => w.length > 2 && !STOPWORDS.has(w));
   if (keywords.length === 0) return items;
-  return items.filter((item) => {
-    const headline = item.headline.toLowerCase();
-    return keywords.some((k) => headline.includes(k));
-  });
+  return items.filter((item) => keywords.some((k) => includesWord(item.headline, k)));
 }
 
 export async function getNews(ticker?: string): Promise<NewsItem[]> {

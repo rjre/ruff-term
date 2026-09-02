@@ -1,4 +1,17 @@
-import type { HistoryResponse, NewsItem, SearchResult, WatchlistQuote } from "@ruff-term/shared";
+import type {
+  ChartsOfTheDaySnapshot,
+  FxSnapshot,
+  HistoryResponse,
+  ImpactedNewsItem,
+  MacroSnapshot,
+  NewsItem,
+  PortfolioActivitySnapshot,
+  PortfolioSnapshot,
+  ResearchItem,
+  SearchResult,
+  UstActivitySnapshot,
+  WatchlistQuote,
+} from "@ruff-term/shared";
 
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(path);
@@ -28,4 +41,36 @@ export function fetchNews(ticker?: string): Promise<NewsItem[]> {
 export function fetchPortfolioNews(tickers: string[]): Promise<NewsItem[]> {
   const qs = tickers.length ? `?tickers=${tickers.join(",")}` : "";
   return getJson(`/api/news/portfolio${qs}`);
+}
+
+export function fetchResearch(): Promise<ResearchItem[]> {
+  return getJson("/api/research");
+}
+
+export function fetchPortfolioSnapshot(): Promise<PortfolioSnapshot> {
+  return getJson("/api/portfolio");
+}
+
+export function fetchPortfolioActivity(): Promise<PortfolioActivitySnapshot> {
+  return getJson("/api/portfolio/activity");
+}
+
+export function fetchImpact(): Promise<ImpactedNewsItem[]> {
+  return getJson("/api/impact");
+}
+
+export function fetchMacro(): Promise<MacroSnapshot> {
+  return getJson("/api/macro");
+}
+
+export function fetchChartsOfTheDay(): Promise<ChartsOfTheDaySnapshot> {
+  return getJson("/api/charts-of-the-day");
+}
+
+export function fetchUstActivity(): Promise<UstActivitySnapshot> {
+  return getJson("/api/ust-activity");
+}
+
+export function fetchFx(): Promise<FxSnapshot> {
+  return getJson("/api/fx");
 }

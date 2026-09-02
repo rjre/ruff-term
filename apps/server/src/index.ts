@@ -9,6 +9,14 @@ import {
   getWatchlistQuotes,
   search,
 } from "./marketData.js";
+import { getChartsOfTheDay } from "./chartsOfTheDay.js";
+import { getFxSnapshot } from "./fx.js";
+import { getPortfolioImpact } from "./impact.js";
+import { getMacroSnapshot } from "./macro.js";
+import { getPortfolioSnapshot } from "./portfolio.js";
+import { getPortfolioActivity } from "./portfolioActivity.js";
+import { getResearch } from "./research.js";
+import { getUstActivity } from "./ustActivity.js";
 
 const app = Fastify({ logger: true });
 
@@ -53,6 +61,27 @@ app.get("/api/news/portfolio", async (req) => {
   const tickers = query.tickers ? query.tickers.split(",").filter(Boolean) : DEFAULT_WATCHLIST;
   return getPortfolioNews(tickers);
 });
+
+app.get("/api/research", async () => getResearch());
+
+app.get("/api/portfolio", async () => getPortfolioSnapshot());
+
+app.get("/api/portfolio/activity", async () => getPortfolioActivity());
+
+app.get("/api/impact", async (req) => {
+  const query = req.query as { tickers?: string };
+  const tickers = query.tickers ? query.tickers.split(",").filter(Boolean) : DEFAULT_WATCHLIST;
+  const [news, portfolio] = await Promise.all([getPortfolioNews(tickers), getPortfolioSnapshot()]);
+  return getPortfolioImpact(news.slice(0, 12), portfolio);
+});
+
+app.get("/api/macro", async () => getMacroSnapshot());
+
+app.get("/api/charts-of-the-day", async () => getChartsOfTheDay());
+
+app.get("/api/ust-activity", async () => getUstActivity());
+
+app.get("/api/fx", async () => getFxSnapshot());
 
 const port = Number(process.env.PORT ?? 4000);
 app
