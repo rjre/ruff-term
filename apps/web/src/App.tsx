@@ -36,6 +36,7 @@ import { ResearchPanel } from "./components/ResearchPanel";
 import { RnsFeedPanel } from "./components/RnsFeedPanel";
 import { ScenarioCalculatorPanel } from "./components/ScenarioCalculatorPanel";
 import { ScreenerPanel } from "./components/ScreenerPanel";
+import { ShortcutsHelp } from "./components/ShortcutsHelp";
 import { ShortPositionsPanel } from "./components/ShortPositionsPanel";
 import { TickerSearch } from "./components/TickerSearch";
 import { TodoPanel } from "./components/TodoPanel";
@@ -55,10 +56,13 @@ function initialTicker(): string | null {
 
 export function App() {
   const [view, setView] = useState<View>(initialView);
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(initialTicker);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(
+    initialTicker,
+  );
   const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/health")
@@ -111,22 +115,37 @@ export function App() {
         setPaletteOpen(true);
         return;
       }
-      if (e.key !== "/") return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      const isTyping =
+        tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable;
+      if (e.key === "?" && !isTyping) {
+        e.preventDefault();
+        setShortcutsOpen(true);
+        return;
+      }
+      if (e.key === "Escape" && shortcutsOpen) {
+        setShortcutsOpen(false);
+        return;
+      }
+      if (e.key !== "/") return;
+      if (isTyping) return;
       e.preventDefault();
       searchInputRef.current?.focus();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [shortcutsOpen]);
 
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="app-brand">
-          <img className="app-logo-mark" src="/brand/ruffer-logo.png" alt="Ruffer" />
+          <img
+            className="app-logo-mark"
+            src="/brand/ruffer-logo.png"
+            alt="Ruffer"
+          />
           <div className="app-brand-divider" />
           <div>
             <div className="app-title">Ruff Term</div>
@@ -142,11 +161,21 @@ export function App() {
           Jump to tab <kbd>⌘K</kbd>
         </button>
         <div style={{ marginLeft: "auto" }}>
-          {dataSource ? <span className="data-source-badge">{dataSource} data</span> : null}
+          {dataSource ? (
+            <span className="data-source-badge">{dataSource} data</span>
+          ) : null}
         </div>
       </header>
       <NavTabs active={view} onSelect={setView} />
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onSelect={setView} />
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onSelect={setView}
+      />
+      <ShortcutsHelp
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
+      />
 
       {view === "morningBrief" && (
         <div className="app-body-scroll">
@@ -162,7 +191,10 @@ export function App() {
           />
           <div className="right-column">
             <PriceChart ticker={selectedTicker} />
-            <NewsFeed ticker={selectedTicker} watchlistTickers={watchlistTickers} />
+            <NewsFeed
+              ticker={selectedTicker}
+              watchlistTickers={watchlistTickers}
+            />
           </div>
           <div className="app-body-footer">Source: Yahoo Finance</div>
         </div>
