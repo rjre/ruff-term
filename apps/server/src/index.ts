@@ -29,6 +29,7 @@ import { getResearch } from "./research.js";
 import { getRnsFeed } from "./rns.js";
 import { getScreenerSnapshot } from "./screener.js";
 import { getShortPositions } from "./shortPositions.js";
+import { getTreasuryAuctions } from "./treasuryAuctions.js";
 import { getUkGiltYields } from "./ukGilts.js";
 import { getUstActivity } from "./ustActivity.js";
 
@@ -138,6 +139,15 @@ app.get("/api/short-positions", async (_req, reply) => {
 app.get("/api/ownership", async () => getOwnershipSnapshot(OWNERSHIP_TICKERS));
 
 app.get("/api/central-bank-balance-sheets", async () => getCentralBankBalanceSheets());
+
+app.get("/api/treasury-auctions", async (_req, reply) => {
+  try {
+    return await getTreasuryAuctions();
+  } catch (err) {
+    reply.code(502);
+    return { error: (err as Error).message };
+  }
+});
 
 app.get("/api/correlation", async (req) => {
   const query = req.query as { days?: string };

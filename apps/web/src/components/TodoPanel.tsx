@@ -17,8 +17,8 @@ const ITEMS: TodoItem[] = [
     note: "Sovereign curves beyond UK/US (EU, JP, EM), plus credit spreads (IG/HY) and CDS. Only UK gilts (BoE) and US Treasury ETF proxies exist today.",
   },
   {
-    title: "Bond auction calendars",
-    note: "DMO gilt auction schedule and US Treasury auction calendar — both free, ties directly into the existing gilt/UST tabs.",
+    title: "DMO gilt auction calendar",
+    note: "US Treasury auctions are now live (Bond Auctions tab, via TreasuryDirect's own API). No equivalent scrapable feed was found for the DMO's UK gilt auction schedule — their site doesn't expose it as static HTML or an obvious JSON/CSV endpoint.",
   },
   {
     title: "Comps / peer tables",

@@ -20,6 +20,7 @@ import type {
   ScreenerSnapshot,
   SearchResult,
   ShortPositionsSnapshot,
+  TreasuryAuctionsSnapshot,
   UkGiltYieldSnapshot,
   UstActivitySnapshot,
   WatchlistQuote,
@@ -101,6 +102,10 @@ export function fetchRns(): Promise<NewsItem[]> {
 
 export function fetchUkGiltYields(): Promise<UkGiltYieldSnapshot> {
   return getJson("/api/uk-gilt-yields");
+}
+
+export function fetchTreasuryAuctions(): Promise<TreasuryAuctionsSnapshot> {
+  return getJson("/api/treasury-auctions");
 }
 
 export function fetchGlobalMarketsCalendar(): Promise<GlobalMarketsCalendarSnapshot> {

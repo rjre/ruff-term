@@ -372,6 +372,20 @@ export interface InflationExpectationsSnapshot {
   lines: InflationExpectationLine[];
 }
 
+export interface TreasuryAuctionLine {
+  securityType: string;
+  securityTerm: string;
+  cusip: string;
+  announcementDate: string;
+  auctionDate: string;
+  issueDate: string;
+}
+
+export interface TreasuryAuctionsSnapshot {
+  asOf: string;
+  auctions: TreasuryAuctionLine[];
+}
+
 export interface CorrelationMatrixSnapshot {
   asOf: string;
   tickers: string[];

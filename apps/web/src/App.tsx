@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AladdinExplorePanel } from "./components/AladdinExplorePanel";
 import { AlertsPanel } from "./components/AlertsPanel";
+import { BondAuctionsPanel } from "./components/BondAuctionsPanel";
 import { CentralBankBalanceSheetsPanel } from "./components/CentralBankBalanceSheetsPanel";
 import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
@@ -269,6 +270,11 @@ export function App() {
       {view === "scenario" && (
         <div className="app-body-scroll">
           <ScenarioCalculatorPanel />
+        </div>
+      )}
+      {view === "bondAuctions" && (
+        <div className="app-body-scroll">
+          <BondAuctionsPanel />
         </div>
       )}
       {view === "nicPerot" && (
