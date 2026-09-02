@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
-import type { ChartsOfTheDaySnapshot, NewsItem, ScreenerRow, WatchlistQuote } from "@ruff-term/shared";
-import { fetchChartsOfTheDay, fetchNews, fetchScreener, fetchWatchlist } from "../api/client";
+import type {
+  ChartsOfTheDaySnapshot,
+  NewsItem,
+  ScreenerRow,
+  WatchlistQuote,
+} from "@ruff-term/shared";
+import {
+  fetchChartsOfTheDay,
+  fetchNews,
+  fetchScreener,
+  fetchWatchlist,
+} from "../api/client";
+import { NewsTickerChips } from "./NewsTickerChips";
 import { SentimentDot } from "./SentimentDot";
 import { SourceFooter } from "./SourceFooter";
 
@@ -30,39 +41,72 @@ function regimeSignal(growthAvg: number, protectionAvg: number): string {
   return gap > 0 ? "Growth leading" : "Protection leading";
 }
 
-function MoverRow({ label, exchange, pct }: { label: string; exchange?: string; pct: number }) {
+function MoverRow({
+  label,
+  exchange,
+  pct,
+  onSelectTicker,
+}: {
+  label: string;
+  exchange?: string;
+  pct: number;
+  onSelectTicker?: (ticker: string) => void;
+}) {
   return (
-    <div className="brief-mover-row">
+    <div
+      className={`brief-mover-row${onSelectTicker ? " brief-mover-row-clickable" : ""}`}
+      onClick={onSelectTicker ? () => onSelectTicker(label) : undefined}
+    >
       <span className="ticker-cell">
         {label}
         {exchange ? <span className="ticker-exchange">{exchange}</span> : null}
       </span>
-      <span className={`num-cell ${pctClass(pct)}`}>{formatSignedPct(pct)}</span>
+      <span className={`num-cell ${pctClass(pct)}`}>
+        {formatSignedPct(pct)}
+      </span>
     </div>
   );
 }
 
-export function MorningBriefPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function MorningBriefPanel({ onSelectTicker }: Props) {
   const [watchlist, setWatchlist] = useState<WatchlistQuote[] | null>(null);
   const [screener, setScreener] = useState<ScreenerRow[] | null>(null);
   const [regime, setRegime] = useState<ChartsOfTheDaySnapshot | null>(null);
   const [headlines, setHeadlines] = useState<NewsItem[] | null>(null);
 
   useEffect(() => {
-    fetchWatchlist().then(setWatchlist).catch(() => setWatchlist([]));
-    fetchScreener().then((s) => setScreener(s.rows)).catch(() => setScreener([]));
-    fetchChartsOfTheDay().then(setRegime).catch(() => setRegime(null));
-    fetchNews().then((n) => setHeadlines(n.slice(0, 6))).catch(() => setHeadlines([]));
+    fetchWatchlist()
+      .then(setWatchlist)
+      .catch(() => setWatchlist([]));
+    fetchScreener()
+      .then((s) => setScreener(s.rows))
+      .catch(() => setScreener([]));
+    fetchChartsOfTheDay()
+      .then(setRegime)
+      .catch(() => setRegime(null));
+    fetchNews()
+      .then((n) => setHeadlines(n.slice(0, 6)))
+      .catch(() => setHeadlines([]));
   }, []);
 
   const loading = watchlist === null || screener === null || headlines === null;
 
   const portfolioMovers = watchlist
-    ? [...watchlist].sort((a, b) => Math.abs(b.changePct1d) - Math.abs(a.changePct1d)).slice(0, 5)
+    ? [...watchlist]
+        .sort((a, b) => Math.abs(b.changePct1d) - Math.abs(a.changePct1d))
+        .slice(0, 5)
     : [];
 
-  const gainers = screener ? [...screener].sort((a, b) => b.changePct1d - a.changePct1d).slice(0, 5) : [];
-  const losers = screener ? [...screener].sort((a, b) => a.changePct1d - b.changePct1d).slice(0, 5) : [];
+  const gainers = screener
+    ? [...screener].sort((a, b) => b.changePct1d - a.changePct1d).slice(0, 5)
+    : [];
+  const losers = screener
+    ? [...screener].sort((a, b) => a.changePct1d - b.changePct1d).slice(0, 5)
+    : [];
 
   return (
     <div className="module-view">
@@ -70,8 +114,9 @@ export function MorningBriefPanel() {
         <div>
           <div className="module-banner-title">Morning Brief</div>
           <div className="module-banner-sub">
-            The one page to open first — what moved, what's leading, what's in the news. Generated
-            fresh on every load from data already live elsewhere in the terminal.
+            The one page to open first — what moved, what's leading, what's in
+            the news. Generated fresh on every load from data already live
+            elsewhere in the terminal.
           </div>
         </div>
       </div>
@@ -84,7 +129,9 @@ export function MorningBriefPanel() {
             <div className="kpi-row">
               <div className="kpi-tile">
                 <div className="kpi-label">Regime signal</div>
-                <div className="kpi-value">{regimeSignal(regime.growthAvgPct, regime.protectionAvgPct)}</div>
+                <div className="kpi-value">
+                  {regimeSignal(regime.growthAvgPct, regime.protectionAvgPct)}
+                </div>
               </div>
               <div className="kpi-tile">
                 <div className="kpi-label">Growth proxies avg</div>
@@ -94,37 +141,63 @@ export function MorningBriefPanel() {
               </div>
               <div className="kpi-tile">
                 <div className="kpi-label">Protection proxies avg</div>
-                <div className={`kpi-value ${pctClass(regime.protectionAvgPct)}`}>
+                <div
+                  className={`kpi-value ${pctClass(regime.protectionAvgPct)}`}
+                >
                   {formatSignedPct(regime.protectionAvgPct)}
                 </div>
               </div>
               <div className="kpi-tile">
                 <div className="kpi-label">Top newsflow theme</div>
-                <div className="kpi-value">{regime.newsThemes[0]?.theme ?? "—"}</div>
+                <div className="kpi-value">
+                  {regime.newsThemes[0]?.theme ?? "—"}
+                </div>
               </div>
             </div>
           )}
 
           <div className="portfolio-grid">
             <section className="portfolio-section">
-              <h3 className="section-heading">Portfolio watchlist — biggest moves today</h3>
+              <h3 className="section-heading">
+                Portfolio watchlist — biggest moves today
+              </h3>
               <div className="brief-mover-list">
                 {portfolioMovers.map((q) => (
-                  <MoverRow key={q.ticker} label={q.ticker} exchange={q.exchange} pct={q.changePct1d} />
+                  <MoverRow
+                    key={q.ticker}
+                    label={q.ticker}
+                    exchange={q.exchange}
+                    pct={q.changePct1d}
+                    onSelectTicker={onSelectTicker}
+                  />
                 ))}
               </div>
             </section>
 
             <section className="portfolio-section">
-              <h3 className="section-heading">Broad market — top gainers / losers</h3>
+              <h3 className="section-heading">
+                Broad market — top gainers / losers
+              </h3>
               <div className="brief-mover-list">
                 {gainers.map((r) => (
-                  <MoverRow key={r.ticker} label={r.ticker} exchange={r.exchange} pct={r.changePct1d} />
+                  <MoverRow
+                    key={r.ticker}
+                    label={r.ticker}
+                    exchange={r.exchange}
+                    pct={r.changePct1d}
+                    onSelectTicker={onSelectTicker}
+                  />
                 ))}
               </div>
               <div className="brief-mover-list" style={{ marginTop: 10 }}>
                 {losers.map((r) => (
-                  <MoverRow key={r.ticker} label={r.ticker} exchange={r.exchange} pct={r.changePct1d} />
+                  <MoverRow
+                    key={r.ticker}
+                    label={r.ticker}
+                    exchange={r.exchange}
+                    pct={r.changePct1d}
+                    onSelectTicker={onSelectTicker}
+                  />
                 ))}
               </div>
             </section>
@@ -142,6 +215,10 @@ export function MorningBriefPanel() {
                 </a>
                 <div className="news-meta">
                   {item.source} · {timeAgo(item.publishedAt)}
+                  <NewsTickerChips
+                    tickers={item.tickers}
+                    onSelectTicker={onSelectTicker}
+                  />
                 </div>
               </li>
             ))}

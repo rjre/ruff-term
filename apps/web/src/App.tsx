@@ -189,7 +189,7 @@ export function App() {
 
       {view === "morningBrief" && (
         <div className="app-body-scroll">
-          <MorningBriefPanel />
+          <MorningBriefPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "markets" && (
@@ -204,6 +204,7 @@ export function App() {
             <NewsFeed
               ticker={selectedTicker}
               watchlistTickers={watchlistTickers}
+              onSelectTicker={goToMarkets}
             />
           </div>
           <div className="app-body-footer">Source: Yahoo Finance</div>
@@ -241,7 +242,7 @@ export function App() {
       )}
       {view === "rns" && (
         <div className="app-body-scroll">
-          <RnsFeedPanel />
+          <RnsFeedPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "activity" && (
@@ -296,7 +297,7 @@ export function App() {
       )}
       {view === "headlines" && (
         <div className="app-body-scroll">
-          <HeadlinesPanel />
+          <HeadlinesPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "navMonitoring" && (

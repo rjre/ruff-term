@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
 import { fetchNews, fetchPortfolioNews } from "../api/client";
+import { NewsTickerChips } from "./NewsTickerChips";
 import { SentimentDot } from "./SentimentDot";
 
 interface Props {
   ticker: string | null;
   watchlistTickers: string[];
+  onSelectTicker?: (ticker: string) => void;
 }
 
 type Mode = "portfolio" | "market";
@@ -19,7 +21,7 @@ function timeAgo(iso: string): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export function NewsFeed({ ticker, watchlistTickers }: Props) {
+export function NewsFeed({ ticker, watchlistTickers, onSelectTicker }: Props) {
   const [mode, setMode] = useState<Mode>("portfolio");
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,11 @@ export function NewsFeed({ ticker, watchlistTickers }: Props) {
       .finally(() => setLoading(false));
   }, [ticker, mode, watchlistTickers]);
 
-  const title = ticker ? `${ticker} — News` : mode === "portfolio" ? "Portfolio Newsflow" : "Market News";
+  const title = ticker
+    ? `${ticker} — News`
+    : mode === "portfolio"
+      ? "Portfolio Newsflow"
+      : "Market News";
 
   return (
     <div className="panel">
@@ -76,7 +82,10 @@ export function NewsFeed({ ticker, watchlistTickers }: Props) {
                 </a>
                 <div className="news-meta">
                   {item.source} · {timeAgo(item.publishedAt)}
-                  {item.tickers.length > 0 ? ` · ${item.tickers.join(", ")}` : ""}
+                  <NewsTickerChips
+                    tickers={item.tickers}
+                    onSelectTicker={onSelectTicker}
+                  />
                 </div>
               </li>
             ))}

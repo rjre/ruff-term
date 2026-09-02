@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
 import { fetchNews } from "../api/client";
+import { NewsTickerChips } from "./NewsTickerChips";
 import { SentimentDot } from "./SentimentDot";
 import { SourceFooter } from "./SourceFooter";
 
@@ -13,7 +14,11 @@ function timeAgo(iso: string): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export function HeadlinesPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function HeadlinesPanel({ onSelectTicker }: Props) {
   const [items, setItems] = useState<NewsItem[] | null>(null);
   const [filter, setFilter] = useState("");
 
@@ -75,6 +80,10 @@ export function HeadlinesPanel() {
               </a>
               <div className="news-meta">
                 {item.source} · {timeAgo(item.publishedAt)}
+                <NewsTickerChips
+                  tickers={item.tickers}
+                  onSelectTicker={onSelectTicker}
+                />
               </div>
             </li>
           ))}
