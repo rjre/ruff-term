@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ShortPositionsSnapshot } from "@ruff-term/shared";
 import { fetchShortPositions } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 
 export function ShortPositionsPanel() {
@@ -24,12 +25,16 @@ export function ShortPositionsPanel() {
   if (!snapshot) {
     return (
       <div className="module-view">
-        <div className="empty-state">Loading FCA short position disclosures…</div>
+        <div className="empty-state">
+          Loading FCA short position disclosures…
+        </div>
       </div>
     );
   }
 
-  const barLines = snapshot.top.slice(0, 15).map((t) => ({ label: t.name, pct: t.netShortPct }));
+  const barLines = snapshot.top
+    .slice(0, 15)
+    .map((t) => ({ label: t.name, pct: t.netShortPct }));
 
   return (
     <div className="module-view">
@@ -37,13 +42,34 @@ export function ShortPositionsPanel() {
         <div>
           <div className="module-banner-title">Short Position Data</div>
           <div className="module-banner-sub">
-            Aggregate net short positions in UK shares at/above the 0.5% disclosure threshold, from
-            the FCA's public register (Short Selling Regulation).
+            Aggregate net short positions in UK shares at/above the 0.5%
+            disclosure threshold, from the FCA's public register (Short Selling
+            Regulation).
           </div>
         </div>
       </div>
 
-      <h3 className="section-heading">Top 15 most-shorted names (aggregated net short %)</h3>
+      <div className="screener-toolbar">
+        <h3 className="section-heading" style={{ margin: 0 }}>
+          Top 15 most-shorted names (aggregated net short %)
+        </h3>
+        <button
+          className="icon-btn"
+          onClick={() =>
+            downloadCsv("short-positions", [
+              ["Name", "ISIN", "Net short %", "Position date"],
+              ...snapshot.top.map((t) => [
+                t.name,
+                t.isin,
+                t.netShortPct,
+                t.positionDate,
+              ]),
+            ])
+          }
+        >
+          Export CSV
+        </button>
+      </div>
       <MagnitudeBarList lines={barLines} hue="var(--down)" />
 
       <h3 className="section-heading" style={{ marginTop: 24 }}>
@@ -63,7 +89,9 @@ export function ShortPositionsPanel() {
       </select>
 
       {history.length === 0 ? (
-        <div className="empty-state">No historical disclosures found for this name.</div>
+        <div className="empty-state">
+          No historical disclosures found for this name.
+        </div>
       ) : (
         <table className="watchlist-table" style={{ maxWidth: 480 }}>
           <thead>

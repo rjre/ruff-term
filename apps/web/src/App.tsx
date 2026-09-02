@@ -85,6 +85,18 @@ export function App() {
     setView("markets");
   }
 
+  // Keep deep-links live: browser back/forward, or a #view URL pasted into
+  // the address bar while the app is already open, both fire hashchange
+  // without a full reload.
+  useEffect(() => {
+    function onHashChange() {
+      const hash = window.location.hash.slice(1) as View;
+      if (VALID_VIEWS.has(hash)) setView(hash);
+    }
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // "/" focuses the ticker search from anywhere, like Slack/Linear/GitHub —

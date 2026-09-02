@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import type { CftcPositioningLine, CftcPositioningSnapshot } from "@ruff-term/shared";
+import type {
+  CftcPositioningLine,
+  CftcPositioningSnapshot,
+} from "@ruff-term/shared";
 import { fetchCftcPositioning } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 
 function pctClass(value: number): string {
   if (value > 0) return "pct-up";
@@ -33,10 +37,16 @@ function DivergingBars({ lines }: { lines: CftcPositioningLine[] }) {
               <div className="diverging-baseline" />
               <div
                 className={`diverging-fill ${v >= 0 ? "diverging-up" : "diverging-down"}`}
-                style={v >= 0 ? { left: "50%", width: `${widthPct}%` } : { right: "50%", width: `${widthPct}%` }}
+                style={
+                  v >= 0
+                    ? { left: "50%", width: `${widthPct}%` }
+                    : { right: "50%", width: `${widthPct}%` }
+                }
               />
             </div>
-            <span className={`diverging-value ${pctClass(v)}`}>{v.toFixed(1)}% OI</span>
+            <span className={`diverging-value ${pctClass(v)}`}>
+              {v.toFixed(1)}% OI
+            </span>
           </div>
         );
       })}
@@ -45,7 +55,9 @@ function DivergingBars({ lines }: { lines: CftcPositioningLine[] }) {
 }
 
 export function CftcPositioningPanel() {
-  const [snapshot, setSnapshot] = useState<CftcPositioningSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<CftcPositioningSnapshot | null>(
+    null,
+  );
 
   useEffect(() => {
     fetchCftcPositioning()
@@ -67,18 +79,46 @@ export function CftcPositioningPanel() {
         <div>
           <div className="module-banner-title">CFTC Positioning</div>
           <div className="module-banner-sub">
-            Speculative (non-commercial) net positioning in key financial and commodity futures, as
-            of the latest weekly Commitments of Traders report ({snapshot.lines[0]?.reportDate ?? "—"}).
+            Speculative (non-commercial) net positioning in key financial and
+            commodity futures, as of the latest weekly Commitments of Traders
+            report ({snapshot.lines[0]?.reportDate ?? "—"}).
           </div>
         </div>
       </div>
 
-      <h3 className="section-heading">Net speculative position, as % of open interest</h3>
+      <h3 className="section-heading">
+        Net speculative position, as % of open interest
+      </h3>
       <DivergingBars lines={snapshot.lines} />
 
-      <h3 className="section-heading" style={{ marginTop: 24 }}>
-        Detail
-      </h3>
+      <div className="screener-toolbar" style={{ marginTop: 24 }}>
+        <h3 className="section-heading" style={{ margin: 0 }}>
+          Detail
+        </h3>
+        <button
+          className="icon-btn"
+          onClick={() =>
+            downloadCsv("cftc-positioning", [
+              [
+                "Contract",
+                "Report date",
+                "Open interest",
+                "Net spec position",
+                "1W change",
+              ],
+              ...snapshot.lines.map((l) => [
+                l.label,
+                l.reportDate,
+                l.openInterest,
+                l.netNoncommPosition,
+                l.netNoncommChange1w,
+              ]),
+            ])
+          }
+        >
+          Export CSV
+        </button>
+      </div>
       <table className="watchlist-table">
         <thead>
           <tr>
@@ -105,9 +145,10 @@ export function CftcPositioningPanel() {
       </table>
 
       <div className="note-banner">
-        Net spec position = non-commercial (speculative) long contracts minus short contracts.
-        Positive means speculators are net long; negative means net short. Data is weekly (Tuesday
-        snapshot, published the following Friday) — not live intraday.
+        Net spec position = non-commercial (speculative) long contracts minus
+        short contracts. Positive means speculators are net long; negative means
+        net short. Data is weekly (Tuesday snapshot, published the following
+        Friday) — not live intraday.
       </div>
 
       <div className="source-footer">

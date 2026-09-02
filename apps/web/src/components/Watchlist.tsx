@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { WatchlistQuote } from "@ruff-term/shared";
 import { fetchWatchlist } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 import { TickerSearch } from "./TickerSearch";
 
 const LEGACY_KEY = "ruff-term:watchlist";
@@ -14,7 +15,8 @@ function loadLists(): Record<string, string[]> {
     const raw = localStorage.getItem(LISTS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed))
+        return parsed;
     }
   } catch {
     // fall through to legacy migration
@@ -59,9 +61,17 @@ interface Props {
   onTickersChange?: (tickers: string[]) => void;
 }
 
-export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: Props) {
-  const [lists, setLists] = useState<Record<string, string[]>>(() => loadLists());
-  const [activeList, setActiveList] = useState<string>(() => loadActiveList(loadLists()));
+export function Watchlist({
+  selectedTicker,
+  onSelectTicker,
+  onTickersChange,
+}: Props) {
+  const [lists, setLists] = useState<Record<string, string[]>>(() =>
+    loadLists(),
+  );
+  const [activeList, setActiveList] = useState<string>(() =>
+    loadActiveList(loadLists()),
+  );
   const [quotes, setQuotes] = useState<WatchlistQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const prevPrices = useRef<Map<string, number>>(new Map());
@@ -80,7 +90,12 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
     const anyTickers = Object.values(lists).some((l) => l.length > 0);
     if (anyTickers) return;
     fetchWatchlist()
-      .then((data) => setLists((prev) => ({ ...prev, [activeList]: data.map((q) => q.ticker) })))
+      .then((data) =>
+        setLists((prev) => ({
+          ...prev,
+          [activeList]: data.map((q) => q.ticker),
+        })),
+      )
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -184,7 +199,11 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
               </option>
             ))}
           </select>
-          <button className="icon-btn" onClick={createList} title="New watchlist">
+          <button
+            className="icon-btn"
+            onClick={createList}
+            title="New watchlist"
+          >
             +
           </button>
           <button
@@ -200,13 +219,44 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
           <div className="search-box">
             <TickerSearch onSelect={addTicker} compact />
           </div>
+          <button
+            className="icon-btn"
+            disabled={quotes.length === 0}
+            title="Export this watchlist as CSV"
+            onClick={() =>
+              downloadCsv(`watchlist-${activeList}`, [
+                [
+                  "Ticker",
+                  "Exchange",
+                  "Short Name",
+                  "Last Price",
+                  "Currency",
+                  "%1D",
+                  "%2D",
+                ],
+                ...quotes.map((q) => [
+                  q.ticker,
+                  q.exchange,
+                  q.shortName,
+                  q.lastPrice,
+                  q.currency,
+                  q.changePct1d,
+                  q.changePct2d,
+                ]),
+              ])
+            }
+          >
+            Export CSV
+          </button>
         </div>
       </div>
       <div className="panel-body">
         {loading && quotes.length === 0 ? (
           <div className="empty-state">Loading quotes…</div>
         ) : quotes.length === 0 ? (
-          <div className="empty-state">No tickers yet — search above to add one.</div>
+          <div className="empty-state">
+            No tickers yet — search above to add one.
+          </div>
         ) : (
           <table className="watchlist-table">
             <thead>
@@ -225,7 +275,9 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
                 return (
                   <tr
                     key={q.ticker}
-                    className={q.ticker === selectedTicker ? "selected" : undefined}
+                    className={
+                      q.ticker === selectedTicker ? "selected" : undefined
+                    }
                     onClick={() => onSelectTicker(q.ticker)}
                   >
                     <td className="ticker-cell">
@@ -238,7 +290,9 @@ export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: P
                       title={q.currency}
                     >
                       {formatPrice(q.lastPrice)}
-                      {q.priceSuffix ? <span className="price-suffix">{q.priceSuffix}</span> : null}
+                      {q.priceSuffix ? (
+                        <span className="price-suffix">{q.priceSuffix}</span>
+                      ) : null}
                     </td>
                     <td className={`num-cell ${pctClass(q.changePct1d)}`}>
                       {formatPct(q.changePct1d)}
