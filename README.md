@@ -77,7 +77,7 @@ markup, not guessed:
 | Live Orders | Placeholder order blotter — dataset used elsewhere, dashboard replica |
 | Financial Headlines | Broad market news via Yahoo, unfiltered, with a rough keyword-based tone dot per headline |
 | NAV Monitoring | UK investment trust premium/discount snapshot derived from `rjre/nav-monitoring-`'s committed data (not that repo's live roll-forward estimate), auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
-| Podcast Monitor | Stock/sector mention volume, sentiment and momentum, derived from `rjre/podcast-monitor`'s committed `aggregates.json`, auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
+| Podcast Monitor | Stock/sector/theme mention volume, sentiment and momentum, plus a global sentiment KPI, derived from `rjre/podcast-monitor`'s committed `aggregates.json`, auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
 | Fed Voting | `rjre/fed-voting`, embedded live via iframe (already deployed to GitHub Pages) |
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
@@ -192,10 +192,19 @@ to CSV.
   picked by eye.
 - Most data tables (Watchlist, Screener, CFTC Positioning, Short Position
   Data, Ownership & Insider, Dividends & Corp Actions, Correlation Matrix,
-  Bond Auctions, Central Bank Balance Sheets, Portfolio Activity, and the
-  price chart itself) have an "Export CSV" button for pulling the current
-  view into Excel. Financial Headlines and RNS Newsfeed have a keyword
-  filter box instead, for narrowing a long list rather than exporting it.
+  Bond Auctions, Central Bank Balance Sheets, Portfolio Activity, NAV
+  Monitoring, and the price chart itself) have an "Export CSV" button for
+  pulling the current view into Excel. Financial Headlines and RNS
+  Newsfeed have a keyword filter box instead, for narrowing a long list
+  rather than exporting it.
+- Click any ticker anywhere in the app — a watchlist/screener/ownership
+  row, a correlation-matrix label, a headline's ticker tag, a Morning
+  Brief mover — and it opens that ticker's chart on Markets. The chart
+  itself remembers your last 8 tickers as one-click "Recently viewed"
+  chips once you clear the selection, and has a "Set Alert" button that
+  creates a price alert without leaving the chart.
+- Click the Ruffer logo/title in the header to jump back to Morning Brief
+  from anywhere.
 
 ## Scripts
 
