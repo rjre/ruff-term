@@ -7,7 +7,11 @@ function codeClass(acquiredDisposed: "A" | "D"): string {
   return acquiredDisposed === "A" ? "pct-up" : "pct-down";
 }
 
-export function OwnershipPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function OwnershipPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<OwnershipSnapshot | null>(null);
 
   useEffect(() => {
@@ -102,7 +106,18 @@ export function OwnershipPanel() {
             <tbody>
               {snapshot.transactions.map((t, i) => (
                 <tr key={`${t.ticker}-${t.transactionDate}-${i}`}>
-                  <td className="ticker-cell">{t.ticker}</td>
+                  <td className="ticker-cell">
+                    {onSelectTicker ? (
+                      <button
+                        className="ticker-cell-btn"
+                        onClick={() => onSelectTicker(t.ticker)}
+                      >
+                        {t.ticker}
+                      </button>
+                    ) : (
+                      t.ticker
+                    )}
+                  </td>
                   <td className="short-name-cell">{t.ownerName}</td>
                   <td className="short-name-cell">
                     {t.officerTitle ??

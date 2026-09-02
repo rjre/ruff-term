@@ -257,7 +257,7 @@ export function App() {
       )}
       {view === "dividends" && (
         <div className="app-body-scroll">
-          <DividendsPanel />
+          <DividendsPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "aladdinExplore" && (
@@ -358,7 +358,7 @@ export function App() {
       )}
       {view === "ownership" && (
         <div className="app-body-scroll">
-          <OwnershipPanel />
+          <OwnershipPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "centralBankBalanceSheets" && (

@@ -4,7 +4,11 @@ import { fetchDividends } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { SourceFooter } from "./SourceFooter";
 
-export function DividendsPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function DividendsPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<DividendsSnapshot | null>(null);
 
   useEffect(() => {
@@ -84,7 +88,18 @@ export function DividendsPanel() {
             <tbody>
               {snapshot.lines.map((line) => (
                 <tr key={line.ticker}>
-                  <td className="ticker-cell">{line.ticker}</td>
+                  <td className="ticker-cell">
+                    {onSelectTicker ? (
+                      <button
+                        className="ticker-cell-btn"
+                        onClick={() => onSelectTicker(line.ticker)}
+                      >
+                        {line.ticker}
+                      </button>
+                    ) : (
+                      line.ticker
+                    )}
+                  </td>
                   <td className="short-name-cell">{line.shortName}</td>
                   <td>
                     {line.payments
