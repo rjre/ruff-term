@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { MacroSnapshot, UkGiltYieldSnapshot } from "@ruff-term/shared";
-import { fetchMacro, fetchUkGiltYields } from "../api/client";
+import type { InflationExpectationsSnapshot, MacroSnapshot, UkGiltYieldSnapshot } from "@ruff-term/shared";
+import { fetchInflationExpectations, fetchMacro, fetchUkGiltYields } from "../api/client";
 import { InstrumentPanelGrid } from "./InstrumentPanelGrid";
 import { SourceFooter } from "./SourceFooter";
 
@@ -45,9 +45,47 @@ function GiltYieldTable({ gilts }: { gilts: UkGiltYieldSnapshot | null | "error"
   );
 }
 
+function InflationExpectationsTable({ snapshot }: { snapshot: InflationExpectationsSnapshot | null | "error" }) {
+  if (snapshot === "error") {
+    return <div className="empty-state">FRED inflation expectations fetch failed.</div>;
+  }
+  if (snapshot === null) {
+    return <div className="empty-state">Loading inflation expectations…</div>;
+  }
+  return (
+    <div className="macro-panel-card">
+      <div className="macro-panel-title">US Inflation Expectations — TIPS breakevens (FRED)</div>
+      <table className="macro-table">
+        <thead>
+          <tr>
+            <th>Series</th>
+            <th className="num">Level</th>
+            <th className="num">1D chg (bp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {snapshot.lines.map((line) => (
+            <tr key={line.label}>
+              <td className="ticker-cell" title={`As of ${line.asOfDate}`}>
+                {line.label}
+              </td>
+              <td className="num-cell">{line.valuePct.toFixed(2)}%</td>
+              <td className={`num-cell ${pctClass(line.changeBp1d)}`}>
+                {line.changeBp1d > 0 ? "+" : ""}
+                {line.changeBp1d}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function MacroMonitor() {
   const [snapshot, setSnapshot] = useState<MacroSnapshot | null>(null);
   const [gilts, setGilts] = useState<UkGiltYieldSnapshot | null | "error">(null);
+  const [inflation, setInflation] = useState<InflationExpectationsSnapshot | null | "error">(null);
 
   useEffect(() => {
     fetchMacro()
@@ -56,6 +94,9 @@ export function MacroMonitor() {
     fetchUkGiltYields()
       .then(setGilts)
       .catch(() => setGilts("error"));
+    fetchInflationExpectations()
+      .then(setInflation)
+      .catch(() => setInflation("error"));
   }, []);
 
   return (
@@ -76,11 +117,13 @@ export function MacroMonitor() {
       )}
       <div className="macro-grid" style={{ marginTop: 14 }}>
         <GiltYieldTable gilts={gilts} />
+        <InflationExpectationsTable snapshot={inflation} />
       </div>
       <SourceFooter
         sources={[
           "Yahoo Finance (live futures/indices/FX/US rates, UK gilt ETF proxies)",
           "Bank of England (real UK gilt spot yields, updated daily)",
+          "FRED (US TIPS breakeven inflation, updated daily)",
         ]}
       />
     </div>

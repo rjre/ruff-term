@@ -18,6 +18,7 @@ import { getFxSnapshot } from "./fx.js";
 import { getGlobalMarketsCalendar } from "./globalMarketsCalendar.js";
 import { getGlobalMarketsGuide } from "./globalMarketsGuide.js";
 import { getPortfolioImpact } from "./impact.js";
+import { getInflationExpectations } from "./inflationExpectations.js";
 import { getMacroSnapshot } from "./macro.js";
 import { getNavMonitoringSnapshot } from "./navMonitoring.js";
 import { getOwnershipSnapshot } from "./ownership.js";
@@ -91,6 +92,8 @@ app.get("/api/impact", async (req) => {
 });
 
 app.get("/api/macro", async () => getMacroSnapshot());
+
+app.get("/api/inflation-expectations", async () => getInflationExpectations());
 
 app.get("/api/charts-of-the-day", async () => getChartsOfTheDay());
 

@@ -361,6 +361,17 @@ export interface CentralBankBalanceSheetSnapshot {
   series: CentralBankBalanceSheetSeries[];
 }
 
+export interface InflationExpectationLine {
+  label: string;
+  valuePct: number;
+  changeBp1d: number;
+  asOfDate: string;
+}
+
+export interface InflationExpectationsSnapshot {
+  lines: InflationExpectationLine[];
+}
+
 export interface CorrelationMatrixSnapshot {
   asOf: string;
   tickers: string[];

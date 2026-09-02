@@ -8,6 +8,7 @@ import type {
   GlobalMarketsGuideCountry,
   HistoryResponse,
   ImpactedNewsItem,
+  InflationExpectationsSnapshot,
   MacroSnapshot,
   NavMonitoringSnapshot,
   NewsItem,
@@ -72,6 +73,10 @@ export function fetchImpact(): Promise<ImpactedNewsItem[]> {
 
 export function fetchMacro(): Promise<MacroSnapshot> {
   return getJson("/api/macro");
+}
+
+export function fetchInflationExpectations(): Promise<InflationExpectationsSnapshot> {
+  return getJson("/api/inflation-expectations");
 }
 
 export function fetchChartsOfTheDay(): Promise<ChartsOfTheDaySnapshot> {
