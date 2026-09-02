@@ -1,4 +1,6 @@
 import type {
+  CentralBankBalanceSheetSnapshot,
+  CftcPositioningSnapshot,
   ChartsOfTheDaySnapshot,
   FxSnapshot,
   GlobalMarketsCalendarSnapshot,
@@ -8,11 +10,14 @@ import type {
   MacroSnapshot,
   NavMonitoringSnapshot,
   NewsItem,
+  OwnershipSnapshot,
   PodcastMonitorSnapshot,
   PortfolioActivitySnapshot,
   PortfolioSnapshot,
   ResearchItem,
+  ScreenerSnapshot,
   SearchResult,
+  ShortPositionsSnapshot,
   UkGiltYieldSnapshot,
   UstActivitySnapshot,
   WatchlistQuote,
@@ -106,4 +111,24 @@ export function fetchNavMonitoring(): Promise<NavMonitoringSnapshot> {
 
 export function fetchPodcastMonitor(): Promise<PodcastMonitorSnapshot> {
   return getJson("/api/podcast-monitor");
+}
+
+export function fetchScreener(): Promise<ScreenerSnapshot> {
+  return getJson("/api/screener");
+}
+
+export function fetchCftcPositioning(): Promise<CftcPositioningSnapshot> {
+  return getJson("/api/cftc-positioning");
+}
+
+export function fetchShortPositions(): Promise<ShortPositionsSnapshot> {
+  return getJson("/api/short-positions");
+}
+
+export function fetchOwnership(): Promise<OwnershipSnapshot> {
+  return getJson("/api/ownership");
+}
+
+export function fetchCentralBankBalanceSheets(): Promise<CentralBankBalanceSheetSnapshot> {
+  return getJson("/api/central-bank-balance-sheets");
 }

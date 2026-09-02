@@ -52,6 +52,16 @@ placeholder sections requested along the way.
 | Podcast Monitor | Stock/sector mention volume, sentiment and momentum, snapshot copied from `rjre/podcast-monitor`'s committed `aggregates.json` |
 | Fed Voting | `rjre/fed-voting`, embedded live via iframe (already deployed to GitHub Pages) |
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
+| Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
+| Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
+| Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
+| CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
+| Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS |
+| Short Position Data | UK aggregate net short position disclosures at/above the 0.5% threshold, live via the FCA's public CSVs (current + historic) |
+| Ownership & Insider | Section 16 insider transactions (Form 4) for the US-listed watchlist names, live via SEC EDGAR. Foreign private issuers (SFL, South Bow) are exempt and show no rows |
+| Central Bank Balance Sheets | Fed / ECB / BoJ total assets, live via FRED. BoE omitted — no equivalent free machine-readable weekly series found |
+| To Do | Static list of known gaps vs. a full FactSet/Bloomberg replacement (fundamentals, vol surfaces, credit spreads, auction calendars, comps, export, Excel plugin) |
+| Copilot | Placeholder — intended to embed Ruffer's internal M&E Market Commentary Agent |
 | Nic Perot's Chart | Placeholder (TBC) |
 
 `rjre/fx-data` (Citi Velocity FX data tool) informs the FX tab's vol-surface

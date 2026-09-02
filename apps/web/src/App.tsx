@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { AladdinExplorePanel } from "./components/AladdinExplorePanel";
+import { AlertsPanel } from "./components/AlertsPanel";
+import { CentralBankBalanceSheetsPanel } from "./components/CentralBankBalanceSheetsPanel";
+import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
+import { CopilotPanel } from "./components/CopilotPanel";
 import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
@@ -18,6 +22,7 @@ import { MacroMonitor } from "./components/MacroMonitor";
 import { NavMonitoringPanel } from "./components/NavMonitoringPanel";
 import { NavTabs, type View } from "./components/NavTabs";
 import { NewsFeed } from "./components/NewsFeed";
+import { OwnershipPanel } from "./components/OwnershipPanel";
 import { PlaceholderPanel } from "./components/PlaceholderPanel";
 import { PodcastMonitorPanel } from "./components/PodcastMonitorPanel";
 import { PortfolioActivityPanel } from "./components/PortfolioActivityPanel";
@@ -25,7 +30,10 @@ import { PortfolioPanel } from "./components/PortfolioPanel";
 import { PriceChart } from "./components/PriceChart";
 import { ResearchPanel } from "./components/ResearchPanel";
 import { RnsFeedPanel } from "./components/RnsFeedPanel";
+import { ScreenerPanel } from "./components/ScreenerPanel";
+import { ShortPositionsPanel } from "./components/ShortPositionsPanel";
 import { TickerSearch } from "./components/TickerSearch";
+import { TodoPanel } from "./components/TodoPanel";
 import { UstActivityPanel } from "./components/UstActivityPanel";
 import { Watchlist } from "./components/Watchlist";
 
@@ -202,6 +210,46 @@ export function App() {
       {view === "guideToGlobalMarkets" && (
         <div className="app-body-scroll">
           <GuideToGlobalMarketsPanel />
+        </div>
+      )}
+      {view === "screener" && (
+        <div className="app-body-scroll">
+          <ScreenerPanel />
+        </div>
+      )}
+      {view === "cftcPositioning" && (
+        <div className="app-body-scroll">
+          <CftcPositioningPanel />
+        </div>
+      )}
+      {view === "alerts" && (
+        <div className="app-body-scroll">
+          <AlertsPanel />
+        </div>
+      )}
+      {view === "shortPositions" && (
+        <div className="app-body-scroll">
+          <ShortPositionsPanel />
+        </div>
+      )}
+      {view === "ownership" && (
+        <div className="app-body-scroll">
+          <OwnershipPanel />
+        </div>
+      )}
+      {view === "centralBankBalanceSheets" && (
+        <div className="app-body-scroll">
+          <CentralBankBalanceSheetsPanel />
+        </div>
+      )}
+      {view === "todo" && (
+        <div className="app-body-scroll">
+          <TodoPanel />
+        </div>
+      )}
+      {view === "copilot" && (
+        <div className="app-body-scroll">
+          <CopilotPanel />
         </div>
       )}
       {view === "nicPerot" && (

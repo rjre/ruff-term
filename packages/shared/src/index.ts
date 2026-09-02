@@ -263,6 +263,106 @@ export interface ImpactedNewsItem extends NewsItem {
   impactSource: "claude" | "heuristic";
 }
 
+export interface ScreenerRow {
+  ticker: string;
+  name: string;
+  sector: string;
+  exchange: string;
+  currency: string;
+  lastPrice: number;
+  changePct1d: number;
+  changePct1w: number;
+  changePct1m: number;
+  changePct3m: number;
+  changePctYtd: number;
+  pctFrom52wHigh: number;
+  pctFrom52wLow: number;
+}
+
+export interface ScreenerSnapshot {
+  asOf: string;
+  rows: ScreenerRow[];
+}
+
+export interface CftcPositioningLine {
+  label: string;
+  contractMarketCode: string;
+  reportDate: string;
+  openInterest: number;
+  noncommLong: number;
+  noncommShort: number;
+  netNoncommPosition: number;
+  netNoncommChange1w: number;
+}
+
+export interface CftcPositioningSnapshot {
+  asOf: string;
+  lines: CftcPositioningLine[];
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+export interface ShortPositionLine {
+  name: string;
+  isin: string;
+  netShortPct: number;
+  positionDate: string;
+}
+
+export interface ShortPositionHistoryPoint {
+  netShortPct: number;
+  positionDate: string;
+}
+
+export interface ShortPositionsSnapshot {
+  asOf: string;
+  top: ShortPositionLine[];
+  history: Record<string, ShortPositionHistoryPoint[]>;
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+export interface InsiderTransaction {
+  ticker: string;
+  ownerName: string;
+  isOfficer: boolean;
+  isDirector: boolean;
+  officerTitle: string | null;
+  transactionDate: string;
+  transactionCode: string;
+  transactionCodeLabel: string;
+  shares: number;
+  pricePerShare: number | null;
+  acquiredDisposed: "A" | "D";
+  sharesOwnedAfter: number;
+  filingUrl: string;
+}
+
+export interface OwnershipSnapshot {
+  asOf: string;
+  tickers: string[];
+  transactions: InsiderTransaction[];
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
+export interface BalanceSheetPoint {
+  date: string;
+  valueBn: number;
+}
+
+export interface CentralBankBalanceSheetSeries {
+  bank: string;
+  currency: string;
+  sourceUrl: string;
+  points: BalanceSheetPoint[];
+}
+
+export interface CentralBankBalanceSheetSnapshot {
+  asOf: string;
+  series: CentralBankBalanceSheetSeries[];
+}
+
 export interface PortfolioSnapshot {
   fundName: string;
   /** ISO date the underlying factsheet is "as of". */

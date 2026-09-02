@@ -24,6 +24,14 @@ export type View =
   | "fedStatement"
   | "globalMarketsCalendar"
   | "guideToGlobalMarkets"
+  | "screener"
+  | "cftcPositioning"
+  | "alerts"
+  | "shortPositions"
+  | "ownership"
+  | "centralBankBalanceSheets"
+  | "todo"
+  | "copilot"
   | "nicPerot";
 
 const TABS: Array<{ id: View; label: string }> = [
@@ -52,6 +60,14 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "fedStatement", label: "Fed Statement" },
   { id: "globalMarketsCalendar", label: "Global Markets Calendar" },
   { id: "guideToGlobalMarkets", label: "Guide to Global Markets" },
+  { id: "screener", label: "Screener" },
+  { id: "cftcPositioning", label: "CFTC Positioning" },
+  { id: "alerts", label: "Alerts" },
+  { id: "shortPositions", label: "Short Position Data" },
+  { id: "ownership", label: "Ownership & Insider" },
+  { id: "centralBankBalanceSheets", label: "Central Bank Balance Sheets" },
+  { id: "todo", label: "To Do" },
+  { id: "copilot", label: "Copilot" },
   { id: "nicPerot", label: "Nic Perot's Chart" },
 ];
 
