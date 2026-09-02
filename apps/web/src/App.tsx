@@ -23,7 +23,7 @@ import { LiveOrdersPanel } from "./components/LiveOrdersPanel";
 import { MacroMonitor } from "./components/MacroMonitor";
 import { MorningBriefPanel } from "./components/MorningBriefPanel";
 import { NavMonitoringPanel } from "./components/NavMonitoringPanel";
-import { NavTabs, type View } from "./components/NavTabs";
+import { NavTabs, TABS, type View } from "./components/NavTabs";
 import { NewsFeed } from "./components/NewsFeed";
 import { OwnershipPanel } from "./components/OwnershipPanel";
 import { PlaceholderPanel } from "./components/PlaceholderPanel";
@@ -41,9 +41,20 @@ import { TodoPanel } from "./components/TodoPanel";
 import { UstActivityPanel } from "./components/UstActivityPanel";
 import { Watchlist } from "./components/Watchlist";
 
+const VALID_VIEWS = new Set(TABS.map((t) => t.id));
+
+function initialView(): View {
+  const hash = window.location.hash.slice(1) as View;
+  return VALID_VIEWS.has(hash) ? hash : "morningBrief";
+}
+
+function initialTicker(): string | null {
+  return new URLSearchParams(window.location.search).get("t");
+}
+
 export function App() {
-  const [view, setView] = useState<View>("morningBrief");
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [view, setView] = useState<View>(initialView);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(initialTicker);
   const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
 
@@ -53,6 +64,21 @@ export function App() {
       .then((data) => setDataSource(data.dataSource))
       .catch(() => setDataSource(null));
   }, []);
+
+  // Keep the URL shareable: #view for the active tab, ?t= for the selected
+  // ticker while on Markets. Uses replaceState so switching tabs doesn't
+  // spam the browser's back/forward history.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (view === "markets" && selectedTicker) {
+      params.set("t", selectedTicker);
+    } else {
+      params.delete("t");
+    }
+    const query = params.toString();
+    const url = `${window.location.pathname}${query ? `?${query}` : ""}#${view}`;
+    window.history.replaceState(null, "", url);
+  }, [view, selectedTicker]);
 
   function goToMarkets(ticker: string) {
     setSelectedTicker(ticker);
