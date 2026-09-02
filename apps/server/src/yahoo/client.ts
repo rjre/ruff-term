@@ -83,6 +83,9 @@ interface YahooChartResponse {
           volume: (number | null)[];
         }>;
       };
+      events?: {
+        dividends?: Record<string, { amount: number; date: number }>;
+      };
     }>;
     error?: { code: string; description: string } | null;
   };
@@ -122,6 +125,25 @@ export async function fetchChart(symbol: string, range: string): Promise<ChartDa
   }
 
   return { meta: result.meta, bars };
+}
+
+export interface DividendPayment {
+  date: number; // unix seconds
+  amount: number;
+}
+
+/** Real historical dividend payments — from the same chart endpoint used for
+ * price bars, via its `events=div` param. Unlike quoteSummary/v7 endpoints,
+ * this one isn't gated behind Yahoo's auth crumb. */
+export async function fetchDividends(symbol: string, range: string): Promise<DividendPayment[]> {
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
+    symbol
+  )}?interval=1d&range=${range}&events=div`;
+  const data = await yahooGet<YahooChartResponse>(url);
+  const result = data.chart.result?.[0];
+  if (!result) throw new Error(data.chart.error?.description ?? `No chart data for ${symbol}`);
+  const dividends = result.events?.dividends ?? {};
+  return Object.values(dividends).sort((a, b) => a.date - b.date);
 }
 
 interface YahooSearchResponse {

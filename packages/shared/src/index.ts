@@ -372,6 +372,24 @@ export interface InflationExpectationsSnapshot {
   lines: InflationExpectationLine[];
 }
 
+export interface DividendHistoryPayment {
+  date: string;
+  amount: number;
+}
+
+export interface DividendHistoryLine {
+  ticker: string;
+  shortName: string;
+  currency: string;
+  payments: DividendHistoryPayment[];
+  estimatedNextDate: string | null;
+}
+
+export interface DividendsSnapshot {
+  asOf: string;
+  lines: DividendHistoryLine[];
+}
+
 export interface TreasuryAuctionLine {
   securityType: string;
   securityTerm: string;

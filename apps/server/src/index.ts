@@ -14,6 +14,7 @@ import { getCftcPositioning } from "./cftcPositioning.js";
 import { getChartsOfTheDay } from "./chartsOfTheDay.js";
 import { getCommoditiesSnapshot } from "./commodities.js";
 import { getCorrelationMatrix } from "./correlation.js";
+import { getDividends } from "./dividends.js";
 import { getFxSnapshot } from "./fx.js";
 import { getGlobalMarketsCalendar } from "./globalMarketsCalendar.js";
 import { getGlobalMarketsGuide } from "./globalMarketsGuide.js";
@@ -121,6 +122,12 @@ app.get("/api/uk-gilt-yields", async (_req, reply) => {
     reply.code(502);
     return { error: (err as Error).message };
   }
+});
+
+app.get("/api/dividends", async (req) => {
+  const query = req.query as { tickers?: string };
+  const tickers = query.tickers ? query.tickers.split(",").filter(Boolean) : DEFAULT_WATCHLIST;
+  return getDividends(tickers);
 });
 
 app.get("/api/screener", async () => getScreenerSnapshot());

@@ -3,6 +3,7 @@ import type {
   CftcPositioningSnapshot,
   ChartsOfTheDaySnapshot,
   CorrelationMatrixSnapshot,
+  DividendsSnapshot,
   FxSnapshot,
   GlobalMarketsCalendarSnapshot,
   GlobalMarketsGuideCountry,
@@ -146,4 +147,9 @@ export function fetchCentralBankBalanceSheets(): Promise<CentralBankBalanceSheet
 
 export function fetchCorrelationMatrix(days: number): Promise<CorrelationMatrixSnapshot> {
   return getJson(`/api/correlation?days=${days}`);
+}
+
+export function fetchDividends(tickers?: string[]): Promise<DividendsSnapshot> {
+  const qs = tickers && tickers.length ? `?tickers=${tickers.join(",")}` : "";
+  return getJson(`/api/dividends${qs}`);
 }
