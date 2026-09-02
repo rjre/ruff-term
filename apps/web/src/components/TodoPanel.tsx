@@ -14,7 +14,7 @@ const ITEMS: TodoItem[] = [
   },
   {
     title: "Rates & credit breadth",
-    note: "Sovereign curves beyond UK/US (EU, JP, EM), plus credit spreads (IG/HY) and CDS. Only UK gilts (BoE) and US Treasury ETF proxies exist today.",
+    note: "Macro now has a Global Rates & Credit ETF-proxy panel (international treasuries, EM USD bonds, US IG and high-yield credit), same honesty pattern as the UK gilts panel. Still missing: true sovereign yield curves for EU/JP/EM (not just ETF price proxies) and actual credit spreads/CDS, not bond-fund prices.",
   },
   {
     title: "DMO gilt auction calendar",

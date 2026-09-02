@@ -66,6 +66,20 @@ const PANEL_DEFS: PanelDef[] = [
     ],
   },
   {
+    // Broader global rates/credit coverage, same "live ETF proxy" honesty
+    // as the UK gilts panel above — not raw yields or true credit spreads,
+    // but real, tradeable, free-to-fetch instruments giving a genuine read
+    // on global rates and credit risk appetite.
+    title: "Global Rates & Credit (ETF proxies)",
+    instruments: [
+      { ticker: "IGOV", label: "Intl Treasuries (IGOV)" },
+      { ticker: "BWX", label: "Intl Treasuries ex-US (BWX)" },
+      { ticker: "EMB", label: "EM USD Bonds (EMB)" },
+      { ticker: "LQD", label: "US IG Corp Credit (LQD)" },
+      { ticker: "HYG", label: "US High Yield Credit (HYG)" },
+    ],
+  },
+  {
     title: "Digital",
     instruments: [
       { ticker: "BTC-USD", label: "Bitcoin" },
