@@ -12,14 +12,21 @@ const RANGES: Array<{ label: string; days: number }> = [
 
 function cellStyle(value: number): { background: string; color: string } {
   const alpha = Math.min(Math.abs(value), 1) * 0.75;
-  const background = value >= 0 ? `rgba(12,163,12,${alpha})` : `rgba(208,59,59,${alpha})`;
+  const background =
+    value >= 0 ? `rgba(12,163,12,${alpha})` : `rgba(208,59,59,${alpha})`;
   const color = alpha > 0.45 ? "#ffffff" : "var(--text)";
   return { background, color };
 }
 
-export function CorrelationMatrixPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function CorrelationMatrixPanel({ onSelectTicker }: Props) {
   const [rangeDays, setRangeDays] = useState(180);
-  const [snapshot, setSnapshot] = useState<CorrelationMatrixSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<CorrelationMatrixSnapshot | null>(
+    null,
+  );
 
   useEffect(() => {
     setSnapshot(null);
@@ -34,8 +41,9 @@ export function CorrelationMatrixPanel() {
         <div>
           <div className="module-banner-title">Correlation Matrix</div>
           <div className="module-banner-sub">
-            How major asset classes are actually moving together right now — daily log-return
-            correlation across equities, rates, gold, oil, the dollar and vol.
+            How major asset classes are actually moving together right now —
+            daily log-return correlation across equities, rates, gold, oil, the
+            dollar and vol.
           </div>
         </div>
       </div>
@@ -73,15 +81,37 @@ export function CorrelationMatrixPanel() {
             <thead>
               <tr>
                 <th />
-                {snapshot.labels.map((label) => (
-                  <th key={label}>{label}</th>
+                {snapshot.labels.map((label, j) => (
+                  <th key={label}>
+                    {onSelectTicker ? (
+                      <button
+                        className="label-btn"
+                        onClick={() => onSelectTicker(snapshot.tickers[j])}
+                      >
+                        {label}
+                      </button>
+                    ) : (
+                      label
+                    )}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {snapshot.matrix.map((row, i) => (
                 <tr key={snapshot.tickers[i]}>
-                  <th scope="row">{snapshot.labels[i]}</th>
+                  <th scope="row">
+                    {onSelectTicker ? (
+                      <button
+                        className="label-btn"
+                        onClick={() => onSelectTicker(snapshot.tickers[i])}
+                      >
+                        {snapshot.labels[i]}
+                      </button>
+                    ) : (
+                      snapshot.labels[i]
+                    )}
+                  </th>
                   {row.map((value, j) => (
                     <td key={snapshot.tickers[j]} style={cellStyle(value)}>
                       {value.toFixed(2)}
@@ -95,9 +125,11 @@ export function CorrelationMatrixPanel() {
       )}
 
       <div className="note-banner">
-        Pearson correlation of daily log returns. +1 = move in lockstep, -1 = move in exact
-        opposition, 0 = no linear relationship. Correlations are not stable — they shift with the
-        macro regime, which is the point of checking this rather than assuming last year's diversification still holds.
+        Pearson correlation of daily log returns. +1 = move in lockstep, -1 =
+        move in exact opposition, 0 = no linear relationship. Correlations are
+        not stable — they shift with the macro regime, which is the point of
+        checking this rather than assuming last year's diversification still
+        holds.
       </div>
 
       <SourceFooter sources={["Yahoo Finance (daily closes, live)"]} />

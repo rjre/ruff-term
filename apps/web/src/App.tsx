@@ -378,7 +378,7 @@ export function App() {
       )}
       {view === "correlation" && (
         <div className="app-body-scroll">
-          <CorrelationMatrixPanel />
+          <CorrelationMatrixPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "scenario" && (
