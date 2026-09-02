@@ -16,7 +16,11 @@ function formatSignedPct(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
-export function FxPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function FxPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<FxSnapshot | null>(null);
 
   useEffect(() => {
@@ -44,7 +48,9 @@ export function FxPanel() {
           <div className="module-banner-title">FX</div>
           <div className="module-banner-sub">
             G10 spot grid, refreshing every 20s.
-            {snapshot ? ` Last update ${new Date(snapshot.asOf).toLocaleTimeString()}.` : ""}
+            {snapshot
+              ? ` Last update ${new Date(snapshot.asOf).toLocaleTimeString()}.`
+              : ""}
           </div>
         </div>
       </div>
@@ -63,7 +69,15 @@ export function FxPanel() {
           </thead>
           <tbody>
             {snapshot.g10.map((line) => (
-              <tr key={line.ticker}>
+              <tr
+                key={line.ticker}
+                className={
+                  onSelectTicker ? "screener-row-clickable" : undefined
+                }
+                onClick={
+                  onSelectTicker ? () => onSelectTicker(line.ticker) : undefined
+                }
+              >
                 <td className="ticker-cell">{line.pair}</td>
                 <td className="num-cell">{line.lastPrice.toFixed(4)}</td>
                 <td className={`num-cell ${pctClass(line.changePct1d)}`}>
@@ -76,9 +90,10 @@ export function FxPanel() {
       )}
 
       <div className="demo-banner" style={{ marginTop: 24 }}>
-        Vol surface: implied vol by tenor/delta lives behind Ruffer's own rjre/fx-data tool
-        (Citi Velocity's institutional FX API) — needs CITI_CLIENT_ID/CITI_CLIENT_SECRET, not
-        available in this environment. Placeholder shape below, not real numbers.
+        Vol surface: implied vol by tenor/delta lives behind Ruffer's own
+        rjre/fx-data tool (Citi Velocity's institutional FX API) — needs
+        CITI_CLIENT_ID/CITI_CLIENT_SECRET, not available in this environment.
+        Placeholder shape below, not real numbers.
       </div>
       <h3 className="section-heading">Vol surface (TBC)</h3>
       <table className="watchlist-table">

@@ -252,7 +252,7 @@ export function App() {
       )}
       {view === "ustActivity" && (
         <div className="app-body-scroll">
-          <UstActivityPanel />
+          <UstActivityPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "dividends" && (
@@ -272,7 +272,7 @@ export function App() {
       )}
       {view === "fx" && (
         <div className="app-body-scroll">
-          <FxPanel />
+          <FxPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "fmp" && (

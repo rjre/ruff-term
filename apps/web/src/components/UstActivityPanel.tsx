@@ -14,7 +14,11 @@ function formatSignedPct(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
-export function UstActivityPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function UstActivityPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<UstActivitySnapshot | null>(null);
 
   useEffect(() => {
@@ -31,8 +35,14 @@ export function UstActivityPanel() {
     );
   }
 
-  const subtypeLines = snapshot.demoVolumeBySubtype.map((l) => ({ label: l.label, pct: l.parValueBn }));
-  const maturityLines = snapshot.demoVolumeByMaturity.map((l) => ({ label: l.label, pct: l.parValueBn }));
+  const subtypeLines = snapshot.demoVolumeBySubtype.map((l) => ({
+    label: l.label,
+    pct: l.parValueBn,
+  }));
+  const maturityLines = snapshot.demoVolumeByMaturity.map((l) => ({
+    label: l.label,
+    pct: l.parValueBn,
+  }));
 
   return (
     <div className="module-view">
@@ -40,8 +50,8 @@ export function UstActivityPanel() {
         <div>
           <div className="module-banner-title">UST Trading Activity</div>
           <div className="module-banner-sub">
-            Live Treasury ETF proxies by maturity, plus an illustrative FINRA TRACE-style volume
-            breakdown.
+            Live Treasury ETF proxies by maturity, plus an illustrative FINRA
+            TRACE-style volume breakdown.
           </div>
         </div>
       </div>
@@ -58,10 +68,18 @@ export function UstActivityPanel() {
         </thead>
         <tbody>
           {snapshot.etfs.map((e) => (
-            <tr key={e.ticker}>
+            <tr
+              key={e.ticker}
+              className={onSelectTicker ? "screener-row-clickable" : undefined}
+              onClick={
+                onSelectTicker ? () => onSelectTicker(e.ticker) : undefined
+              }
+            >
               <td className="ticker-cell">{e.label}</td>
               <td className="num-cell">{e.lastPrice.toFixed(2)}</td>
-              <td className={`num-cell ${pctClass(e.changePct1d)}`}>{formatSignedPct(e.changePct1d)}</td>
+              <td className={`num-cell ${pctClass(e.changePct1d)}`}>
+                {formatSignedPct(e.changePct1d)}
+              </td>
               <td className="num-cell">{e.volume.toLocaleString()}</td>
             </tr>
           ))}
@@ -69,16 +87,25 @@ export function UstActivityPanel() {
       </table>
 
       <div className="demo-banner" style={{ marginTop: 20 }}>
-        DEMO DATA below — illustrative of FINRA TRACE Treasury aggregate reporting categories, not
-        real FINRA figures (that requires a FINRA account/API key).
+        DEMO DATA below — illustrative of FINRA TRACE Treasury aggregate
+        reporting categories, not real FINRA figures (that requires a FINRA
+        account/API key).
       </div>
       <div className="portfolio-grid">
         <section className="portfolio-section">
-          <h3 className="section-heading">Volume by security subtype ($bn par, illustrative)</h3>
-          <MagnitudeBarList lines={subtypeLines} hue="var(--ruffer-green-light)" unit="bn" />
+          <h3 className="section-heading">
+            Volume by security subtype ($bn par, illustrative)
+          </h3>
+          <MagnitudeBarList
+            lines={subtypeLines}
+            hue="var(--ruffer-green-light)"
+            unit="bn"
+          />
         </section>
         <section className="portfolio-section">
-          <h3 className="section-heading">Volume by maturity bucket ($bn par, illustrative)</h3>
+          <h3 className="section-heading">
+            Volume by maturity bucket ($bn par, illustrative)
+          </h3>
           <MagnitudeBarList lines={maturityLines} hue="#2a78d6" unit="bn" />
         </section>
       </div>
