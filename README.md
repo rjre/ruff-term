@@ -187,8 +187,10 @@ to CSV.
   picked by eye.
 - Most data tables (Watchlist, Screener, CFTC Positioning, Short Position
   Data, Ownership & Insider, Dividends & Corp Actions, Correlation Matrix,
-  and the price chart itself) have an "Export CSV" button for pulling the
-  current view into Excel.
+  Bond Auctions, Central Bank Balance Sheets, Portfolio Activity, and the
+  price chart itself) have an "Export CSV" button for pulling the current
+  view into Excel. Financial Headlines and RNS Newsfeed have a keyword
+  filter box instead, for narrowing a long list rather than exporting it.
 
 ## Scripts
 
