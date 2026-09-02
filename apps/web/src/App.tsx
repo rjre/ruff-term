@@ -62,14 +62,34 @@ export function App() {
   );
   const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
   const [dataSource, setDataSource] = useState<string | null>(null);
+  const [backendUnreachable, setBackendUnreachable] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
+  // Poll health so a "backend is down" banner both appears and clears itself
+  // automatically — useful during local dev restarts, not just first load.
   useEffect(() => {
-    fetch("/api/health")
-      .then((r) => r.json())
-      .then((data) => setDataSource(data.dataSource))
-      .catch(() => setDataSource(null));
+    let cancelled = false;
+    function checkHealth() {
+      fetch("/api/health")
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+          setDataSource(data.dataSource);
+          setBackendUnreachable(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setDataSource(null);
+          setBackendUnreachable(true);
+        });
+    }
+    checkHealth();
+    const interval = setInterval(checkHealth, 15_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   // Keep the URL shareable: #view for the active tab, ?t= for the selected
@@ -180,6 +200,13 @@ export function App() {
         </div>
       </header>
       <NavTabs active={view} onSelect={setView} />
+      {backendUnreachable && (
+        <div className="backend-down-banner">
+          Can't reach the Ruff Term backend at <code>/api</code> — is{" "}
+          <code>npm run dev</code> (or the server workspace) running? Retrying
+          every 15s.
+        </div>
+      )}
       <CommandPalette
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}

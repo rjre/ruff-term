@@ -713,6 +713,23 @@ body {
   margin-bottom: 16px;
 }
 
+.backend-down-banner {
+  background: var(--down);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 12px;
+}
+
+.backend-down-banner code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
 .note-banner {
   background: var(--note-bg);
   border: 1px solid var(--note-border);
