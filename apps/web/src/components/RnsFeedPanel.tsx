@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
 import { fetchRns } from "../api/client";
 import { SentimentDot } from "./SentimentDot";
@@ -15,6 +15,7 @@ function timeAgo(iso: string): string {
 
 export function RnsFeedPanel() {
   const [items, setItems] = useState<NewsItem[] | null>(null);
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     fetchRns()
@@ -22,12 +23,24 @@ export function RnsFeedPanel() {
       .catch(() => setItems([]));
   }, []);
 
+  const filtered = useMemo(() => {
+    if (!items) return items;
+    const q = filter.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter(
+      (item) =>
+        item.headline.toLowerCase().includes(q) ||
+        item.tickers.some((t) => t.toLowerCase().includes(q)),
+    );
+  }, [items, filter]);
+
   return (
     <div className="module-view">
       <div className="demo-banner">
-        Not the official LSE RNS feed — there is no free/keyless RNS API. This is general company
-        news for large UK-listed names via Yahoo, as a working stand-in. Real regulatory RNS filings
-        need a licensed source (LSEG RNS, ticker.app, or Investegate's API).
+        Not the official LSE RNS feed — there is no free/keyless RNS API. This
+        is general company news for large UK-listed names via Yahoo, as a
+        working stand-in. Real regulatory RNS filings need a licensed source
+        (LSEG RNS, ticker.app, or Investegate's API).
       </div>
       <div className="module-banner">
         <div>
@@ -35,13 +48,29 @@ export function RnsFeedPanel() {
           <div className="module-banner-sub">UK-listed company news.</div>
         </div>
       </div>
+      {items !== null && items.length > 0 && (
+        <div className="screener-toolbar">
+          <input
+            className="search-input"
+            style={{ maxWidth: 280 }}
+            placeholder="Filter by headline or ticker…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+          <span className="screener-count">
+            {filtered?.length ?? 0} of {items.length}
+          </span>
+        </div>
+      )}
       {items === null ? (
         <div className="empty-state">Loading…</div>
       ) : items.length === 0 ? (
         <div className="empty-state">No news available.</div>
+      ) : filtered?.length === 0 ? (
+        <div className="empty-state">No headlines match "{filter}".</div>
       ) : (
         <ul className="news-list">
-          {items.map((item) => (
+          {filtered?.map((item) => (
             <li key={item.id} className="news-item">
               <a href={item.url} target="_blank" rel="noreferrer">
                 <SentimentDot headline={item.headline} />
@@ -55,7 +84,9 @@ export function RnsFeedPanel() {
           ))}
         </ul>
       )}
-      <SourceFooter sources={["Yahoo Finance (company news, not official RNS)"]} />
+      <SourceFooter
+        sources={["Yahoo Finance (company news, not official RNS)"]}
+      />
     </div>
   );
 }
