@@ -211,6 +211,49 @@ body {
   min-height: 0;
 }
 
+/* Price chart toolbar */
+
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chart-compare {
+  margin-left: auto;
+}
+
+.chart-compare-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 2px 4px 2px 8px;
+}
+
+.chart-compare-remove {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
 .right-column {
   display: grid;
   grid-template-rows: 1fr 1fr;
