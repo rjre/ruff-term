@@ -32,10 +32,6 @@ const ITEMS: TodoItem[] = [
     title: "Real Excel plugin",
     note: "FactSet/Bloomberg's =FDS(...)-style Excel formulas. Not something a free/keyless data layer can replicate — paid-provider territory, flagged honestly rather than faked.",
   },
-  {
-    title: "Live sync for GH-repo-sourced tabs",
-    note: "NAV Monitoring and Podcast Monitor are frozen snapshots taken once from rjre/nav-monitoring- and rjre/podcast-monitor (those repos don't publish a live Pages site to iframe, unlike Fed Voting/Statement). A push to either repo won't show up here until the snapshot is manually regenerated.",
-  },
 ];
 
 export function TodoPanel() {

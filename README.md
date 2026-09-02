@@ -48,8 +48,8 @@ placeholder sections requested along the way.
 | Historic Pricing | Dummy MSFT chart back to Nov 2021 — intended source: Aladdin |
 | Live Orders | Placeholder order blotter — dataset used elsewhere, dashboard replica |
 | Financial Headlines | Broad market news via Yahoo, unfiltered |
-| NAV Monitoring | UK investment trust premium/discount snapshot copied from `rjre/nav-monitoring-`'s committed data (not that repo's live roll-forward estimate) |
-| Podcast Monitor | Stock/sector mention volume, sentiment and momentum, snapshot copied from `rjre/podcast-monitor`'s committed `aggregates.json` |
+| NAV Monitoring | UK investment trust premium/discount snapshot derived from `rjre/nav-monitoring-`'s committed data (not that repo's live roll-forward estimate), auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
+| Podcast Monitor | Stock/sector mention volume, sentiment and momentum, derived from `rjre/podcast-monitor`'s committed `aggregates.json`, auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
 | Fed Voting | `rjre/fed-voting`, embedded live via iframe (already deployed to GitHub Pages) |
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
@@ -71,6 +71,20 @@ it isn't embedded live like the two Fed tabs.
 Anything marked "demo" or "placeholder" is clearly labeled in the UI itself,
 not just here. Every tab also shows a "Source(s):" line at the bottom stating
 exactly what powers it.
+
+### Keeping the GH-repo snapshots fresh
+
+`rjre/nav-monitoring-` and `rjre/podcast-monitor` are private repos with no
+public raw-file access, so the NAV Monitoring and Podcast Monitor tabs can't
+poll them live at request time the way the Yahoo/BoE/FCA/CFTC/SEC/FRED tabs
+do. Instead, `scripts/refresh-external-snapshots.mjs` pulls each source
+repo's latest commit and regenerates
+`apps/server/src/data/navMonitoringSnapshot.json` /
+`podcastMonitorAggregates.json` from their current data. A daily scheduled
+job runs it (in a fresh session, with both source repos re-cloned) and
+pushes to `main` only when the regenerated snapshot actually changed. Run it
+by hand any time with `npm run refresh:external` (needs both source repos
+cloned locally with pull access; see the script's header comment).
 
 ### On UK gilts
 
