@@ -473,6 +473,27 @@ body {
   color: var(--accent);
 }
 
+.sentiment-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 7px;
+  flex-shrink: 0;
+}
+
+.sentiment-positive {
+  background: var(--up);
+}
+
+.sentiment-negative {
+  background: var(--down);
+}
+
+.sentiment-neutral {
+  background: var(--text-faint);
+}
+
 .news-meta {
   color: var(--text-faint);
   font-size: 10px;

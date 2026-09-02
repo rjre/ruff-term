@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
 import { fetchNews, fetchPortfolioNews } from "../api/client";
+import { SentimentDot } from "./SentimentDot";
 
 interface Props {
   ticker: string | null;
@@ -70,6 +71,7 @@ export function NewsFeed({ ticker, watchlistTickers }: Props) {
             {news.map((item) => (
               <li key={item.id} className="news-item">
                 <a href={item.url} target="_blank" rel="noreferrer">
+                  <SentimentDot headline={item.headline} />
                   {item.headline}
                 </a>
                 <div className="news-meta">

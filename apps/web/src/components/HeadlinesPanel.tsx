@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
 import { fetchNews } from "../api/client";
+import { SentimentDot } from "./SentimentDot";
 import { SourceFooter } from "./SourceFooter";
 
 function timeAgo(iso: string): string {
@@ -26,7 +27,10 @@ export function HeadlinesPanel() {
       <div className="module-banner">
         <div>
           <div className="module-banner-title">Financial Headlines</div>
-          <div className="module-banner-sub">Broad market news, not filtered to any one ticker.</div>
+          <div className="module-banner-sub">
+            Broad market news, not filtered to any one ticker. The colored dot is a rough
+            keyword-based tone read, not real sentiment analysis.
+          </div>
         </div>
       </div>
       {items === null ? (
@@ -38,6 +42,7 @@ export function HeadlinesPanel() {
           {items.map((item) => (
             <li key={item.id} className="news-item">
               <a href={item.url} target="_blank" rel="noreferrer">
+                <SentimentDot headline={item.headline} />
                 {item.headline}
               </a>
               <div className="news-meta">

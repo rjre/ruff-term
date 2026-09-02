@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChartsOfTheDaySnapshot, NewsItem, ScreenerRow, WatchlistQuote } from "@ruff-term/shared";
 import { fetchChartsOfTheDay, fetchNews, fetchScreener, fetchWatchlist } from "../api/client";
+import { SentimentDot } from "./SentimentDot";
 import { SourceFooter } from "./SourceFooter";
 
 function pctClass(value: number): string {
@@ -136,6 +137,7 @@ export function MorningBriefPanel() {
             {headlines.map((item) => (
               <li key={item.id} className="news-item">
                 <a href={item.url} target="_blank" rel="noreferrer">
+                  <SentimentDot headline={item.headline} />
                   {item.headline}
                 </a>
                 <div className="news-meta">
