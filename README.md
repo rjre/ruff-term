@@ -67,7 +67,7 @@ markup, not guessed:
 | RNS Newsfeed | UK-listed company news via Yahoo, with a rough keyword-based tone dot per headline — not the official LSE RNS feed (no free/keyless RNS API exists; real regulatory filings need a licensed source like LSEG RNS, ticker.app, or Investegate's API) |
 | Portfolio Activity | Demo week-to-date trading actions log |
 | UST Activity | Live Treasury ETF proxies + illustrative FINRA TRACE-style volume breakdown |
-| Dividends & Corp Actions | Placeholder — to source from Aladdin |
+| Dividends & Corp Actions | Real dividend payment history (last 6 payments + a rough "next expected" projection) for the default watchlist names, live via Yahoo's chart endpoint. This is the watchlist's own history, not Ruffer's actual holdings calendar — that still needs Aladdin |
 | Aladdin Explore | Placeholder for portfolio views/attribution/holdings charts, for users without Aladdin Explore access |
 | JD Sleeve | Demo sleeve holdings with fabricated weights/values |
 | FX | Live G10 spot grid; vol surface is a placeholder (needs Citi Velocity credentials via `rjre/fx-data`) |
@@ -84,7 +84,7 @@ markup, not guessed:
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
 | Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
-| Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS |
+| Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Price alerts fire once then deactivate. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS, though an optional Notification API hook can show a real desktop notification |
 | Short Position Data | UK aggregate net short position disclosures at/above the 0.5% threshold, live via the FCA's public CSVs (current + historic) |
 | Ownership & Insider | Section 16 insider transactions (Form 4) for the US-listed watchlist names, live via SEC EDGAR. Foreign private issuers (SFL, South Bow) are exempt and show no rows |
 | Central Bank Balance Sheets | Fed / ECB / BoJ total assets, live via FRED. BoE omitted — no equivalent free machine-readable weekly series found |
@@ -164,19 +164,31 @@ and briefly flashes a price cell when it moves. The default seed watchlist
 spans real tickers across Amsterdam, US, Hong Kong, Australia, Paris,
 Copenhagen, Tokyo, and Toronto — verified to resolve against Yahoo. Supports
 multiple named, saved watchlists (per-browser, via `localStorage`) for
-organizing by book or theme; add/remove tickers via search.
+organizing by book or theme; add/remove tickers via search. Click any column
+header to sort (click again to flip direction), and export the current view
+to CSV.
 
 ## Navigating
 
 - Press **/** anywhere to jump into the ticker search (same convention as
   Slack/Linear/GitHub).
+- Press **Ctrl/Cmd+K** (or click "Jump to tab" in the header) to open a
+  fuzzy-filterable command palette listing all 38 top-level tabs — the fast
+  path since the nav bar itself needs horizontal scrolling to reach the
+  later tabs.
 - The active tab lives in the URL (`#macro`), and the selected Markets
   ticker in `?t=` — `/?t=MSFT#markets` opens straight to that chart, so a
   link is shareable even if the recipient's own watchlist doesn't have that
-  ticker.
+  ticker. This works live too: pasting a different `#tab` hash while the app
+  is already open (or browser back/forward) switches tabs immediately, no
+  reload needed.
 - Chart/categorical colors are drawn from a validated, colorblind-safe
   palette (see `apps/web/src/components/PortfolioPanel.tsx`) rather than
   picked by eye.
+- Most data tables (Watchlist, Screener, CFTC Positioning, Short Position
+  Data, Ownership & Insider, Dividends & Corp Actions, Correlation Matrix,
+  and the price chart itself) have an "Export CSV" button for pulling the
+  current view into Excel.
 
 ## Scripts
 
