@@ -15,6 +15,13 @@ placeholder sections requested along the way.
   Ruffer's own licensed data feeds later by replacing
   `apps/server/src/marketData.ts` / `apps/server/src/yahoo/client.ts` — the
   rest of the app only depends on the `@ruff-term/shared` types.
+- **Refresh cadence:** prices are intraday, not end-of-day — the Watchlist
+  polls the API every 30s, and the server itself caches each quote for 20s
+  (`marketData.ts`'s `quoteCache`) before re-pulling from Yahoo. Yahoo's free
+  endpoint is ~15 minutes delayed (same as the public finance.yahoo.com site),
+  not tick-by-tick real-time. Once a market's closed, the price holds at the
+  last print and gets a small "c" (close) suffix once the quote is more than
+  20 minutes old, so a closed market reads as a close, not a stale live tick.
 - **Optional:** set `ANTHROPIC_API_KEY` to unlock live Claude-generated
   "Ruffer Impact" news reframing; without it, a rule-based heuristic fallback
   is used.
