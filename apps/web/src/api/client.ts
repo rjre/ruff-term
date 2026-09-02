@@ -4,11 +4,14 @@ import type {
   HistoryResponse,
   ImpactedNewsItem,
   MacroSnapshot,
+  NavMonitoringSnapshot,
   NewsItem,
+  PodcastMonitorSnapshot,
   PortfolioActivitySnapshot,
   PortfolioSnapshot,
   ResearchItem,
   SearchResult,
+  UkGiltYieldSnapshot,
   UstActivitySnapshot,
   WatchlistQuote,
 } from "@ruff-term/shared";
@@ -81,4 +84,16 @@ export function fetchCommodities(): Promise<MacroSnapshot> {
 
 export function fetchRns(): Promise<NewsItem[]> {
   return getJson("/api/rns");
+}
+
+export function fetchUkGiltYields(): Promise<UkGiltYieldSnapshot> {
+  return getJson("/api/uk-gilt-yields");
+}
+
+export function fetchNavMonitoring(): Promise<NavMonitoringSnapshot> {
+  return getJson("/api/nav-monitoring");
+}
+
+export function fetchPodcastMonitor(): Promise<PodcastMonitorSnapshot> {
+  return getJson("/api/podcast-monitor");
 }

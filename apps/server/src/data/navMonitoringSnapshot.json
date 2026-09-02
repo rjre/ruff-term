@@ -1,0 +1,661 @@
+{
+  "lastRefreshed": "2026-08-25 20:23 UTC",
+  "companies": [
+    {
+      "ticker": "3IN",
+      "name": "3i Infrastructure",
+      "navPence": 403.16,
+      "navDate": "2026-08-06",
+      "sharePricePence": 384.5,
+      "discountPct": -4.63
+    },
+    {
+      "ticker": "AAS",
+      "name": "Aberdeen Asia Focus",
+      "navPence": 488.98,
+      "navDate": "2026-08-06",
+      "sharePricePence": 447.0,
+      "discountPct": -8.59
+    },
+    {
+      "ticker": "AGT",
+      "name": "AGT",
+      "navPence": 281.37,
+      "navDate": "2026-08-06",
+      "sharePricePence": 263.5,
+      "discountPct": -6.35
+    },
+    {
+      "ticker": "AIE",
+      "name": "Ashoka India Equity Investment Trust",
+      "navPence": 267.34,
+      "navDate": "2026-08-06",
+      "sharePricePence": 256.5,
+      "discountPct": -4.06
+    },
+    {
+      "ticker": "ALW",
+      "name": "Alliance Witan",
+      "navPence": 1451.46,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1383.0,
+      "discountPct": -4.72
+    },
+    {
+      "ticker": "ASL",
+      "name": "Aberforth Smaller Companies Trust",
+      "navPence": 1935.9,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1708.0,
+      "discountPct": -11.77
+    },
+    {
+      "ticker": "ATR",
+      "name": "Schroder Asian Total Return Investment Company",
+      "navPence": 712.15,
+      "navDate": "2026-08-06",
+      "sharePricePence": 704.0,
+      "discountPct": -1.14
+    },
+    {
+      "ticker": "ATT",
+      "name": "Allianz Technology Trust",
+      "navPence": 760.78,
+      "navDate": "2026-08-06",
+      "sharePricePence": 712.0,
+      "discountPct": -6.41
+    },
+    {
+      "ticker": "BGFD",
+      "name": "Baillie Gifford Japan Trust",
+      "navPence": 1157.19,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1080.0,
+      "discountPct": -6.67
+    },
+    {
+      "ticker": "BHMG",
+      "name": "BHMG",
+      "navPence": 444.0,
+      "navDate": "2026-07-16",
+      "sharePricePence": 423.0,
+      "discountPct": -4.73
+    },
+    {
+      "ticker": "BNKR",
+      "name": "Bankers Investment Trust",
+      "navPence": 165.68,
+      "navDate": "2026-08-06",
+      "sharePricePence": 152.6,
+      "discountPct": -7.9
+    },
+    {
+      "ticker": "BRGE",
+      "name": "BlackRock Greater Europe Investment Trust",
+      "navPence": 653.94,
+      "navDate": "2026-08-06",
+      "sharePricePence": 611.0,
+      "discountPct": -6.57
+    },
+    {
+      "ticker": "BRSC",
+      "name": "BlackRock Smaller Companies Trust",
+      "navPence": 317.7,
+      "navDate": "2026-08-06",
+      "sharePricePence": 279.5,
+      "discountPct": -12.02
+    },
+    {
+      "ticker": "BRWM",
+      "name": "BlackRock World Mining Trust",
+      "navPence": 969.06,
+      "navDate": "2026-08-06",
+      "sharePricePence": 952.0,
+      "discountPct": -1.76
+    },
+    {
+      "ticker": "BSIF",
+      "name": "Bluefield Solar Income Fund",
+      "navPence": 102.27,
+      "navDate": "2026-07-30",
+      "sharePricePence": 92.2,
+      "discountPct": -9.85
+    },
+    {
+      "ticker": "CGT",
+      "name": "Capital Gearing Trust",
+      "navPence": 518.75,
+      "navDate": "2026-08-06",
+      "sharePricePence": 529.0,
+      "discountPct": 1.98
+    },
+    {
+      "ticker": "CLDN",
+      "name": "CLDN",
+      "navPence": 594.26,
+      "navDate": "2026-08-06",
+      "sharePricePence": 388.0,
+      "discountPct": -34.71
+    },
+    {
+      "ticker": "CORD",
+      "name": "Cordiant Digital Infrastructure",
+      "navPence": 145.29,
+      "navDate": "2026-08-06",
+      "sharePricePence": 124.0,
+      "discountPct": -14.65
+    },
+    {
+      "ticker": "CTY",
+      "name": "City of London Investment Trust",
+      "navPence": 581.17,
+      "navDate": "2026-08-06",
+      "sharePricePence": 593.0,
+      "discountPct": 2.04
+    },
+    {
+      "ticker": "EDIN",
+      "name": "Edinburgh Investment Trust",
+      "navPence": 925.91,
+      "navDate": "2026-08-06",
+      "sharePricePence": 856.0,
+      "discountPct": -7.55
+    },
+    {
+      "ticker": "ESCT",
+      "name": "European Smaller Companies Trust",
+      "navPence": 258.16,
+      "navDate": "2026-08-06",
+      "sharePricePence": 239.0,
+      "discountPct": -7.42
+    },
+    {
+      "ticker": "EWI",
+      "name": "Edinburgh Worldwide Investment Trust",
+      "navPence": 266.22,
+      "navDate": "2026-08-06",
+      "sharePricePence": 240.0,
+      "discountPct": -9.85
+    },
+    {
+      "ticker": "FCIT",
+      "name": "F&C Investment Trust",
+      "navPence": 374.95,
+      "navDate": "2026-08-06",
+      "sharePricePence": 343.4,
+      "discountPct": -8.41
+    },
+    {
+      "ticker": "FCSS",
+      "name": "Fidelity China Special Situations",
+      "navPence": 283.82,
+      "navDate": "2026-08-06",
+      "sharePricePence": 264.0,
+      "discountPct": -6.98
+    },
+    {
+      "ticker": "FEML",
+      "name": "Fidelity Emerging Markets",
+      "navPence": 1512.6,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1430.0,
+      "discountPct": -5.46
+    },
+    {
+      "ticker": "FEV",
+      "name": "Fidelity European Trust",
+      "navPence": 462.65,
+      "navDate": "2026-08-06",
+      "sharePricePence": 441.0,
+      "discountPct": -4.68
+    },
+    {
+      "ticker": "FGEN",
+      "name": "Foresight Environmental Infrastructure",
+      "navPence": 106.01,
+      "navDate": "2026-08-06",
+      "sharePricePence": 86.5,
+      "discountPct": -18.41
+    },
+    {
+      "ticker": "FSV",
+      "name": "Fidelity Special Values",
+      "navPence": 467.03,
+      "navDate": "2026-08-06",
+      "sharePricePence": 470.0,
+      "discountPct": 0.64
+    },
+    {
+      "ticker": "GSCT",
+      "name": "Global Smaller Companies Trust",
+      "navPence": 205.31,
+      "navDate": "2026-08-06",
+      "sharePricePence": 195.8,
+      "discountPct": -4.63
+    },
+    {
+      "ticker": "HANA",
+      "name": "Hansa Investment Company",
+      "navPence": 533.95,
+      "navDate": "2026-07-30",
+      "sharePricePence": 328.0,
+      "discountPct": -38.57
+    },
+    {
+      "ticker": "HFEL",
+      "name": "Henderson Far East Income",
+      "navPence": 244.81,
+      "navDate": "2026-08-06",
+      "sharePricePence": 257.5,
+      "discountPct": 5.18
+    },
+    {
+      "ticker": "HGT",
+      "name": "Hg Capital Trust",
+      "navPence": 529.78,
+      "navDate": "2026-08-06",
+      "sharePricePence": 391.0,
+      "discountPct": -26.2
+    },
+    {
+      "ticker": "HICL",
+      "name": "HICL Infrastructure Company",
+      "navPence": 161.05,
+      "navDate": "2026-08-06",
+      "sharePricePence": 138.8,
+      "discountPct": -13.82
+    },
+    {
+      "ticker": "HRI",
+      "name": "Herald Investment Trust",
+      "navPence": 3308.8,
+      "navDate": "2026-08-06",
+      "sharePricePence": 3035.0,
+      "discountPct": -8.27
+    },
+    {
+      "ticker": "HSL",
+      "name": "Henderson Smaller Companies Investment Trust",
+      "navPence": 1076.49,
+      "navDate": "2026-08-06",
+      "sharePricePence": 988.0,
+      "discountPct": -8.22
+    },
+    {
+      "ticker": "IAD",
+      "name": "Invesco Asia Dragon Trust",
+      "navPence": 522.46,
+      "navDate": "2026-08-06",
+      "sharePricePence": 493.0,
+      "discountPct": -5.64
+    },
+    {
+      "ticker": "ICGT",
+      "name": "ICG Enterprise Trust",
+      "navPence": 2034.61,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1468.0,
+      "discountPct": -27.85
+    },
+    {
+      "ticker": "III",
+      "name": "3i Group",
+      "navPence": 3131.0,
+      "navDate": "2026-06-30",
+      "sharePricePence": 2486.0,
+      "discountPct": -20.6
+    },
+    {
+      "ticker": "JAM",
+      "name": "JPMorgan American Investment Trust",
+      "navPence": 1283.18,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1244.0,
+      "discountPct": -3.05
+    },
+    {
+      "ticker": "JCH",
+      "name": "JPMorgan Claverhouse Investment Trust",
+      "navPence": 989.97,
+      "navDate": "2026-08-06",
+      "sharePricePence": 978.0,
+      "discountPct": -1.21
+    },
+    {
+      "ticker": "JEDT",
+      "name": "JPMorgan European Discovery",
+      "navPence": 687.82,
+      "navDate": "2026-08-06",
+      "sharePricePence": 633.0,
+      "discountPct": -7.97
+    },
+    {
+      "ticker": "JEGI",
+      "name": "JPMorgan European Growth & Income",
+      "navPence": 151.34,
+      "navDate": "2026-08-06",
+      "sharePricePence": 150.0,
+      "discountPct": -0.89
+    },
+    {
+      "ticker": "JEMI",
+      "name": "JPMorgan Emerging Markets Dividend Income",
+      "navPence": 220.59,
+      "navDate": "2026-08-06",
+      "sharePricePence": 204.0,
+      "discountPct": -7.52
+    },
+    {
+      "ticker": "JFJ",
+      "name": "JPMorgan Japanese Investment Trust",
+      "navPence": 879.7,
+      "navDate": "2026-08-06",
+      "sharePricePence": 836.0,
+      "discountPct": -4.97
+    },
+    {
+      "ticker": "JGGI",
+      "name": "JPMorgan Global Growth & Income",
+      "navPence": 636.57,
+      "navDate": "2026-08-06",
+      "sharePricePence": 636.0,
+      "discountPct": -0.09
+    },
+    {
+      "ticker": "JIGI",
+      "name": "JIGI",
+      "navPence": 947.12,
+      "navDate": "2026-07-08",
+      "sharePricePence": 885.0,
+      "discountPct": -6.75
+    },
+    {
+      "ticker": "JMGI",
+      "name": "JPMorgan Emerging Markets Growth & Income",
+      "navPence": 175.91,
+      "navDate": "2026-08-06",
+      "sharePricePence": 163.4,
+      "discountPct": -7.11
+    },
+    {
+      "ticker": "LWDB",
+      "name": "Law Debenture",
+      "navPence": 1236.64,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1266.0,
+      "discountPct": 2.37
+    },
+    {
+      "ticker": "MIGO",
+      "name": "MIGO",
+      "navPence": 428.16,
+      "navDate": "2026-07-08",
+      "sharePricePence": 408.0,
+      "discountPct": -4.34
+    },
+    {
+      "ticker": "MNKS",
+      "name": "Monks Investment Trust",
+      "navPence": 1701.28,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1614.0,
+      "discountPct": -5.13
+    },
+    {
+      "ticker": "MNTN",
+      "name": "Schiehallion Fund",
+      "navPence": 2.36,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1.95,
+      "discountPct": -17.52
+    },
+    {
+      "ticker": "MRC",
+      "name": "Mercantile Investment Trust",
+      "navPence": 316.06,
+      "navDate": "2026-08-06",
+      "sharePricePence": 285.0,
+      "discountPct": -9.83
+    },
+    {
+      "ticker": "MRCH",
+      "name": "Merchants Trust",
+      "navPence": 716.08,
+      "navDate": "2026-08-06",
+      "sharePricePence": 680.0,
+      "discountPct": -5.04
+    },
+    {
+      "ticker": "MUT",
+      "name": "Murray Income Trust",
+      "navPence": 1083.67,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1010.0,
+      "discountPct": -6.8
+    },
+    {
+      "ticker": "MYI",
+      "name": "Murray International Trust",
+      "navPence": 364.2,
+      "navDate": "2026-08-06",
+      "sharePricePence": 369.5,
+      "discountPct": 1.46
+    },
+    {
+      "ticker": "NAS",
+      "name": "North Atlantic Smaller Companies Investment Trust",
+      "navPence": null,
+      "navDate": "2026-07-31",
+      "sharePricePence": 420.0,
+      "discountPct": null
+    },
+    {
+      "ticker": "NSI",
+      "name": "NSI",
+      "navPence": 203.19,
+      "navDate": "2026-06-30",
+      "sharePricePence": 136.0,
+      "discountPct": -33.07
+    },
+    {
+      "ticker": "OCI",
+      "name": "Oakley Capital Investments",
+      "navPence": 782.45,
+      "navDate": "2026-08-06",
+      "sharePricePence": 530.0,
+      "discountPct": -32.26
+    },
+    {
+      "ticker": "PCGH",
+      "name": "Polar Capital Global Healthcare Trust",
+      "navPence": 435.96,
+      "navDate": "2026-08-06",
+      "sharePricePence": 442.5,
+      "discountPct": 1.5
+    },
+    {
+      "ticker": "PCT",
+      "name": "Polar Capital Technology Trust",
+      "navPence": 712.86,
+      "navDate": "2026-08-06",
+      "sharePricePence": 669.0,
+      "discountPct": -6.15
+    },
+    {
+      "ticker": "PEY",
+      "name": "Partners Group Private Equity",
+      "navPence": 1014.57,
+      "navDate": "2026-08-06",
+      "sharePricePence": 615.25,
+      "discountPct": -39.36
+    },
+    {
+      "ticker": "PHI",
+      "name": "Pacific Horizon Investment Trust",
+      "navPence": 1175.19,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1090.0,
+      "discountPct": -7.25
+    },
+    {
+      "ticker": "PINT",
+      "name": "Pantheon Infrastructure",
+      "navPence": 126.35,
+      "navDate": "2026-08-06",
+      "sharePricePence": 112.2,
+      "discountPct": -11.2
+    },
+    {
+      "ticker": "PNL",
+      "name": "Personal Assets Trust",
+      "navPence": 552.24,
+      "navDate": "2026-08-06",
+      "sharePricePence": 552.0,
+      "discountPct": -0.04
+    },
+    {
+      "ticker": "PPET",
+      "name": "Patria Private Equity Trust",
+      "navPence": 864.45,
+      "navDate": "2026-08-06",
+      "sharePricePence": 600.0,
+      "discountPct": -30.59
+    },
+    {
+      "ticker": "PSH",
+      "name": "PSH",
+      "navPence": 5721.0,
+      "navDate": "2026-08-06",
+      "sharePricePence": 3904.0,
+      "discountPct": -31.76
+    },
+    {
+      "ticker": "RCP",
+      "name": "RCP",
+      "navPence": 3159,
+      "navDate": "2026-06-30",
+      "sharePricePence": 2290.0,
+      "discountPct": -27.51
+    },
+    {
+      "ticker": "RICA",
+      "name": "RICA",
+      "navPence": 309.34,
+      "navDate": "2026-08-06",
+      "sharePricePence": 298.5,
+      "discountPct": -3.5
+    },
+    {
+      "ticker": "RMMC",
+      "name": "RMMC",
+      "navPence": 279.25,
+      "navDate": "2026-08-06",
+      "sharePricePence": 241.0,
+      "discountPct": -13.7
+    },
+    {
+      "ticker": "RTW",
+      "name": "RTW Biotech Opportunities",
+      "navPence": 2.86,
+      "navDate": "2026-08-06",
+      "sharePricePence": 2.49,
+      "discountPct": -12.94
+    },
+    {
+      "ticker": "SAIN",
+      "name": "Scottish American Investment Company",
+      "navPence": 605.36,
+      "navDate": "2026-08-06",
+      "sharePricePence": 565.0,
+      "discountPct": -6.67
+    },
+    {
+      "ticker": "SDP",
+      "name": "Schroder AsiaPacific Fund",
+      "navPence": 897.38,
+      "navDate": "2026-08-06",
+      "sharePricePence": 826.0,
+      "discountPct": -7.95
+    },
+    {
+      "ticker": "SMT",
+      "name": "Scottish Mortgage Investment Trust",
+      "navPence": 1516.17,
+      "navDate": "2026-08-06",
+      "sharePricePence": 1364.5,
+      "discountPct": -10.0
+    },
+    {
+      "ticker": "SSIT",
+      "name": "Seraphim Space Investment Trust",
+      "navPence": 177.63,
+      "navDate": "2026-08-06",
+      "sharePricePence": 182.0,
+      "discountPct": 2.46
+    },
+    {
+      "ticker": "TEM",
+      "name": "Templeton Emerging Markets Investment Trust",
+      "navPence": 334.99,
+      "navDate": "2026-08-06",
+      "sharePricePence": 312.5,
+      "discountPct": -6.71
+    },
+    {
+      "ticker": "TFIF",
+      "name": "TwentyFour Income Fund",
+      "navPence": 105.92,
+      "navDate": "2026-08-06",
+      "sharePricePence": 108.0,
+      "discountPct": 1.96
+    },
+    {
+      "ticker": "TMPL",
+      "name": "Temple Bar Investment Trust",
+      "navPence": 421.23,
+      "navDate": "2026-08-06",
+      "sharePricePence": 426.0,
+      "discountPct": 1.13
+    },
+    {
+      "ticker": "TRIG",
+      "name": "The Renewables Infrastructure Group",
+      "navPence": 104.87,
+      "navDate": "2026-08-06",
+      "sharePricePence": 77.0,
+      "discountPct": -26.58
+    },
+    {
+      "ticker": "TRY",
+      "name": "TR Property Investment Trust",
+      "navPence": 347.72,
+      "navDate": "2026-08-06",
+      "sharePricePence": 317.0,
+      "discountPct": -8.83
+    },
+    {
+      "ticker": "UEM",
+      "name": "Utilico Emerging Markets",
+      "navPence": 318.89,
+      "navDate": "2026-08-06",
+      "sharePricePence": 290.0,
+      "discountPct": -9.06
+    },
+    {
+      "ticker": "USA",
+      "name": "Baillie Gifford US Growth Trust",
+      "navPence": 346.88,
+      "navDate": "2026-08-06",
+      "sharePricePence": 312.5,
+      "discountPct": -9.91
+    },
+    {
+      "ticker": "WWH",
+      "name": "Worldwide Healthcare Trust",
+      "navPence": 410.55,
+      "navDate": "2026-08-06",
+      "sharePricePence": 378.0,
+      "discountPct": -7.93
+    }
+  ]
+}

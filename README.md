@@ -20,6 +20,10 @@ placeholder sections requested along the way.
   is used.
 - **Not yet built:** auth/user accounts, real Ruffer holdings integration
   (Aladdin), FINRA TRACE / Citi Velocity credentials.
+- **UK gilt yields are real**, not a proxy: `apps/server/src/ukGilts.ts` pulls
+  the Bank of England's own daily nominal spot-curve publication (a stable,
+  keyless URL, updated each business day) and parses the actual 2/5/10/30yr
+  yields out of the bundled Excel workbook.
 
 ## Tabs
 
@@ -43,7 +47,16 @@ placeholder sections requested along the way.
 | Events | Placeholder for earnings/trading statements/calls |
 | Historic Pricing | Dummy MSFT chart back to Nov 2021 — intended source: Aladdin |
 | Live Orders | Placeholder order blotter — dataset used elsewhere, dashboard replica |
+| Financial Headlines | Broad market news via Yahoo, unfiltered |
+| NAV Monitoring | UK investment trust premium/discount snapshot copied from `rjre/nav-monitoring-`'s committed data (not that repo's live roll-forward estimate) |
+| Podcast Monitor | Stock/sector mention volume, sentiment and momentum, snapshot copied from `rjre/podcast-monitor`'s committed `aggregates.json` |
+| Fed Voting | `rjre/fed-voting`, embedded live via iframe (already deployed to GitHub Pages) |
+| Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Nic Perot's Chart | Placeholder (TBC) |
+
+`rjre/fx-data` (Citi Velocity FX data tool) informs the FX tab's vol-surface
+placeholder — it needs Citi credentials this environment doesn't have, so
+it isn't embedded live like the two Fed tabs.
 
 Anything marked "demo" or "placeholder" is clearly labeled in the UI itself,
 not just here. Every tab also shows a "Source(s):" line at the bottom stating

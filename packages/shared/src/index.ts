@@ -135,6 +135,52 @@ export interface FxSnapshot {
   g10: G10Line[];
 }
 
+export interface NavMonitoringCompany {
+  ticker: string;
+  name: string;
+  navPence: number | null;
+  navDate: string | null;
+  sharePricePence: number | null;
+  discountPct: number | null;
+}
+
+export interface NavMonitoringSnapshot {
+  lastRefreshed: string;
+  companies: NavMonitoringCompany[];
+}
+
+export interface PodcastMentionEntity {
+  id: string;
+  label: string;
+  mentions: number;
+  avgSentiment: number;
+  momentumPct: number;
+  trend: string;
+  buyMentions: number;
+  sellMentions: number;
+}
+
+export interface PodcastMonitorSnapshot {
+  generatedAt: string;
+  globalAvgSentiment: number;
+  stocks: PodcastMentionEntity[];
+  sectors: PodcastMentionEntity[];
+  themes: PodcastMentionEntity[];
+}
+
+export interface UkGiltYieldLine {
+  tenorYears: number;
+  yieldPct: number;
+  changeBp1d: number;
+}
+
+export interface UkGiltYieldSnapshot {
+  asOfDate: string;
+  lines: UkGiltYieldLine[];
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
 export interface TreasuryEtfLine {
   ticker: string;
   label: string;

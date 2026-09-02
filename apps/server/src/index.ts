@@ -14,10 +14,13 @@ import { getCommoditiesSnapshot } from "./commodities.js";
 import { getFxSnapshot } from "./fx.js";
 import { getPortfolioImpact } from "./impact.js";
 import { getMacroSnapshot } from "./macro.js";
+import { getNavMonitoringSnapshot } from "./navMonitoring.js";
+import { getPodcastMonitorSnapshot } from "./podcastMonitor.js";
 import { getPortfolioSnapshot } from "./portfolio.js";
 import { getPortfolioActivity } from "./portfolioActivity.js";
 import { getResearch } from "./research.js";
 import { getRnsFeed } from "./rns.js";
+import { getUkGiltYields } from "./ukGilts.js";
 import { getUstActivity } from "./ustActivity.js";
 
 const app = Fastify({ logger: true });
@@ -88,6 +91,19 @@ app.get("/api/fx", async () => getFxSnapshot());
 app.get("/api/commodities", async () => getCommoditiesSnapshot());
 
 app.get("/api/rns", async () => getRnsFeed());
+
+app.get("/api/nav-monitoring", async () => getNavMonitoringSnapshot());
+
+app.get("/api/podcast-monitor", async () => getPodcastMonitorSnapshot());
+
+app.get("/api/uk-gilt-yields", async (_req, reply) => {
+  try {
+    return await getUkGiltYields();
+  } catch (err) {
+    reply.code(502);
+    return { error: (err as Error).message };
+  }
+});
 
 const port = Number(process.env.PORT ?? 4000);
 app

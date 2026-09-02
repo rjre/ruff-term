@@ -6,14 +6,18 @@ import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
 import { FxPanel } from "./components/FxPanel";
+import { HeadlinesPanel } from "./components/HeadlinesPanel";
 import { HistoricPricingPanel } from "./components/HistoricPricingPanel";
+import { IframeEmbedPanel } from "./components/IframeEmbedPanel";
 import { ImpactPanel } from "./components/ImpactPanel";
 import { JdSleevePanel } from "./components/JdSleevePanel";
 import { LiveOrdersPanel } from "./components/LiveOrdersPanel";
 import { MacroMonitor } from "./components/MacroMonitor";
+import { NavMonitoringPanel } from "./components/NavMonitoringPanel";
 import { NavTabs, type View } from "./components/NavTabs";
 import { NewsFeed } from "./components/NewsFeed";
 import { PlaceholderPanel } from "./components/PlaceholderPanel";
+import { PodcastMonitorPanel } from "./components/PodcastMonitorPanel";
 import { PortfolioActivityPanel } from "./components/PortfolioActivityPanel";
 import { PortfolioPanel } from "./components/PortfolioPanel";
 import { PriceChart } from "./components/PriceChart";
@@ -156,6 +160,37 @@ export function App() {
         <div className="app-body-scroll">
           <LiveOrdersPanel />
         </div>
+      )}
+      {view === "headlines" && (
+        <div className="app-body-scroll">
+          <HeadlinesPanel />
+        </div>
+      )}
+      {view === "navMonitoring" && (
+        <div className="app-body-scroll">
+          <NavMonitoringPanel />
+        </div>
+      )}
+      {view === "podcastMonitor" && (
+        <div className="app-body-scroll">
+          <PodcastMonitorPanel />
+        </div>
+      )}
+      {view === "fedVoting" && (
+        <IframeEmbedPanel
+          title="Fed Voting"
+          subtitle="Every FOMC dissenting vote, Jan 2016–Jul 2026, vs the fed funds target path."
+          src="https://rjre.github.io/fed-voting/"
+          repoLabel="rjre/fed-voting"
+        />
+      )}
+      {view === "fedStatement" && (
+        <IframeEmbedPanel
+          title="Fed Statement"
+          subtitle="Word count of every FOMC post-meeting statement since Feb 2000, by rate decision."
+          src="https://rjre.github.io/fed-statement/"
+          repoLabel="rjre/fed-statement"
+        />
       )}
       {view === "nicPerot" && (
         <div className="app-body-scroll">
