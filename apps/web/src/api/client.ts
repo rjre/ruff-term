@@ -2,6 +2,7 @@ import type {
   CentralBankBalanceSheetSnapshot,
   CftcPositioningSnapshot,
   ChartsOfTheDaySnapshot,
+  CorrelationMatrixSnapshot,
   FxSnapshot,
   GlobalMarketsCalendarSnapshot,
   GlobalMarketsGuideCountry,
@@ -131,4 +132,8 @@ export function fetchOwnership(): Promise<OwnershipSnapshot> {
 
 export function fetchCentralBankBalanceSheets(): Promise<CentralBankBalanceSheetSnapshot> {
   return getJson("/api/central-bank-balance-sheets");
+}
+
+export function fetchCorrelationMatrix(days: number): Promise<CorrelationMatrixSnapshot> {
+  return getJson(`/api/correlation?days=${days}`);
 }

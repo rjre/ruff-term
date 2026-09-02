@@ -32,6 +32,7 @@ export type View =
   | "centralBankBalanceSheets"
   | "todo"
   | "copilot"
+  | "correlation"
   | "nicPerot";
 
 const TABS: Array<{ id: View; label: string }> = [
@@ -68,6 +69,7 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "centralBankBalanceSheets", label: "Central Bank Balance Sheets" },
   { id: "todo", label: "To Do" },
   { id: "copilot", label: "Copilot" },
+  { id: "correlation", label: "Correlation Matrix" },
   { id: "nicPerot", label: "Nic Perot's Chart" },
 ];
 

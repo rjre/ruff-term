@@ -361,6 +361,14 @@ export interface CentralBankBalanceSheetSnapshot {
   series: CentralBankBalanceSheetSeries[];
 }
 
+export interface CorrelationMatrixSnapshot {
+  asOf: string;
+  tickers: string[];
+  labels: string[];
+  matrix: number[][];
+  rangeDays: number;
+}
+
 export interface PortfolioSnapshot {
   fundName: string;
   /** ISO date the underlying factsheet is "as of". */

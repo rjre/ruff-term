@@ -13,6 +13,7 @@ import { getCentralBankBalanceSheets } from "./centralBankBalanceSheets.js";
 import { getCftcPositioning } from "./cftcPositioning.js";
 import { getChartsOfTheDay } from "./chartsOfTheDay.js";
 import { getCommoditiesSnapshot } from "./commodities.js";
+import { getCorrelationMatrix } from "./correlation.js";
 import { getFxSnapshot } from "./fx.js";
 import { getGlobalMarketsCalendar } from "./globalMarketsCalendar.js";
 import { getGlobalMarketsGuide } from "./globalMarketsGuide.js";
@@ -134,6 +135,12 @@ app.get("/api/short-positions", async (_req, reply) => {
 app.get("/api/ownership", async () => getOwnershipSnapshot(OWNERSHIP_TICKERS));
 
 app.get("/api/central-bank-balance-sheets", async () => getCentralBankBalanceSheets());
+
+app.get("/api/correlation", async (req) => {
+  const query = req.query as { days?: string };
+  const days = Number(query.days ?? "180");
+  return getCorrelationMatrix(days);
+});
 
 const port = Number(process.env.PORT ?? 4000);
 app

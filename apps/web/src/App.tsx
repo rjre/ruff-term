@@ -6,6 +6,7 @@ import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
+import { CorrelationMatrixPanel } from "./components/CorrelationMatrixPanel";
 import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
@@ -251,6 +252,11 @@ export function App() {
       {view === "copilot" && (
         <div className="app-body-scroll">
           <CopilotPanel />
+        </div>
+      )}
+      {view === "correlation" && (
+        <div className="app-body-scroll">
+          <CorrelationMatrixPanel />
         </div>
       )}
       {view === "nicPerot" && (
