@@ -13,6 +13,8 @@ export type View =
   | "fx"
   | "fmp"
   | "events"
+  | "historicPricing"
+  | "liveOrders"
   | "nicPerot";
 
 const TABS: Array<{ id: View; label: string }> = [
@@ -30,6 +32,8 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "fx", label: "FX" },
   { id: "fmp", label: "FMP Market Data" },
   { id: "events", label: "Events" },
+  { id: "historicPricing", label: "Historic Pricing" },
+  { id: "liveOrders", label: "Live Orders" },
   { id: "nicPerot", label: "Nic Perot's Chart" },
 ];
 

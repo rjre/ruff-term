@@ -5,8 +5,10 @@ import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
 import { FxPanel } from "./components/FxPanel";
+import { HistoricPricingPanel } from "./components/HistoricPricingPanel";
 import { ImpactPanel } from "./components/ImpactPanel";
 import { JdSleevePanel } from "./components/JdSleevePanel";
+import { LiveOrdersPanel } from "./components/LiveOrdersPanel";
 import { MacroMonitor } from "./components/MacroMonitor";
 import { NavTabs, type View } from "./components/NavTabs";
 import { NewsFeed } from "./components/NewsFeed";
@@ -130,6 +132,16 @@ export function App() {
       {view === "events" && (
         <div className="app-body-scroll">
           <EventsPanel />
+        </div>
+      )}
+      {view === "historicPricing" && (
+        <div className="app-body-scroll">
+          <HistoricPricingPanel />
+        </div>
+      )}
+      {view === "liveOrders" && (
+        <div className="app-body-scroll">
+          <LiveOrdersPanel />
         </div>
       )}
       {view === "nicPerot" && (
