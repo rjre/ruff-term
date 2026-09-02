@@ -175,7 +175,12 @@ to CSV.
 - Press **Ctrl/Cmd+K** (or click "Jump to tab" in the header) to open a
   fuzzy-filterable command palette listing all 38 top-level tabs — the fast
   path since the nav bar itself needs horizontal scrolling to reach the
-  later tabs.
+  later tabs. It also searches tickers (same results as the "/" search box),
+  so it doubles as a single do-anything launcher.
+- Click the ☾/☀ button in the header to switch between light and dark
+  themes. The choice is remembered per-browser and applied before first
+  paint, so there's no flash of the wrong theme on load; it defaults to
+  your OS's light/dark preference the first time.
 - The active tab lives in the URL (`#macro`), and the selected Markets
   ticker in `?t=` — `/?t=MSFT#markets` opens straight to that chart, so a
   link is shareable even if the recipient's own watchlist doesn't have that

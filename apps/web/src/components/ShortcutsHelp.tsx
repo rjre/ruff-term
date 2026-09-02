@@ -5,7 +5,7 @@ interface Props {
 
 const SHORTCUTS: Array<[string, string]> = [
   ["/", "Focus the ticker search"],
-  ["Ctrl / Cmd + K", "Open the jump-to-tab palette"],
+  ["Ctrl / Cmd + K", "Open the jump-to-tab-or-ticker palette"],
   ["?", "Show this shortcuts list"],
   ["Esc", "Close an open overlay"],
 ];
