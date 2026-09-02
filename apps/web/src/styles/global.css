@@ -448,7 +448,8 @@ body {
   cursor: pointer;
 }
 
-.search-result-row:hover {
+.search-result-row:hover,
+.search-result-row.highlighted {
   background: var(--row-hover);
 }
 
