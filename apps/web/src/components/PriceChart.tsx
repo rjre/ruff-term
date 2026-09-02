@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ColorType,
-  LineStyle,
+  PriceScaleMode,
   createChart,
   type IChartApi,
   type ISeriesApi,
@@ -22,9 +22,26 @@ const RANGES: Array<{ label: string; days: number }> = [
   { label: "2Y", days: 730 },
 ];
 
+type ScaleMode = "price" | "log" | "index100" | "pct";
+
+const SCALE_MODE_MAP: Record<ScaleMode, PriceScaleMode> = {
+  price: PriceScaleMode.Normal,
+  log: PriceScaleMode.Logarithmic,
+  index100: PriceScaleMode.IndexedTo100,
+  pct: PriceScaleMode.Percentage,
+};
+
+const SCALE_MODE_LABELS: Array<{ mode: ScaleMode; label: string }> = [
+  { mode: "price", label: "Price" },
+  { mode: "log", label: "Log" },
+  { mode: "index100", label: "Index=100" },
+  { mode: "pct", label: "%Chg" },
+];
+
 const MA_PERIODS = [20, 50, 200] as const;
 const MA_COLORS: Record<number, string> = { 20: "#2a78d6", 50: "#eb6834", 200: "#8b5cf6" };
 const COMPARE_COLOR = "#c9922f";
+const BB_COLOR = "#8b98d1";
 
 function sma(closes: number[], period: number): (number | null)[] {
   const out: (number | null)[] = new Array(closes.length).fill(null);
@@ -37,10 +54,28 @@ function sma(closes: number[], period: number): (number | null)[] {
   return out;
 }
 
-function rebased(bars: PriceBar[]): { time: UTCTimestamp; value: number }[] {
-  if (bars.length === 0) return [];
-  const base = bars[0].close;
-  return bars.map((b) => ({ time: b.time as UTCTimestamp, value: (b.close / base) * 100 }));
+/** Bollinger Bands: SMA(period) +/- k standard deviations, computed over a
+ * trailing window of the raw close series. */
+function bollinger(closes: number[], period: number, k: number): { upper: (number | null)[]; lower: (number | null)[] } {
+  const mid = sma(closes, period);
+  const upper: (number | null)[] = new Array(closes.length).fill(null);
+  const lower: (number | null)[] = new Array(closes.length).fill(null);
+  for (let i = period - 1; i < closes.length; i++) {
+    const m = mid[i];
+    if (m === null) continue;
+    let variance = 0;
+    for (let j = i - period + 1; j <= i; j++) variance += (closes[j] - m) ** 2;
+    const sd = Math.sqrt(variance / period);
+    upper[i] = m + k * sd;
+    lower[i] = m - k * sd;
+  }
+  return { upper, lower };
+}
+
+function toLinePoints(bars: PriceBar[], values: (number | null)[]) {
+  return bars
+    .map((b, i) => ({ time: b.time as UTCTimestamp, value: values[i] }))
+    .filter((p): p is { time: UTCTimestamp; value: number } => p.value !== null);
 }
 
 export function PriceChart({ ticker }: Props) {
@@ -49,14 +84,19 @@ export function PriceChart({ ticker }: Props) {
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line" | "Histogram">[]>([]);
 
   const [rangeDays, setRangeDays] = useState(180);
-  const [rebase, setRebase] = useState(false);
+  const [scaleMode, setScaleMode] = useState<ScaleMode>("price");
   const [maPeriods, setMaPeriods] = useState<Set<number>>(new Set());
+  const [showBollinger, setShowBollinger] = useState(false);
   const [compareInput, setCompareInput] = useState("");
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
   const [primaryBars, setPrimaryBars] = useState<PriceBar[]>([]);
   const [compareBars, setCompareBars] = useState<PriceBar[]>([]);
 
-  const rebaseActive = rebase || compareTicker !== null;
+  const comparing = compareTicker !== null;
+  // Two raw-price series only make sense on a normalized scale — force one
+  // whenever comparing, same idea as TradingView's own "compare" feature.
+  const effectiveMode: ScaleMode = comparing && (scaleMode === "price" || scaleMode === "log") ? "index100" : scaleMode;
+  const showCandles = !comparing && (effectiveMode === "price" || effectiveMode === "log");
 
   // Chart lifecycle — created once, resized to fit its container.
   useEffect(() => {
@@ -94,12 +134,13 @@ export function PriceChart({ ticker }: Props) {
     };
   }, []);
 
-  // Reset controls and clear compare when the selected ticker changes.
+  // Reset controls when the selected ticker changes.
   useEffect(() => {
     setCompareTicker(null);
     setCompareInput("");
-    setRebase(false);
+    setScaleMode("price");
     setMaPeriods(new Set());
+    setShowBollinger(false);
   }, [ticker]);
 
   // Fetch primary + (optional) compare history whenever inputs change.
@@ -131,6 +172,11 @@ export function PriceChart({ ticker }: Props) {
     };
   }, [compareTicker, rangeDays]);
 
+  // Apply the scale mode to the shared right price scale.
+  useEffect(() => {
+    chartRef.current?.priceScale("right").applyOptions({ mode: SCALE_MODE_MAP[effectiveMode] });
+  }, [effectiveMode]);
+
   // Rebuild series whenever the data or display options change.
   useEffect(() => {
     const chart = chartRef.current;
@@ -141,21 +187,7 @@ export function PriceChart({ ticker }: Props) {
 
     if (!ticker || primaryBars.length === 0) return;
 
-    if (rebaseActive) {
-      const line = chart.addLineSeries({ color: "#086132", lineWidth: 2 });
-      line.setData(rebased(primaryBars));
-      seriesRef.current.push(line);
-
-      if (compareTicker && compareBars.length > 0) {
-        const compareLine = chart.addLineSeries({
-          color: COMPARE_COLOR,
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
-        });
-        compareLine.setData(rebased(compareBars));
-        seriesRef.current.push(compareLine);
-      }
-    } else {
+    if (showCandles) {
       const candles = chart.addCandlestickSeries({
         upColor: "#0ca30c",
         downColor: "#d03b3b",
@@ -188,28 +220,48 @@ export function PriceChart({ ticker }: Props) {
         }))
       );
       seriesRef.current.push(volume);
+    } else {
+      const line = chart.addLineSeries({ color: "#086132", lineWidth: 2 });
+      line.setData(primaryBars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+      seriesRef.current.push(line);
+
+      if (compareTicker && compareBars.length > 0) {
+        const compareLine = chart.addLineSeries({ color: COMPARE_COLOR, lineWidth: 2 });
+        compareLine.setData(compareBars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+        seriesRef.current.push(compareLine);
+      }
     }
 
     const closes = primaryBars.map((b) => b.close);
-    const baseValues = rebaseActive ? rebased(primaryBars).map((p) => p.value) : closes;
+
     for (const period of maPeriods) {
-      const values = sma(baseValues, period);
       const line = chart.addLineSeries({
         color: MA_COLORS[period],
         lineWidth: 1,
         priceLineVisible: false,
         lastValueVisible: false,
       });
-      line.setData(
-        primaryBars
-          .map((b, i) => ({ time: b.time as UTCTimestamp, value: values[i] }))
-          .filter((p): p is { time: UTCTimestamp; value: number } => p.value !== null)
-      );
+      line.setData(toLinePoints(primaryBars, sma(closes, period)));
       seriesRef.current.push(line);
     }
 
+    if (showBollinger) {
+      const { upper, lower } = bollinger(closes, 20, 2);
+      for (const values of [upper, lower]) {
+        const line = chart.addLineSeries({
+          color: BB_COLOR,
+          lineWidth: 1,
+          lineStyle: 2 /* dashed */,
+          priceLineVisible: false,
+          lastValueVisible: false,
+        });
+        line.setData(toLinePoints(primaryBars, values));
+        seriesRef.current.push(line);
+      }
+    }
+
     chart.timeScale().fitContent();
-  }, [ticker, primaryBars, compareTicker, compareBars, rebaseActive, maPeriods]);
+  }, [ticker, primaryBars, compareTicker, compareBars, showCandles, maPeriods, showBollinger]);
 
   function toggleMa(period: number) {
     setMaPeriods((prev) => {
@@ -246,14 +298,19 @@ export function PriceChart({ ticker }: Props) {
             ))}
           </div>
           <div className="chart-toolbar-group">
-            <button
-              className={`toggle-btn ${rebaseActive ? "active" : ""}`}
-              disabled={compareTicker !== null}
-              onClick={() => setRebase((v) => !v)}
-              title={compareTicker ? "Rebased automatically while comparing" : "Rebase to 100 at period start"}
-            >
-              Rebase=100
-            </button>
+            {SCALE_MODE_LABELS.map(({ mode, label }) => (
+              <button
+                key={mode}
+                className={`toggle-btn ${effectiveMode === mode ? "active" : ""}`}
+                disabled={comparing && (mode === "price" || mode === "log")}
+                onClick={() => setScaleMode(mode)}
+                title={comparing && (mode === "price" || mode === "log") ? "Not available while comparing" : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="chart-toolbar-group">
             {MA_PERIODS.map((p) => (
               <button
                 key={p}
@@ -264,6 +321,14 @@ export function PriceChart({ ticker }: Props) {
                 MA{p}
               </button>
             ))}
+            <button
+              className={`toggle-btn ${showBollinger ? "active" : ""}`}
+              style={showBollinger ? { background: BB_COLOR, borderColor: BB_COLOR } : undefined}
+              onClick={() => setShowBollinger((v) => !v)}
+              title="Bollinger Bands (20-period, 2 std dev)"
+            >
+              BB
+            </button>
           </div>
           <div className="chart-toolbar-group chart-compare">
             {compareTicker ? (
