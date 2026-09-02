@@ -69,10 +69,23 @@ export function PodcastMonitorPanel() {
       {snapshot === null ? (
         <div className="empty-state">Loading…</div>
       ) : (
-        <div className="portfolio-grid">
-          <EntityTable title="Top stocks by mentions" entities={snapshot.stocks} />
-          <EntityTable title="Top sectors by mentions" entities={snapshot.sectors} />
-        </div>
+        <>
+          <div className="kpi-row">
+            <div className="kpi-tile">
+              <div className="kpi-label">Global avg sentiment</div>
+              <div className={`kpi-value ${pctClass(snapshot.globalAvgSentiment)}`}>
+                {snapshot.globalAvgSentiment.toFixed(2)}
+              </div>
+            </div>
+          </div>
+          <div className="portfolio-grid">
+            <EntityTable title="Top stocks by mentions" entities={snapshot.stocks} />
+            <EntityTable title="Top sectors by mentions" entities={snapshot.sectors} />
+          </div>
+          <div className="portfolio-grid" style={{ marginTop: 20 }}>
+            <EntityTable title="Top themes by mentions" entities={snapshot.themes} />
+          </div>
+        </>
       )}
       <SourceFooter sources={["rjre/podcast-monitor (static snapshot of committed aggregates.json)"]} />
     </div>
