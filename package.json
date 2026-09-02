@@ -12,7 +12,8 @@
     "dev:server": "npm run dev --workspace=@ruff-term/server",
     "dev:web": "npm run dev --workspace=@ruff-term/web",
     "build": "npm run build --workspace=@ruff-term/server && npm run build --workspace=@ruff-term/web",
-    "typecheck": "npm run typecheck --workspace=@ruff-term/server && npm run typecheck --workspace=@ruff-term/web"
+    "typecheck": "npm run typecheck --workspace=@ruff-term/server && npm run typecheck --workspace=@ruff-term/web",
+    "refresh:external": "node scripts/refresh-external-snapshots.mjs"
   },
   "devDependencies": {
     "typescript": "^5.6.3"
