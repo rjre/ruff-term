@@ -5,6 +5,26 @@ replacing FactSet for a subset of users. Built out as a multi-tab terminal
 covering markets, portfolio, macro, and a number of Ruffer-specific and
 placeholder sections requested along the way.
 
+## Branding
+
+Colors, logo and type are pulled from ruffer.co.uk's own stylesheet and
+markup, not guessed:
+
+- **Logo:** the real Ruffer wordmark (`apps/web/public/brand/ruffer-logo.png`,
+  pulled from the site's own `/images/logos/ruffer-logo-header.png`), and the
+  site's own favicons.
+- **Colors:** `#086132` (deep green), `#4e9a33` (link green), `#64b446`
+  (lime), `#f68e4c` (orange) — all read directly out of the site's CSS, not
+  eyeballed from a screenshot.
+- **Type:** the real site pairs Avenir (headings/UI) with Georgia (body
+  copy) — both served as licensed webfonts we can't embed here. Headings use
+  **Jost** instead (same geometric-sans lineage as Avenir/Futura, free on
+  Google Fonts); body copy uses plain system **Georgia**, which renders
+  identically to their webfont on any machine that has it — effectively all
+  of them, since it ships with Windows and macOS. Ticker symbols and numeric
+  table columns stay in **Roboto Mono** for tabular alignment — a deliberate
+  exception for data-dense grids, not an inconsistency.
+
 ## Status / scope
 
 - **Interface:** web app (React + TypeScript frontend, Node/TypeScript backend).

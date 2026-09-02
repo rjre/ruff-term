@@ -59,10 +59,11 @@ export function App() {
     <div className="app-shell">
       <header className="app-header">
         <div className="app-brand">
-          <span className="app-logo-mark">R</span>
+          <img className="app-logo-mark" src="/brand/ruffer-logo.png" alt="Ruffer" />
+          <div className="app-brand-divider" />
           <div>
             <div className="app-title">Ruff Term</div>
-            <div className="app-tagline">for Ruffer</div>
+            <div className="app-tagline">Internal terminal</div>
           </div>
         </div>
         <TickerSearch onSelect={goToMarkets} />

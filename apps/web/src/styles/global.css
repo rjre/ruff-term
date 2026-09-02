@@ -1,16 +1,23 @@
 :root {
-  /* Ruffer's actual site palette (ruffer.co.uk): white ground, deep forest
-   * green primary, lime accent, warm orange highlight. */
+  /* Ruffer's actual site palette and type, pulled from ruffer.co.uk's own
+   * stylesheet: white ground, deep forest green primary, lime accent, warm
+   * orange highlight, Avenir headings over Georgia body copy. Avenir and
+   * the site's licensed "Georgia W01" webfont can't be embedded here, so
+   * headings use Jost (same geometric-sans lineage as Avenir/Futura, free)
+   * and body text uses plain system Georgia, which renders identically to
+   * their webfont on any machine that has it — which is effectively all of
+   * them, since it ships with Windows and macOS. */
   --ruffer-green-deep: #086132;
   --ruffer-green: #4e9a33;
   --ruffer-green-light: #4e9a33;
+  --ruffer-green-mid: #134f33;
   --ruffer-lime: #64b446;
   --ruffer-orange: #f68e4c;
 
   --bg: #ffffff;
   --panel-bg: #ffffff;
   --border: #e2e5e1;
-  --text: #202420;
+  --text: #383838;
   --text-dim: #57604f;
   --text-faint: #727a72;
   --up: #0ca30c;
@@ -21,8 +28,9 @@
   --flash: var(--ruffer-orange);
 
   --font-display: "Jost", "Avenir Next", Avenir, "Century Gothic", "Segoe UI", sans-serif;
+  --font-body: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --font-mono: "Roboto Mono", "SF Mono", "Consolas", monospace;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 * {
@@ -101,17 +109,16 @@ body {
 }
 
 .app-logo-mark {
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  background: linear-gradient(155deg, var(--ruffer-green-light), var(--ruffer-green-deep));
-  color: #06170d;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 26px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
+}
+
+.app-brand-divider {
+  width: 1px;
+  height: 26px;
+  background: var(--border);
   flex-shrink: 0;
 }
 
@@ -255,6 +262,7 @@ body {
 }
 
 .ticker-cell {
+  font-family: var(--font-mono);
   font-weight: 700;
   color: var(--text);
 }
@@ -272,6 +280,7 @@ body {
 
 .num-cell {
   text-align: right;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -712,6 +721,7 @@ body {
 .magnitude-pct {
   font-size: 11px;
   text-align: right;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
@@ -773,6 +783,7 @@ body {
 .diverging-value {
   font-size: 11px;
   text-align: right;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
