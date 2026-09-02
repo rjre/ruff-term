@@ -56,14 +56,15 @@ markup, not guessed:
 
 | Tab | What it is |
 |---|---|
-| Markets | Global watchlist, candlestick chart, per-ticker/market news |
+| Morning Brief | Default landing tab — biggest watchlist/universe movers, the day's growth-vs-protection regime signal, and top headlines, synthesized from data already live elsewhere in the app |
+| Markets | Global watchlist (multiple saved lists, per-browser), candlestick/line chart with range selector, log/percentage/indexed scale modes, moving averages, Bollinger Bands, a second-ticker overlay, and PNG/CSV export; per-ticker/market news |
 | Ruffer Research | Demo research notes — not real Ruffer output |
 | Ruffer Portfolio | TM Ruffer Portfolio Fund snapshot, sourced from ruffer.co.uk's public monthly factsheet (manually refreshed, not a live feed) |
 | Ruffer Impact | Portfolio newsflow reframed against the fund's disclosed allocation/holdings via an in-repo rule-based heuristic |
 | Charts of the Day | Growth-vs-protection regime barometer (live ETF proxies) + newsflow theme breakdown |
-| Macro | Multi-panel futures/indices/FX/US rates/UK gilts monitor, live via Yahoo |
+| Macro | Multi-panel futures/indices/FX/US rates/UK gilts monitor plus a Global Rates & Credit ETF-proxy panel (international treasuries, EM bonds, US IG/HY credit) and US inflation expectations (TIPS breakevens via FRED) — all live |
 | Commodities | Energy, metals and agriculture futures, live via Yahoo |
-| RNS Newsfeed | UK-listed company news via Yahoo — not the official LSE RNS feed (no free/keyless RNS API exists; real regulatory filings need a licensed source like LSEG RNS, ticker.app, or Investegate's API) |
+| RNS Newsfeed | UK-listed company news via Yahoo, with a rough keyword-based tone dot per headline — not the official LSE RNS feed (no free/keyless RNS API exists; real regulatory filings need a licensed source like LSEG RNS, ticker.app, or Investegate's API) |
 | Portfolio Activity | Demo week-to-date trading actions log |
 | UST Activity | Live Treasury ETF proxies + illustrative FINRA TRACE-style volume breakdown |
 | Dividends & Corp Actions | Placeholder — to source from Aladdin |
@@ -74,20 +75,23 @@ markup, not guessed:
 | Events | Placeholder for earnings/trading statements/calls |
 | Historic Pricing | Dummy MSFT chart back to Nov 2021 — intended source: Aladdin |
 | Live Orders | Placeholder order blotter — dataset used elsewhere, dashboard replica |
-| Financial Headlines | Broad market news via Yahoo, unfiltered |
+| Financial Headlines | Broad market news via Yahoo, unfiltered, with a rough keyword-based tone dot per headline |
 | NAV Monitoring | UK investment trust premium/discount snapshot derived from `rjre/nav-monitoring-`'s committed data (not that repo's live roll-forward estimate), auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
 | Podcast Monitor | Stock/sector mention volume, sentiment and momentum, derived from `rjre/podcast-monitor`'s committed `aggregates.json`, auto-refreshed daily — see [Keeping the GH-repo snapshots fresh](#keeping-the-gh-repo-snapshots-fresh) |
 | Fed Voting | `rjre/fed-voting`, embedded live via iframe (already deployed to GitHub Pages) |
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
-| Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
+| Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
 | Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS |
 | Short Position Data | UK aggregate net short position disclosures at/above the 0.5% threshold, live via the FCA's public CSVs (current + historic) |
 | Ownership & Insider | Section 16 insider transactions (Form 4) for the US-listed watchlist names, live via SEC EDGAR. Foreign private issuers (SFL, South Bow) are exempt and show no rows |
 | Central Bank Balance Sheets | Fed / ECB / BoJ total assets, live via FRED. BoE omitted — no equivalent free machine-readable weekly series found |
-| To Do | Static list of known gaps vs. a full FactSet/Bloomberg replacement (fundamentals, vol surfaces, credit spreads, auction calendars, comps, export, Excel plugin) |
+| Correlation Matrix | Pairwise Pearson correlation of daily log returns across 11 cross-asset instruments (equities, rates, gold, oil, USD, VIX), live via Yahoo, 3M/6M/1Y lookback, CSV export |
+| Scenario Calculator | Shock sliders (equities/yields/credit/gold/FX) mapped onto the real disclosed Ruffer Portfolio allocation via assumed durations — explicitly an illustrative linear approximation, not a risk model |
+| Bond Auctions | Upcoming US Treasury auctions, live via TreasuryDirect's own API. No equivalent free feed found for UK DMO gilt auctions (links out to DMO's site instead) |
+| To Do | Static list of known gaps vs. a full FactSet/Bloomberg replacement (fundamentals, vol surfaces, true credit spreads/CDS, non-UK sovereign curves, comps, Excel plugin, AAII/CBOE sentiment — all checked and found blocked or unbuilt) |
 | Copilot | Placeholder — intended to embed Ruffer's internal M&E Market Commentary Agent |
 | Nic Perot's Chart | Placeholder (TBC) |
 
@@ -158,18 +162,21 @@ percentage change columns colored green/red, with a small "c" suffix when a
 price is a closed-market close rather than a live tick. It polls every 30s
 and briefly flashes a price cell when it moves. The default seed watchlist
 spans real tickers across Amsterdam, US, Hong Kong, Australia, Paris,
-Copenhagen, Tokyo, and Toronto — verified to resolve against Yahoo. The list
-persists to `localStorage`; add/remove tickers via search.
+Copenhagen, Tokyo, and Toronto — verified to resolve against Yahoo. Supports
+multiple named, saved watchlists (per-browser, via `localStorage`) for
+organizing by book or theme; add/remove tickers via search.
 
-## Branding
+## Navigating
 
-Colors and typography are pulled from ruffer.co.uk's actual site: a white
-ground with the deep green (`#086132`) / medium green (`#4e9a33`) palette as
-accents, and the Jost typeface (a free geometric-sans stand-in for Ruffer's
-licensed Avenir) for UI chrome, with tabular monospace kept for numeric data
-columns. Chart/categorical colors are drawn from a validated, colorblind-safe
-palette (see `apps/web/src/components/PortfolioPanel.tsx`) rather than
-picked by eye.
+- Press **/** anywhere to jump into the ticker search (same convention as
+  Slack/Linear/GitHub).
+- The active tab lives in the URL (`#macro`), and the selected Markets
+  ticker in `?t=` — `/?t=MSFT#markets` opens straight to that chart, so a
+  link is shareable even if the recipient's own watchlist doesn't have that
+  ticker.
+- Chart/categorical colors are drawn from a validated, colorblind-safe
+  palette (see `apps/web/src/components/PortfolioPanel.tsx`) rather than
+  picked by eye.
 
 ## Scripts
 
