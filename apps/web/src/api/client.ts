@@ -24,3 +24,8 @@ export function fetchNews(ticker?: string): Promise<NewsItem[]> {
   const qs = ticker ? `?ticker=${encodeURIComponent(ticker)}` : "";
   return getJson(`/api/news${qs}`);
 }
+
+export function fetchPortfolioNews(tickers: string[]): Promise<NewsItem[]> {
+  const qs = tickers.length ? `?tickers=${tickers.join(",")}` : "";
+  return getJson(`/api/news/portfolio${qs}`);
+}

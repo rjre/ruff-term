@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import type { NewsItem } from "@ruff-term/shared";
-import { fetchNews } from "../api/client";
+import { fetchNews, fetchPortfolioNews } from "../api/client";
 
 interface Props {
   ticker: string | null;
+  watchlistTickers: string[];
 }
+
+type Mode = "portfolio" | "market";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -15,22 +18,47 @@ function timeAgo(iso: string): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export function NewsFeed({ ticker }: Props) {
+export function NewsFeed({ ticker, watchlistTickers }: Props) {
+  const [mode, setMode] = useState<Mode>("portfolio");
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    fetchNews(ticker ?? undefined)
+    const load = ticker
+      ? fetchNews(ticker)
+      : mode === "portfolio"
+        ? fetchPortfolioNews(watchlistTickers)
+        : fetchNews();
+
+    load
       .then(setNews)
       .catch(() => setNews([]))
       .finally(() => setLoading(false));
-  }, [ticker]);
+  }, [ticker, mode, watchlistTickers]);
+
+  const title = ticker ? `${ticker} — News` : mode === "portfolio" ? "Portfolio Newsflow" : "Market News";
 
   return (
     <div className="panel">
       <div className="panel-header">
-        <span>{ticker ? `${ticker} — News` : "Market News"}</span>
+        <span>{title}</span>
+        {!ticker ? (
+          <div className="news-mode-toggle">
+            <button
+              className={`toggle-btn${mode === "portfolio" ? " active" : ""}`}
+              onClick={() => setMode("portfolio")}
+            >
+              Portfolio
+            </button>
+            <button
+              className={`toggle-btn${mode === "market" ? " active" : ""}`}
+              onClick={() => setMode("market")}
+            >
+              Market
+            </button>
+          </div>
+        ) : null}
       </div>
       <div className="panel-body">
         {loading ? (

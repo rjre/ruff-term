@@ -35,9 +35,10 @@ function pctClass(value: number): string {
 interface Props {
   selectedTicker: string | null;
   onSelectTicker: (ticker: string) => void;
+  onTickersChange?: (tickers: string[]) => void;
 }
 
-export function Watchlist({ selectedTicker, onSelectTicker }: Props) {
+export function Watchlist({ selectedTicker, onSelectTicker, onTickersChange }: Props) {
   const [tickers, setTickers] = useState<string[]>(() => loadStoredTickers() ?? []);
   const [quotes, setQuotes] = useState<WatchlistQuote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,8 @@ export function Watchlist({ selectedTicker, onSelectTicker }: Props) {
   useEffect(() => {
     if (tickers.length === 0) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tickers));
-  }, [tickers]);
+    onTickersChange?.(tickers);
+  }, [tickers, onTickersChange]);
 
   useEffect(() => {
     if (tickers.length === 0) return;
@@ -151,8 +153,10 @@ export function Watchlist({ selectedTicker, onSelectTicker }: Props) {
                     <td className="short-name-cell">{q.shortName}</td>
                     <td
                       className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
+                      title={q.currency}
                     >
                       {formatPrice(q.lastPrice)}
+                      {q.priceSuffix ? <span className="price-suffix">{q.priceSuffix}</span> : null}
                     </td>
                     <td className={`num-cell ${pctClass(q.changePct1d)}`}>
                       {formatPct(q.changePct1d)}

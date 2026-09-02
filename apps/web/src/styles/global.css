@@ -1,17 +1,27 @@
 :root {
-  --bg: #0a0d11;
-  --panel-bg: #10141a;
-  --border: #1f262f;
-  --text: #e6e9ed;
-  --text-dim: #9aa4b2;
-  --text-faint: #5b6572;
-  --up: #2ecc71;
-  --down: #ff4d4f;
-  --accent: #4da3ff;
-  --header-bg: #12161c;
-  --row-hover: #161b22;
-  --flash: #ffb020;
-  font-family: "Roboto Mono", "SF Mono", "Consolas", monospace;
+  /* Ruffer brand: deep forest green primary, lime accent, warm orange highlight */
+  --ruffer-green-deep: #086132;
+  --ruffer-green: #4e9a33;
+  --ruffer-green-light: #64b446;
+  --ruffer-lime: #abfc8d;
+  --ruffer-orange: #f68e4c;
+
+  --bg: #0a100c;
+  --panel-bg: #0f1712;
+  --border: #1c2921;
+  --text: #e9ede9;
+  --text-dim: #96a89c;
+  --text-faint: #5a695f;
+  --up: #3ddc73;
+  --down: #ff5c5c;
+  --accent: var(--ruffer-green-light);
+  --header-bg: #0d1510;
+  --row-hover: #16211a;
+  --flash: var(--ruffer-orange);
+
+  --font-display: "Jost", "Avenir Next", Avenir, "Century Gothic", "Segoe UI", sans-serif;
+  --font-mono: "Roboto Mono", "SF Mono", "Consolas", monospace;
+  font-family: var(--font-mono);
 }
 
 * {
@@ -43,14 +53,45 @@ body {
   gap: 16px;
   padding: 8px 16px;
   background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--ruffer-green-deep);
+  box-shadow: 0 1px 0 rgba(171, 252, 141, 0.08);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-logo-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: linear-gradient(155deg, var(--ruffer-green-light), var(--ruffer-green-deep));
+  color: #06170d;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .app-title {
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.app-tagline {
+  font-family: var(--font-display);
+  color: var(--text-faint);
+  font-size: 10px;
   letter-spacing: 0.06em;
-  color: var(--accent);
-  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .app-body {
@@ -70,9 +111,10 @@ body {
 }
 
 .panel-header {
-  padding: 6px 12px;
+  padding: 7px 12px;
+  font-family: var(--font-display);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--text-dim);
   border-bottom: 1px solid var(--border);
@@ -80,6 +122,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.news-mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  color: var(--text);
+}
+
+.toggle-btn.active {
+  color: #06170d;
+  background: var(--ruffer-green-light);
+  border-color: var(--ruffer-green-light);
 }
 
 .panel-body {
@@ -129,7 +199,8 @@ body {
 }
 
 .watchlist-table tbody tr.selected {
-  background: #182233;
+  background: rgba(78, 154, 51, 0.18);
+  box-shadow: inset 2px 0 0 var(--ruffer-green-light);
 }
 
 .watchlist-table td {
