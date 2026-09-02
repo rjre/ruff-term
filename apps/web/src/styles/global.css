@@ -1345,6 +1345,17 @@ body {
   color: #fff;
 }
 
+.command-palette-ticker {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.command-palette-ticker-name {
+  opacity: 0.75;
+  font-size: 12px;
+}
+
 .command-palette-empty {
   padding: 14px 16px;
   color: var(--text-faint);

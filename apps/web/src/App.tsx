@@ -180,6 +180,7 @@ export function App() {
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         onSelect={setView}
+        onSelectTicker={goToMarkets}
       />
       <ShortcutsHelp
         open={shortcutsOpen}
