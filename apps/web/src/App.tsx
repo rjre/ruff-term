@@ -38,6 +38,7 @@ import { ScenarioCalculatorPanel } from "./components/ScenarioCalculatorPanel";
 import { ScreenerPanel } from "./components/ScreenerPanel";
 import { ShortcutsHelp } from "./components/ShortcutsHelp";
 import { ShortPositionsPanel } from "./components/ShortPositionsPanel";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { TickerSearch } from "./components/TickerSearch";
 import { TodoPanel } from "./components/TodoPanel";
 import { UstActivityPanel } from "./components/UstActivityPanel";
@@ -160,10 +161,18 @@ export function App() {
         >
           Jump to tab <kbd>⌘K</kbd>
         </button>
-        <div style={{ marginLeft: "auto" }}>
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
           {dataSource ? (
             <span className="data-source-badge">{dataSource} data</span>
           ) : null}
+          <ThemeToggle />
         </div>
       </header>
       <NavTabs active={view} onSelect={setView} />

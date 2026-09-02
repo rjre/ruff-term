@@ -26,11 +26,52 @@
   --header-bg: #fbfcfb;
   --row-hover: #f1f6f1;
   --flash: var(--ruffer-orange);
+  --input-bg: #f7f8f6;
+  --demo-text: #9a5117;
+  --demo-border: var(--ruffer-orange);
+  --demo-bg: rgba(246, 142, 76, 0.12);
+  --note-text: #1c5cab;
+  --note-border: #2a78d6;
+  --note-bg: rgba(42, 120, 214, 0.08);
+  --chart-bg: #ffffff;
+  --chart-text: #57604f;
+  --chart-grid: #eef1ed;
+  --shadow: rgba(0, 0, 0, 0.12);
 
-  --font-display: "Jost", "Avenir Next", Avenir, "Century Gothic", "Segoe UI", sans-serif;
+  --font-display:
+    "Jost", "Avenir Next", Avenir, "Century Gothic", "Segoe UI", sans-serif;
   --font-body: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --font-mono: "Roboto Mono", "SF Mono", "Consolas", monospace;
   font-family: var(--font-body);
+}
+
+/* Dark theme — same Ruffer accent, inverted ground. Explicit opt-in via the
+ * header toggle (persisted to localStorage), not tied to OS preference,
+ * since this is an internal tool people may want consistent either way. */
+:root[data-theme="dark"] {
+  --bg: #14161a;
+  --panel-bg: #1b1e23;
+  --border: #2c3038;
+  --text: #e7e9ec;
+  --text-dim: #a9afb8;
+  --text-faint: #767d88;
+  --up: #3ecf4e;
+  --down: #ff5c5c;
+  --accent: var(--ruffer-lime);
+  --header-bg: #1b1e23;
+  --row-hover: #23262d;
+  --flash: var(--ruffer-orange);
+  --input-bg: #22252b;
+  --demo-text: #ffb066;
+  --demo-border: #b56a2e;
+  --demo-bg: rgba(246, 142, 76, 0.14);
+  --note-text: #7db4f2;
+  --note-border: #3d6ea8;
+  --note-bg: rgba(42, 120, 214, 0.12);
+  --chart-bg: #1b1e23;
+  --chart-text: #a9afb8;
+  --chart-grid: #262a31;
+  --shadow: rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -415,7 +456,7 @@ body {
 
 .search-input {
   width: 100%;
-  background: #f7f8f6;
+  background: var(--input-bg);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 5px 10px;
@@ -526,6 +567,22 @@ body {
   letter-spacing: 0.05em;
 }
 
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1;
+  padding: 5px 9px;
+  cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 /* Generic module/section chrome shared by the non-Markets tabs */
 
 .module-view {
@@ -554,9 +611,9 @@ body {
 }
 
 .demo-banner {
-  background: rgba(246, 142, 76, 0.12);
-  border: 1px solid var(--ruffer-orange);
-  color: #9a5117;
+  background: var(--demo-bg);
+  border: 1px solid var(--demo-border);
+  color: var(--demo-text);
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 600;
@@ -567,9 +624,9 @@ body {
 }
 
 .note-banner {
-  background: rgba(42, 120, 214, 0.08);
-  border: 1px solid #2a78d6;
-  color: #1c5cab;
+  background: var(--note-bg);
+  border: 1px solid var(--note-border);
+  color: var(--note-text);
   font-family: var(--font-display);
   font-size: 11px;
   padding: 8px 12px;

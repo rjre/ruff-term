@@ -11,6 +11,16 @@ import {
 import type { PriceBar } from "@ruff-term/shared";
 import { fetchHistory } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
+import { cssVar } from "../lib/theme";
+
+function chartColors() {
+  return {
+    background: cssVar("--chart-bg") || "#ffffff",
+    text: cssVar("--chart-text") || "#57604f",
+    grid: cssVar("--chart-grid") || "#eef1ee",
+    border: cssVar("--border") || "#e2e5e1",
+  };
+}
 
 interface Props {
   ticker: string | null;
@@ -41,7 +51,11 @@ const SCALE_MODE_LABELS: Array<{ mode: ScaleMode; label: string }> = [
 ];
 
 const MA_PERIODS = [20, 50, 200] as const;
-const MA_COLORS: Record<number, string> = { 20: "#2a78d6", 50: "#eb6834", 200: "#8b5cf6" };
+const MA_COLORS: Record<number, string> = {
+  20: "#2a78d6",
+  50: "#eb6834",
+  200: "#8b5cf6",
+};
 const COMPARE_COLOR = "#c9922f";
 const BB_COLOR = "#8b98d1";
 
@@ -58,7 +72,11 @@ function sma(closes: number[], period: number): (number | null)[] {
 
 /** Bollinger Bands: SMA(period) +/- k standard deviations, computed over a
  * trailing window of the raw close series. */
-function bollinger(closes: number[], period: number, k: number): { upper: (number | null)[]; lower: (number | null)[] } {
+function bollinger(
+  closes: number[],
+  period: number,
+  k: number,
+): { upper: (number | null)[]; lower: (number | null)[] } {
   const mid = sma(closes, period);
   const upper: (number | null)[] = new Array(closes.length).fill(null);
   const lower: (number | null)[] = new Array(closes.length).fill(null);
@@ -77,13 +95,17 @@ function bollinger(closes: number[], period: number, k: number): { upper: (numbe
 function toLinePoints(bars: PriceBar[], values: (number | null)[]) {
   return bars
     .map((b, i) => ({ time: b.time as UTCTimestamp, value: values[i] }))
-    .filter((p): p is { time: UTCTimestamp; value: number } => p.value !== null);
+    .filter(
+      (p): p is { time: UTCTimestamp; value: number } => p.value !== null,
+    );
 }
 
 export function PriceChart({ ticker }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line" | "Histogram">[]>([]);
+  const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line" | "Histogram">[]>(
+    [],
+  );
 
   const [rangeDays, setRangeDays] = useState(180);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("price");
@@ -97,26 +119,31 @@ export function PriceChart({ ticker }: Props) {
   const comparing = compareTicker !== null;
   // Two raw-price series only make sense on a normalized scale — force one
   // whenever comparing, same idea as TradingView's own "compare" feature.
-  const effectiveMode: ScaleMode = comparing && (scaleMode === "price" || scaleMode === "log") ? "index100" : scaleMode;
-  const showCandles = !comparing && (effectiveMode === "price" || effectiveMode === "log");
+  const effectiveMode: ScaleMode =
+    comparing && (scaleMode === "price" || scaleMode === "log")
+      ? "index100"
+      : scaleMode;
+  const showCandles =
+    !comparing && (effectiveMode === "price" || effectiveMode === "log");
 
   // Chart lifecycle — created once, resized to fit its container.
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const colors = chartColors();
     const chart = createChart(containerRef.current, {
       layout: {
-        background: { type: ColorType.Solid, color: "#ffffff" },
-        textColor: "#57604f",
+        background: { type: ColorType.Solid, color: colors.background },
+        textColor: colors.text,
         fontFamily: "'Roboto Mono', monospace",
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "#eef1ee" },
-        horzLines: { color: "#eef1ee" },
+        vertLines: { color: colors.grid },
+        horzLines: { color: colors.grid },
       },
-      rightPriceScale: { borderColor: "#e2e5e1" },
-      timeScale: { borderColor: "#e2e5e1" },
+      rightPriceScale: { borderColor: colors.border },
+      timeScale: { borderColor: colors.border },
       width: containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
     });
@@ -129,8 +156,25 @@ export function PriceChart({ ticker }: Props) {
     });
     resizeObserver.observe(containerRef.current);
 
+    // The chart is a canvas — CSS variables can't reach it, so re-read them
+    // and re-apply on every theme toggle instead.
+    function onThemeChange() {
+      const c = chartColors();
+      chart.applyOptions({
+        layout: {
+          background: { type: ColorType.Solid, color: c.background },
+          textColor: c.text,
+        },
+        grid: { vertLines: { color: c.grid }, horzLines: { color: c.grid } },
+        rightPriceScale: { borderColor: c.border },
+        timeScale: { borderColor: c.border },
+      });
+    }
+    window.addEventListener("ruff-term:theme-change", onThemeChange);
+
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener("ruff-term:theme-change", onThemeChange);
       chart.remove();
       chartRef.current = null;
     };
@@ -176,7 +220,9 @@ export function PriceChart({ ticker }: Props) {
 
   // Apply the scale mode to the shared right price scale.
   useEffect(() => {
-    chartRef.current?.priceScale("right").applyOptions({ mode: SCALE_MODE_MAP[effectiveMode] });
+    chartRef.current
+      ?.priceScale("right")
+      .applyOptions({ mode: SCALE_MODE_MAP[effectiveMode] });
   }, [effectiveMode]);
 
   // Rebuild series whenever the data or display options change.
@@ -204,7 +250,7 @@ export function PriceChart({ ticker }: Props) {
           high: b.high,
           low: b.low,
           close: b.close,
-        }))
+        })),
       );
       seriesRef.current.push(candles);
 
@@ -213,23 +259,39 @@ export function PriceChart({ ticker }: Props) {
         priceScaleId: "volume",
         color: "#cfd8ca",
       });
-      volume.priceScale().applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+      volume
+        .priceScale()
+        .applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
       volume.setData(
         primaryBars.map((b) => ({
           time: b.time as UTCTimestamp,
           value: b.volume,
-          color: b.close >= b.open ? "rgba(12,163,12,0.5)" : "rgba(208,59,59,0.5)",
-        }))
+          color:
+            b.close >= b.open ? "rgba(12,163,12,0.5)" : "rgba(208,59,59,0.5)",
+        })),
       );
       seriesRef.current.push(volume);
     } else {
       const line = chart.addLineSeries({ color: "#086132", lineWidth: 2 });
-      line.setData(primaryBars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+      line.setData(
+        primaryBars.map((b) => ({
+          time: b.time as UTCTimestamp,
+          value: b.close,
+        })),
+      );
       seriesRef.current.push(line);
 
       if (compareTicker && compareBars.length > 0) {
-        const compareLine = chart.addLineSeries({ color: COMPARE_COLOR, lineWidth: 2 });
-        compareLine.setData(compareBars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+        const compareLine = chart.addLineSeries({
+          color: COMPARE_COLOR,
+          lineWidth: 2,
+        });
+        compareLine.setData(
+          compareBars.map((b) => ({
+            time: b.time as UTCTimestamp,
+            value: b.close,
+          })),
+        );
         seriesRef.current.push(compareLine);
       }
     }
@@ -263,7 +325,15 @@ export function PriceChart({ ticker }: Props) {
     }
 
     chart.timeScale().fitContent();
-  }, [ticker, primaryBars, compareTicker, compareBars, showCandles, maPeriods, showBollinger]);
+  }, [
+    ticker,
+    primaryBars,
+    compareTicker,
+    compareBars,
+    showCandles,
+    maPeriods,
+    showBollinger,
+  ]);
 
   function toggleMa(period: number) {
     setMaPeriods((prev) => {
@@ -314,7 +384,9 @@ export function PriceChart({ ticker }: Props) {
     <div className="panel">
       <div className="panel-header">
         <span>
-          {ticker ? `${ticker}${compareTicker ? ` vs ${compareTicker}` : ""} — Price` : "Price Chart"}
+          {ticker
+            ? `${ticker}${compareTicker ? ` vs ${compareTicker}` : ""} — Price`
+            : "Price Chart"}
         </span>
       </div>
       {ticker && (
@@ -337,7 +409,11 @@ export function PriceChart({ ticker }: Props) {
                 className={`toggle-btn ${effectiveMode === mode ? "active" : ""}`}
                 disabled={comparing && (mode === "price" || mode === "log")}
                 onClick={() => setScaleMode(mode)}
-                title={comparing && (mode === "price" || mode === "log") ? "Not available while comparing" : undefined}
+                title={
+                  comparing && (mode === "price" || mode === "log")
+                    ? "Not available while comparing"
+                    : undefined
+                }
               >
                 {label}
               </button>
@@ -348,7 +424,11 @@ export function PriceChart({ ticker }: Props) {
               <button
                 key={p}
                 className={`toggle-btn ${maPeriods.has(p) ? "active" : ""}`}
-                style={maPeriods.has(p) ? { background: MA_COLORS[p], borderColor: MA_COLORS[p] } : undefined}
+                style={
+                  maPeriods.has(p)
+                    ? { background: MA_COLORS[p], borderColor: MA_COLORS[p] }
+                    : undefined
+                }
                 onClick={() => toggleMa(p)}
               >
                 MA{p}
@@ -356,7 +436,11 @@ export function PriceChart({ ticker }: Props) {
             ))}
             <button
               className={`toggle-btn ${showBollinger ? "active" : ""}`}
-              style={showBollinger ? { background: BB_COLOR, borderColor: BB_COLOR } : undefined}
+              style={
+                showBollinger
+                  ? { background: BB_COLOR, borderColor: BB_COLOR }
+                  : undefined
+              }
               onClick={() => setShowBollinger((v) => !v)}
               title="Bollinger Bands (20-period, 2 std dev)"
             >
@@ -365,9 +449,15 @@ export function PriceChart({ ticker }: Props) {
           </div>
           <div className="chart-toolbar-group chart-compare">
             {compareTicker ? (
-              <span className="chart-compare-chip" style={{ color: COMPARE_COLOR, borderColor: COMPARE_COLOR }}>
+              <span
+                className="chart-compare-chip"
+                style={{ color: COMPARE_COLOR, borderColor: COMPARE_COLOR }}
+              >
                 {compareTicker}
-                <button className="chart-compare-remove" onClick={() => setCompareTicker(null)}>
+                <button
+                  className="chart-compare-remove"
+                  onClick={() => setCompareTicker(null)}
+                >
                   ×
                 </button>
               </span>
@@ -399,7 +489,9 @@ export function PriceChart({ ticker }: Props) {
       )}
       <div className="panel-body" style={{ padding: 0 }}>
         {!ticker ? (
-          <div className="empty-state">Select a ticker from the watchlist to view its chart.</div>
+          <div className="empty-state">
+            Select a ticker from the watchlist to view its chart.
+          </div>
         ) : null}
         <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       </div>
