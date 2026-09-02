@@ -285,6 +285,15 @@ body {
   text-align: right;
 }
 
+.watchlist-table thead th.sortable-th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.watchlist-table thead th.sortable-th:hover {
+  color: var(--text);
+}
+
 .watchlist-table tbody tr {
   cursor: pointer;
   border-bottom: 1px solid var(--border);

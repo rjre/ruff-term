@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { WatchlistQuote } from "@ruff-term/shared";
 import { fetchWatchlist } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
@@ -55,6 +55,22 @@ function pctClass(value: number): string {
   return "pct-flat";
 }
 
+type SortKey =
+  | "ticker"
+  | "shortName"
+  | "lastPrice"
+  | "changePct1d"
+  | "changePct2d";
+
+const SORT_ACCESSORS: Record<SortKey, (q: WatchlistQuote) => string | number> =
+  {
+    ticker: (q) => q.ticker,
+    shortName: (q) => q.shortName,
+    lastPrice: (q) => q.lastPrice,
+    changePct1d: (q) => q.changePct1d,
+    changePct2d: (q) => q.changePct2d,
+  };
+
 interface Props {
   selectedTicker: string | null;
   onSelectTicker: (ticker: string) => void;
@@ -77,6 +93,8 @@ export function Watchlist({
   const prevPrices = useRef<Map<string, number>>(new Map());
   const [flashes, setFlashes] = useState<Map<string, "up" | "down">>(new Map());
   const initialized = useRef(false);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDesc, setSortDesc] = useState(true);
 
   const tickers = lists[activeList] ?? [];
 
@@ -159,6 +177,34 @@ export function Watchlist({
     };
   }, [tickers]);
 
+  const sortedQuotes = useMemo(() => {
+    if (!sortKey) return quotes;
+    const accessor = SORT_ACCESSORS[sortKey];
+    return quotes.slice().sort((a, b) => {
+      const av = accessor(a);
+      const bv = accessor(b);
+      const cmp =
+        typeof av === "string"
+          ? av.localeCompare(bv as string)
+          : av - (bv as number);
+      return sortDesc ? -cmp : cmp;
+    });
+  }, [quotes, sortKey, sortDesc]);
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDesc((d) => !d);
+    } else {
+      setSortKey(key);
+      setSortDesc(true);
+    }
+  }
+
+  function sortIndicator(key: SortKey): string {
+    if (sortKey !== key) return "";
+    return sortDesc ? " ▾" : " ▴";
+  }
+
   function addTicker(ticker: string) {
     if (!tickers.includes(ticker)) updateActiveTickers([...tickers, ticker]);
     onSelectTicker(ticker);
@@ -234,7 +280,7 @@ export function Watchlist({
                   "%1D",
                   "%2D",
                 ],
-                ...quotes.map((q) => [
+                ...sortedQuotes.map((q) => [
                   q.ticker,
                   q.exchange,
                   q.shortName,
@@ -261,16 +307,41 @@ export function Watchlist({
           <table className="watchlist-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Short Name</th>
-                <th className="num">Last Price</th>
-                <th className="num">%1D</th>
-                <th className="num">%2D</th>
+                <th
+                  className="sortable-th"
+                  onClick={() => toggleSort("ticker")}
+                >
+                  Ticker{sortIndicator("ticker")}
+                </th>
+                <th
+                  className="sortable-th"
+                  onClick={() => toggleSort("shortName")}
+                >
+                  Short Name{sortIndicator("shortName")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("lastPrice")}
+                >
+                  Last Price{sortIndicator("lastPrice")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct1d")}
+                >
+                  %1D{sortIndicator("changePct1d")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct2d")}
+                >
+                  %2D{sortIndicator("changePct2d")}
+                </th>
                 <th aria-label="remove" />
               </tr>
             </thead>
             <tbody>
-              {quotes.map((q) => {
+              {sortedQuotes.map((q) => {
                 const flash = flashes.get(q.ticker);
                 return (
                   <tr
