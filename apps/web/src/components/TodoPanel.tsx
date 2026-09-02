@@ -25,12 +25,12 @@ const ITEMS: TodoItem[] = [
     note: "Pick a holding, see it against sector peers on standard multiples. Blocked on the same fundamentals-feed gap as above.",
   },
   {
-    title: "Export",
-    note: "No way to get a chart/table out as PDF/PNG/CSV for a note or deck. Purely an engineering gap, not a data-source one — feasible whenever prioritized.",
-  },
-  {
     title: "Real Excel plugin",
     note: "FactSet/Bloomberg's =FDS(...)-style Excel formulas. Not something a free/keyless data layer can replicate — paid-provider territory, flagged honestly rather than faked.",
+  },
+  {
+    title: "Sentiment indicators (AAII, CBOE put/call)",
+    note: "Checked both: aaii.com returns 403 to this environment (membership-gated beyond the current week's headline number), and CBOE's put/call ratio CSV endpoints returned 403/404. Neither has an accessible free feed from here — would need a different vantage point or a paid data reseller.",
   },
 ];
 

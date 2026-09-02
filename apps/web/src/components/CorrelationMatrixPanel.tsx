@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CorrelationMatrixSnapshot } from "@ruff-term/shared";
 import { fetchCorrelationMatrix } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 import { SourceFooter } from "./SourceFooter";
 
 const RANGES: Array<{ label: string; days: number }> = [
@@ -49,6 +50,19 @@ export function CorrelationMatrixPanel() {
             {r.label}
           </button>
         ))}
+        <button
+          className="icon-btn"
+          disabled={!snapshot}
+          onClick={() =>
+            snapshot &&
+            downloadCsv("correlation-matrix", [
+              ["", ...snapshot.labels],
+              ...snapshot.matrix.map((row, i) => [snapshot.labels[i], ...row]),
+            ])
+          }
+        >
+          Export CSV
+        </button>
       </div>
 
       {!snapshot ? (

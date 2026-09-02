@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ScreenerRow } from "@ruff-term/shared";
 import { fetchScreener } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 import { SourceFooter } from "./SourceFooter";
 
 function pctClass(value: number): string {
@@ -102,6 +103,32 @@ export function ScreenerPanel() {
 
         <button className="toggle-btn" onClick={() => setDescending((d) => !d)}>
           {descending ? "Highest first" : "Lowest first"}
+        </button>
+
+        <button
+          className="icon-btn"
+          disabled={!rows}
+          onClick={() =>
+            downloadCsv("screener", [
+              ["Ticker", "Name", "Sector", "Exchange", "Last", "%1D", "%1W", "%1M", "%3M", "%YTD", "%52wHigh", "%52wLow"],
+              ...filtered.map((r) => [
+                r.ticker,
+                r.name,
+                r.sector,
+                r.exchange,
+                r.lastPrice,
+                r.changePct1d,
+                r.changePct1w,
+                r.changePct1m,
+                r.changePct3m,
+                r.changePctYtd,
+                r.pctFrom52wHigh,
+                r.pctFrom52wLow,
+              ]),
+            ])
+          }
+        >
+          Export CSV
         </button>
 
         {rows && <span className="screener-count">{filtered.length} names</span>}

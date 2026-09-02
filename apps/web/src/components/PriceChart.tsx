@@ -10,6 +10,7 @@ import {
 } from "lightweight-charts";
 import type { PriceBar } from "@ruff-term/shared";
 import { fetchHistory } from "../api/client";
+import { downloadCsv } from "../lib/exportCsv";
 
 interface Props {
   ticker: string | null;
@@ -278,6 +279,37 @@ export function PriceChart({ ticker }: Props) {
     if (t) setCompareTicker(t);
   }
 
+  function exportPng() {
+    const canvas = chartRef.current?.takeScreenshot();
+    if (!canvas) return;
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${ticker ?? "chart"}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  function exportOhlcCsv() {
+    if (!ticker) return;
+    downloadCsv(`${ticker}-history`, [
+      ["Date", "Open", "High", "Low", "Close", "Volume"],
+      ...primaryBars.map((b) => [
+        new Date(b.time * 1000).toISOString().slice(0, 10),
+        b.open,
+        b.high,
+        b.low,
+        b.close,
+        b.volume,
+      ]),
+    ]);
+  }
+
   return (
     <div className="panel">
       <div className="panel-header">
@@ -354,6 +386,14 @@ export function PriceChart({ ticker }: Props) {
                 </button>
               </>
             )}
+          </div>
+          <div className="chart-toolbar-group">
+            <button className="icon-btn" onClick={exportPng}>
+              PNG
+            </button>
+            <button className="icon-btn" onClick={exportOhlcCsv}>
+              CSV
+            </button>
           </div>
         </div>
       )}
