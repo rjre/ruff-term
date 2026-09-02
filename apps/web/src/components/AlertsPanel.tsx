@@ -52,13 +52,24 @@ function saveTriggered(events: TriggeredEvent[]) {
   localStorage.setItem(TRIGGERED_KEY, JSON.stringify(events.slice(0, 50)));
 }
 
+function notificationPermission(): NotificationPermission | "unsupported" {
+  return typeof Notification === "undefined"
+    ? "unsupported"
+    : Notification.permission;
+}
+
 export function AlertsPanel() {
   const [alerts, setAlerts] = useState<Alert[]>(loadAlerts);
   const [triggered, setTriggered] = useState<TriggeredEvent[]>(loadTriggered);
   const [tickerInput, setTickerInput] = useState("");
-  const [conditionInput, setConditionInput] = useState<"above" | "below">("above");
+  const [conditionInput, setConditionInput] = useState<"above" | "below">(
+    "above",
+  );
   const [thresholdInput, setThresholdInput] = useState("");
   const [keywordInput, setKeywordInput] = useState("");
+  const [notifPermission, setNotifPermission] = useState(
+    notificationPermission,
+  );
   const seenNewsIds = useRef(new Set<string>());
 
   useEffect(() => saveAlerts(alerts), [alerts]);
@@ -70,15 +81,21 @@ export function AlertsPanel() {
     async function check() {
       const current = loadAlerts();
       const newEvents: TriggeredEvent[] = [];
+      const firedPriceAlertIds = new Set<string>();
 
-      const priceAlerts = current.filter((a): a is PriceAlert => a.kind === "price");
+      const priceAlerts = current.filter(
+        (a): a is PriceAlert => a.kind === "price",
+      );
       for (const alert of priceAlerts) {
         try {
           const [quote] = await fetchWatchlist([alert.ticker]);
           if (!quote) continue;
           const hit =
-            alert.condition === "above" ? quote.lastPrice >= alert.threshold : quote.lastPrice <= alert.threshold;
+            alert.condition === "above"
+              ? quote.lastPrice >= alert.threshold
+              : quote.lastPrice <= alert.threshold;
           if (hit) {
+            firedPriceAlertIds.add(alert.id);
             newEvents.push({
               id: `${alert.id}-${Date.now()}`,
               message: `${alert.ticker} is ${alert.condition === "above" ? "at/above" : "at/below"} ${alert.threshold} (last ${quote.lastPrice})`,
@@ -90,7 +107,9 @@ export function AlertsPanel() {
         }
       }
 
-      const newsAlerts = current.filter((a): a is NewsAlert => a.kind === "news");
+      const newsAlerts = current.filter(
+        (a): a is NewsAlert => a.kind === "news",
+      );
       if (newsAlerts.length > 0) {
         try {
           const news = await fetchNews();
@@ -98,7 +117,11 @@ export function AlertsPanel() {
             if (seenNewsIds.current.has(item.id)) continue;
             seenNewsIds.current.add(item.id);
             for (const alert of newsAlerts) {
-              if (item.headline.toLowerCase().includes(alert.keyword.toLowerCase())) {
+              if (
+                item.headline
+                  .toLowerCase()
+                  .includes(alert.keyword.toLowerCase())
+              ) {
                 newEvents.push({
                   id: `${alert.id}-${item.id}`,
                   message: `"${alert.keyword}" — ${item.headline}`,
@@ -115,6 +138,18 @@ export function AlertsPanel() {
 
       if (!cancelled && newEvents.length > 0) {
         setTriggered((prev) => [...newEvents, ...prev].slice(0, 50));
+        if (
+          typeof Notification !== "undefined" &&
+          Notification.permission === "granted"
+        ) {
+          for (const event of newEvents)
+            new Notification("Ruff Term alert", { body: event.message });
+        }
+      }
+      // Price alerts fire once, then deactivate — otherwise a price sitting
+      // past its threshold would re-fire on every 30s poll indefinitely.
+      if (!cancelled && firedPriceAlertIds.size > 0) {
+        setAlerts((prev) => prev.filter((a) => !firedPriceAlertIds.has(a.id)));
       }
     }
 
@@ -142,7 +177,11 @@ export function AlertsPanel() {
 
   function addNewsAlert() {
     if (!keywordInput.trim()) return;
-    const alert: NewsAlert = { id: `news-${Date.now()}`, kind: "news", keyword: keywordInput.trim() };
+    const alert: NewsAlert = {
+      id: `news-${Date.now()}`,
+      kind: "news",
+      keyword: keywordInput.trim(),
+    };
     setAlerts((prev) => [...prev, alert]);
     setKeywordInput("");
   }
@@ -155,21 +194,47 @@ export function AlertsPanel() {
     setTriggered([]);
   }
 
+  function requestNotifications() {
+    if (typeof Notification === "undefined") return;
+    Notification.requestPermission().then(setNotifPermission);
+  }
+
   return (
     <div className="module-view">
       <div className="module-banner">
         <div>
           <div className="module-banner-title">Alerts</div>
           <div className="module-banner-sub">
-            Price and news-keyword alerts, checked every 30s while this tab is open.
+            Price and news-keyword alerts, checked every 30s while this tab is
+            open.
           </div>
         </div>
       </div>
 
       <div className="demo-banner">
-        Per-browser only: alerts and history are stored in this browser's local storage, not a
-        server-side account, and are only checked while this tab is open in the foreground — not
-        push/email/SMS notifications.
+        Per-browser only: alerts and history are stored in this browser's local
+        storage, not a server-side account, and are only checked while this tab
+        is open (background tabs are throttled by the browser, so a trigger may
+        be delayed) — not server-side push/email/SMS. Price alerts fire once,
+        then deactivate.
+        {notifPermission === "unsupported" ? null : notifPermission ===
+          "granted" ? (
+          " Desktop notifications are enabled — a triggered alert will show even if you're not looking at this tab."
+        ) : (
+          <>
+            {" "}
+            <button
+              className="icon-btn"
+              onClick={requestNotifications}
+              disabled={notifPermission === "denied"}
+              style={{ marginLeft: 6 }}
+            >
+              {notifPermission === "denied"
+                ? "Notifications blocked"
+                : "Enable desktop notifications"}
+            </button>
+          </>
+        )}
       </div>
 
       <div className="portfolio-grid">
@@ -186,7 +251,9 @@ export function AlertsPanel() {
             <select
               className="search-input"
               value={conditionInput}
-              onChange={(e) => setConditionInput(e.target.value as "above" | "below")}
+              onChange={(e) =>
+                setConditionInput(e.target.value as "above" | "below")
+              }
               style={{ maxWidth: 110 }}
             >
               <option value="above">Above</option>
@@ -229,13 +296,20 @@ export function AlertsPanel() {
           ) : (
             <ul className="news-list">
               {alerts.map((a) => (
-                <li className="news-item" key={a.id} style={{ display: "flex", justifyContent: "space-between" }}>
+                <li
+                  className="news-item"
+                  key={a.id}
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <span>
                     {a.kind === "price"
                       ? `${a.ticker} ${a.condition} ${a.threshold}`
                       : `News contains "${a.keyword}"`}
                   </span>
-                  <button className="icon-btn" onClick={() => removeAlert(a.id)}>
+                  <button
+                    className="icon-btn"
+                    onClick={() => removeAlert(a.id)}
+                  >
                     Remove
                   </button>
                 </li>
@@ -245,7 +319,13 @@ export function AlertsPanel() {
         </section>
 
         <section className="portfolio-section">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <h3 className="section-heading" style={{ margin: 0 }}>
               Triggered
             </h3>
@@ -268,7 +348,9 @@ export function AlertsPanel() {
                   ) : (
                     t.message
                   )}
-                  <div className="news-meta">{new Date(t.triggeredAt).toLocaleString()}</div>
+                  <div className="news-meta">
+                    {new Date(t.triggeredAt).toLocaleString()}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -277,8 +359,8 @@ export function AlertsPanel() {
       </div>
 
       <div className="source-footer">
-        Prices: Yahoo Finance (live). News: Yahoo Finance search. Alerts logic and storage: this
-        browser only.
+        Prices: Yahoo Finance (live). News: Yahoo Finance search. Alerts logic
+        and storage: this browser only.
       </div>
     </div>
   );
