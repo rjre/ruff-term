@@ -12,6 +12,8 @@ import {
 import { getChartsOfTheDay } from "./chartsOfTheDay.js";
 import { getCommoditiesSnapshot } from "./commodities.js";
 import { getFxSnapshot } from "./fx.js";
+import { getGlobalMarketsCalendar } from "./globalMarketsCalendar.js";
+import { getGlobalMarketsGuide } from "./globalMarketsGuide.js";
 import { getPortfolioImpact } from "./impact.js";
 import { getMacroSnapshot } from "./macro.js";
 import { getNavMonitoringSnapshot } from "./navMonitoring.js";
@@ -91,6 +93,10 @@ app.get("/api/fx", async () => getFxSnapshot());
 app.get("/api/commodities", async () => getCommoditiesSnapshot());
 
 app.get("/api/rns", async () => getRnsFeed());
+
+app.get("/api/global-markets-calendar", async () => getGlobalMarketsCalendar());
+
+app.get("/api/global-markets-guide", async () => getGlobalMarketsGuide());
 
 app.get("/api/nav-monitoring", async () => getNavMonitoringSnapshot());
 

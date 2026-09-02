@@ -135,6 +135,31 @@ export interface FxSnapshot {
   g10: G10Line[];
 }
 
+export interface GlobalMarketsGuideCountry {
+  name: string;
+  region: string | null;
+  currency: string | null;
+  timeZone: string | null;
+  primaryExchange: string | null;
+  website: string | null;
+  hours: string | null;
+  primaryEquityIndex: string | null;
+  bloombergTicker: string | null;
+}
+
+export interface MarketHolidayDay {
+  date: string;
+  preciousMetalsNote: string | null;
+  currenciesClosed: string[];
+}
+
+export interface GlobalMarketsCalendarSnapshot {
+  live: boolean;
+  days: MarketHolidayDay[];
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
 export interface NavMonitoringCompany {
   ticker: string;
   name: string;

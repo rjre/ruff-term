@@ -1,6 +1,8 @@
 import type {
   ChartsOfTheDaySnapshot,
   FxSnapshot,
+  GlobalMarketsCalendarSnapshot,
+  GlobalMarketsGuideCountry,
   HistoryResponse,
   ImpactedNewsItem,
   MacroSnapshot,
@@ -88,6 +90,14 @@ export function fetchRns(): Promise<NewsItem[]> {
 
 export function fetchUkGiltYields(): Promise<UkGiltYieldSnapshot> {
   return getJson("/api/uk-gilt-yields");
+}
+
+export function fetchGlobalMarketsCalendar(): Promise<GlobalMarketsCalendarSnapshot> {
+  return getJson("/api/global-markets-calendar");
+}
+
+export function fetchGlobalMarketsGuide(): Promise<GlobalMarketsGuideCountry[]> {
+  return getJson("/api/global-markets-guide");
 }
 
 export function fetchNavMonitoring(): Promise<NavMonitoringSnapshot> {

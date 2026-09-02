@@ -22,6 +22,8 @@ export type View =
   | "podcastMonitor"
   | "fedVoting"
   | "fedStatement"
+  | "globalMarketsCalendar"
+  | "guideToGlobalMarkets"
   | "nicPerot";
 
 const TABS: Array<{ id: View; label: string }> = [
@@ -48,6 +50,8 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "podcastMonitor", label: "Podcast Monitor" },
   { id: "fedVoting", label: "Fed Voting" },
   { id: "fedStatement", label: "Fed Statement" },
+  { id: "globalMarketsCalendar", label: "Global Markets Calendar" },
+  { id: "guideToGlobalMarkets", label: "Guide to Global Markets" },
   { id: "nicPerot", label: "Nic Perot's Chart" },
 ];
 

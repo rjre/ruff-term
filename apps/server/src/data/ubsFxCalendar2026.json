@@ -1,0 +1,1611 @@
+[
+  {
+    "date": "2026-01-01",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "AED",
+      "ARS",
+      "AUD",
+      "BRL",
+      "CAD",
+      "CHF",
+      "CLP",
+      "CNY",
+      "COP",
+      "CZK",
+      "DKK",
+      "EUR",
+      "GBP",
+      "HKD",
+      "HUF",
+      "IDR",
+      "JPY",
+      "KRW",
+      "MXN",
+      "MYR",
+      "NOK",
+      "NZD",
+      "PEN",
+      "PHP",
+      "PLN",
+      "RON",
+      "RUB",
+      "SEK",
+      "SGD",
+      "THB",
+      "TRY",
+      "TWD",
+      "USD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-01-02",
+    "preciousMetalsNote": "Loco ZUR: XPD, XPT, XAG, XAU",
+    "currenciesClosed": [
+      "CHF",
+      "CNY",
+      "HUF",
+      "JPY",
+      "NZD",
+      "PEN",
+      "RON",
+      "RUB",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-01-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY",
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-04",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-05",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PLN",
+      "RON",
+      "RUB",
+      "SEK"
+    ]
+  },
+  {
+    "date": "2026-01-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RON",
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-01-12",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "COP",
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-01-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "IDR"
+    ]
+  },
+  {
+    "date": "2026-01-19",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-01-24",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RON"
+    ]
+  },
+  {
+    "date": "2026-01-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD",
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-02-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MXN",
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-02-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "NZD"
+    ]
+  },
+  {
+    "date": "2026-02-11",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-02-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-02-16",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "ARS",
+      "BRL",
+      "CAD",
+      "CNY",
+      "IDR",
+      "KRW",
+      "TWD",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-02-17",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "BRL",
+      "CNY",
+      "HKD",
+      "IDR",
+      "KRW",
+      "MYR",
+      "PHP",
+      "SGD",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-02-18",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "HKD",
+      "KRW",
+      "MYR",
+      "SGD",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-02-19",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "HKD",
+      "INR",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-02-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-02-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-02-22",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-02-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "JPY",
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-02-27",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-03-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "KRW"
+    ]
+  },
+  {
+    "date": "2026-03-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-03-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-03-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-03-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HUF"
+    ]
+  },
+  {
+    "date": "2026-03-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MXN"
+    ]
+  },
+  {
+    "date": "2026-03-18",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "IDR"
+    ]
+  },
+  {
+    "date": "2026-03-19",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "IDR",
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-03-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "IDR",
+      "JPY",
+      "PHP",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-03-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "INR",
+      "MYR",
+      "SGD",
+      "TRY",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-03-22",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "MYR",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-03-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "COP",
+      "IDR",
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-03-24",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "IDR"
+    ]
+  },
+  {
+    "date": "2026-03-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-03-31",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-04-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-04-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "COP",
+      "DKK",
+      "MXN",
+      "NOK",
+      "PEN",
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-04-03",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "ARS",
+      "AUD",
+      "BRL",
+      "CAD",
+      "CHF",
+      "CLP",
+      "CZK",
+      "DKK",
+      "EUR",
+      "GBP",
+      "HKD",
+      "HUF",
+      "IDR",
+      "INR",
+      "MXN",
+      "NOK",
+      "NZD",
+      "PEN",
+      "PHP",
+      "SEK",
+      "SGD",
+      "TWD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-04-04",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD",
+      "CLP",
+      "CNY",
+      "HKD",
+      "MXN"
+    ]
+  },
+  {
+    "date": "2026-04-06",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "AUD",
+      "CHF",
+      "CNY",
+      "CZK",
+      "DKK",
+      "EUR",
+      "GBP",
+      "HKD",
+      "HUF",
+      "NOK",
+      "NZD",
+      "PLN",
+      "SEK",
+      "THB",
+      "TWD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-04-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HKD"
+    ]
+  },
+  {
+    "date": "2026-04-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-04-10",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RON"
+    ]
+  },
+  {
+    "date": "2026-04-13",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RON",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-04-14",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-04-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-04-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "BRL"
+    ]
+  },
+  {
+    "date": "2026-04-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-04-25",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD"
+    ]
+  },
+  {
+    "date": "2026-04-27",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "NZD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-04-29",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-05-01",
+    "preciousMetalsNote": "Loco ZUR: XPD, XPT, XAG, XAU",
+    "currenciesClosed": [
+      "ARS",
+      "BRL",
+      "CHF",
+      "CLP",
+      "CNY",
+      "COP",
+      "CZK",
+      "EUR",
+      "HKD",
+      "HUF",
+      "IDR",
+      "INR",
+      "KRW",
+      "MXN",
+      "MYR",
+      "NOK",
+      "PEN",
+      "PHP",
+      "PLN",
+      "RON",
+      "RUB",
+      "SEK",
+      "SGD",
+      "THB",
+      "TRY",
+      "TWD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-05-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PLN"
+    ]
+  },
+  {
+    "date": "2026-05-04",
+    "preciousMetalsNote": "Loco LDN: XPD, XPT, XAG, XAU",
+    "currenciesClosed": [
+      "CNY",
+      "GBP",
+      "JPY",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-05-05",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "JPY",
+      "KRW"
+    ]
+  },
+  {
+    "date": "2026-05-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-05-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK"
+    ]
+  },
+  {
+    "date": "2026-05-11",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-05-14",
+    "preciousMetalsNote": "Loco ZUR: XPD, XPT, XAG, XAU",
+    "currenciesClosed": [
+      "CHF",
+      "DKK",
+      "IDR",
+      "NOK",
+      "SEK"
+    ]
+  },
+  {
+    "date": "2026-05-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "DKK",
+      "IDR"
+    ]
+  },
+  {
+    "date": "2026-05-17",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "NOK"
+    ]
+  },
+  {
+    "date": "2026-05-18",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CAD",
+      "COP"
+    ]
+  },
+  {
+    "date": "2026-05-19",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-05-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-05-25",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "ARS",
+      "CHF",
+      "DKK",
+      "GBP",
+      "HKD",
+      "HUF",
+      "KRW",
+      "NOK",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-05-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED"
+    ]
+  },
+  {
+    "date": "2026-05-27",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "IDR",
+      "MYR",
+      "PHP",
+      "SGD",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-05-28",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "IDR",
+      "INR",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-05-29",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-05-30",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-05-31",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "IDR",
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-06-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "IDR",
+      "MYR",
+      "NZD",
+      "RON",
+      "SGD",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-06-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "KRW",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-06-04",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "BRL",
+      "PLN"
+    ]
+  },
+  {
+    "date": "2026-06-05",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "DKK"
+    ]
+  },
+  {
+    "date": "2026-06-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "KRW",
+      "SEK"
+    ]
+  },
+  {
+    "date": "2026-06-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-06-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD",
+      "COP"
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PHP",
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-06-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "COP"
+    ]
+  },
+  {
+    "date": "2026-06-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "IDR",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-06-17",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-06-19",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "CNY",
+      "HKD",
+      "SEK",
+      "TWD",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-06-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS"
+    ]
+  },
+  {
+    "date": "2026-06-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-06-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-06-29",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP",
+      "COP",
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-07-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CAD",
+      "HKD"
+    ]
+  },
+  {
+    "date": "2026-07-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-07-05",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK"
+    ]
+  },
+  {
+    "date": "2026-07-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK"
+    ]
+  },
+  {
+    "date": "2026-07-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS"
+    ]
+  },
+  {
+    "date": "2026-07-10",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "NZD"
+    ]
+  },
+  {
+    "date": "2026-07-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-07-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-07-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "COP",
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-07-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-07-28",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-07-29",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-08-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CHF"
+    ]
+  },
+  {
+    "date": "2026-08-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD",
+      "CAD"
+    ]
+  },
+  {
+    "date": "2026-08-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-08-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "COP"
+    ]
+  },
+  {
+    "date": "2026-08-10",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "SGD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-08-11",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-08-12",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-08-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP",
+      "INR",
+      "PLN",
+      "RON"
+    ]
+  },
+  {
+    "date": "2026-08-17",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "COP",
+      "IDR",
+      "KRW"
+    ]
+  },
+  {
+    "date": "2026-08-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HUF"
+    ]
+  },
+  {
+    "date": "2026-08-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HUF",
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-08-25",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED",
+      "IDR",
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-08-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-08-30",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN",
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-08-31",
+    "preciousMetalsNote": "Loco LDN: XPD, XPT, XAG, XAU",
+    "currenciesClosed": [
+      "GBP",
+      "MYR",
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-09-07",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "BRL",
+      "CAD",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-09-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MXN",
+      "MYR"
+    ]
+  },
+  {
+    "date": "2026-09-18",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-09-19",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-09-21",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "KRW",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "KRW",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-09-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HKD",
+      "KRW"
+    ]
+  },
+  {
+    "date": "2026-09-28",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-09-30",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CAD"
+    ]
+  },
+  {
+    "date": "2026-10-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "HKD"
+    ]
+  },
+  {
+    "date": "2026-10-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY",
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-10-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-10-04",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-10-05",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AUD",
+      "CNY",
+      "KRW"
+    ]
+  },
+  {
+    "date": "2026-10-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-10-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CNY"
+    ]
+  },
+  {
+    "date": "2026-10-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-10-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "KRW",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-10-12",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "ARS",
+      "BRL",
+      "CAD",
+      "CLP",
+      "COP",
+      "JPY",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-10-13",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-10-19",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HKD"
+    ]
+  },
+  {
+    "date": "2026-10-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-10-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "HUF",
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-10-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "NZD",
+      "TWD"
+    ]
+  },
+  {
+    "date": "2026-10-28",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK"
+    ]
+  },
+  {
+    "date": "2026-10-29",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "TRY"
+    ]
+  },
+  {
+    "date": "2026-10-31",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP"
+    ]
+  },
+  {
+    "date": "2026-11-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CLP",
+      "HUF",
+      "PEN",
+      "PHP",
+      "PLN"
+    ]
+  },
+  {
+    "date": "2026-11-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "BRL",
+      "COP",
+      "MXN",
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-11-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-11-04",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RUB"
+    ]
+  },
+  {
+    "date": "2026-11-06",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS"
+    ]
+  },
+  {
+    "date": "2026-11-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-11-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MYR",
+      "SGD"
+    ]
+  },
+  {
+    "date": "2026-11-10",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-11-11",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "CAD",
+      "PLN",
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-11-15",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "BRL"
+    ]
+  },
+  {
+    "date": "2026-11-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "COP",
+      "MXN"
+    ]
+  },
+  {
+    "date": "2026-11-17",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK"
+    ]
+  },
+  {
+    "date": "2026-11-20",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "BRL"
+    ]
+  },
+  {
+    "date": "2026-11-23",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "JPY"
+    ]
+  },
+  {
+    "date": "2026-11-24",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "INR"
+    ]
+  },
+  {
+    "date": "2026-11-26",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "USD"
+    ]
+  },
+  {
+    "date": "2026-11-30",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PHP",
+      "RON"
+    ]
+  },
+  {
+    "date": "2026-12-01",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "RON"
+    ]
+  },
+  {
+    "date": "2026-12-02",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED"
+    ]
+  },
+  {
+    "date": "2026-12-03",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "AED"
+    ]
+  },
+  {
+    "date": "2026-12-07",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-12-08",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "CLP",
+      "COP",
+      "PEN",
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-12-09",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PEN"
+    ]
+  },
+  {
+    "date": "2026-12-10",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "THB"
+    ]
+  },
+  {
+    "date": "2026-12-12",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "MXN"
+    ]
+  },
+  {
+    "date": "2026-12-16",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-12-24",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CZK",
+      "DKK",
+      "HUF",
+      "IDR",
+      "NOK",
+      "PHP",
+      "PLN",
+      "SEK"
+    ]
+  },
+  {
+    "date": "2026-12-25",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "ARS",
+      "AUD",
+      "BRL",
+      "CAD",
+      "CHF",
+      "CLP",
+      "COP",
+      "CZK",
+      "DKK",
+      "EUR",
+      "GBP",
+      "HKD",
+      "HUF",
+      "IDR",
+      "INR",
+      "KRW",
+      "MXN",
+      "MYR",
+      "NOK",
+      "NZD",
+      "PEN",
+      "PHP",
+      "PLN",
+      "RON",
+      "SEK",
+      "SGD",
+      "TWD",
+      "USD",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-12-26",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "CHF",
+      "CZK",
+      "DKK",
+      "EUR",
+      "HKD",
+      "HUF",
+      "NOK",
+      "PLN",
+      "RON",
+      "SEK",
+      "ZAR"
+    ]
+  },
+  {
+    "date": "2026-12-28",
+    "preciousMetalsNote": "Loco ZUR & LDN: XAG, XAU, XPD, XPT",
+    "currenciesClosed": [
+      "AUD",
+      "CAD",
+      "GBP",
+      "NZD"
+    ]
+  },
+  {
+    "date": "2026-12-30",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "PHP"
+    ]
+  },
+  {
+    "date": "2026-12-31",
+    "preciousMetalsNote": null,
+    "currenciesClosed": [
+      "ARS",
+      "CLP",
+      "COP",
+      "DKK",
+      "JPY",
+      "PHP",
+      "RUB",
+      "SEK",
+      "THB"
+    ]
+  }
+]

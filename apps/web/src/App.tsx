@@ -6,6 +6,8 @@ import { DividendsPanel } from "./components/DividendsPanel";
 import { EventsPanel } from "./components/EventsPanel";
 import { FmpMarketDataPanel } from "./components/FmpMarketDataPanel";
 import { FxPanel } from "./components/FxPanel";
+import { GlobalMarketsCalendarPanel } from "./components/GlobalMarketsCalendarPanel";
+import { GuideToGlobalMarketsPanel } from "./components/GuideToGlobalMarketsPanel";
 import { HeadlinesPanel } from "./components/HeadlinesPanel";
 import { HistoricPricingPanel } from "./components/HistoricPricingPanel";
 import { IframeEmbedPanel } from "./components/IframeEmbedPanel";
@@ -191,6 +193,16 @@ export function App() {
           src="https://rjre.github.io/fed-statement/"
           repoLabel="rjre/fed-statement"
         />
+      )}
+      {view === "globalMarketsCalendar" && (
+        <div className="app-body-scroll">
+          <GlobalMarketsCalendarPanel />
+        </div>
+      )}
+      {view === "guideToGlobalMarkets" && (
+        <div className="app-body-scroll">
+          <GuideToGlobalMarketsPanel />
+        </div>
       )}
       {view === "nicPerot" && (
         <div className="app-body-scroll">
