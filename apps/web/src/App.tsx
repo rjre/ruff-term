@@ -146,7 +146,11 @@ export function App() {
           onClick={() => setView("morningBrief")}
           title="Go to Morning Brief"
         >
-          <img className="app-logo-mark" src="/brand/ruffer-logo.png" alt="Ruffer" />
+          <img
+            className="app-logo-mark"
+            src="/brand/ruffer-logo.png"
+            alt="Ruffer"
+          />
           <div className="app-brand-divider" />
           <div>
             <div className="app-title">Ruff Term</div>
@@ -222,7 +226,7 @@ export function App() {
       )}
       {view === "impact" && (
         <div className="app-body-scroll">
-          <ImpactPanel />
+          <ImpactPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "chartsOfTheDay" && (

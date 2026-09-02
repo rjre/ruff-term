@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ImpactedNewsItem } from "@ruff-term/shared";
 import { fetchImpact } from "../api/client";
+import { NewsTickerChips } from "./NewsTickerChips";
 import { SourceFooter } from "./SourceFooter";
 
 function timeAgo(iso: string): string {
@@ -12,7 +13,11 @@ function timeAgo(iso: string): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export function ImpactPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function ImpactPanel({ onSelectTicker }: Props) {
   const [items, setItems] = useState<ImpactedNewsItem[] | null>(null);
 
   useEffect(() => {
@@ -27,7 +32,8 @@ export function ImpactPanel() {
         <div>
           <div className="module-banner-title">Ruffer Impact</div>
           <div className="module-banner-sub">
-            Today's portfolio newsflow, reframed against the fund's disclosed allocation and holdings.
+            Today's portfolio newsflow, reframed against the fund's disclosed
+            allocation and holdings.
           </div>
         </div>
       </div>
@@ -40,13 +46,21 @@ export function ImpactPanel() {
           {items.map((item) => (
             <li key={item.id} className="impact-item">
               <div className="impact-headline-row">
-                <a href={item.url} target="_blank" rel="noreferrer" className="impact-headline">
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="impact-headline"
+                >
                   {item.headline}
                 </a>
               </div>
               <div className="news-meta">
                 {item.source} · {timeAgo(item.publishedAt)}
-                {item.tickers.length > 0 ? ` · ${item.tickers.join(", ")}` : ""}
+                <NewsTickerChips
+                  tickers={item.tickers}
+                  onSelectTicker={onSelectTicker}
+                />
               </div>
               <p className="impact-text">{item.impact}</p>
             </li>
