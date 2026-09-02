@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import type { SearchResult } from "@ruff-term/shared";
 import { fetchSearch } from "../api/client";
 
@@ -7,7 +7,10 @@ interface Props {
   compact?: boolean;
 }
 
-export function TickerSearch({ onSelect, compact }: Props) {
+export const TickerSearch = forwardRef<HTMLInputElement, Props>(function TickerSearch(
+  { onSelect, compact },
+  forwardedRef
+) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -45,8 +48,9 @@ export function TickerSearch({ onSelect, compact }: Props) {
   return (
     <div className="search-box" ref={containerRef}>
       <input
+        ref={forwardedRef}
         className="search-input"
-        placeholder={compact ? "Add ticker…" : "Search ticker or company…"}
+        placeholder={compact ? "Add ticker…" : "Search ticker or company… (press / )"}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => results.length > 0 && setOpen(true)}
@@ -63,4 +67,4 @@ export function TickerSearch({ onSelect, compact }: Props) {
       )}
     </div>
   );
-}
+});

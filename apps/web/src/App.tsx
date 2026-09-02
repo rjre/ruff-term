@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AladdinExplorePanel } from "./components/AladdinExplorePanel";
 import { AlertsPanel } from "./components/AlertsPanel";
 import { BondAuctionsPanel } from "./components/BondAuctionsPanel";
@@ -85,6 +85,23 @@ export function App() {
     setView("markets");
   }
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // "/" focuses the ticker search from anywhere, like Slack/Linear/GitHub —
+  // unless the user is already typing somewhere else on the page.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "/") return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -96,7 +113,7 @@ export function App() {
             <div className="app-tagline">Internal terminal</div>
           </div>
         </div>
-        <TickerSearch onSelect={goToMarkets} />
+        <TickerSearch ref={searchInputRef} onSelect={goToMarkets} />
         <div style={{ marginLeft: "auto" }}>
           {dataSource ? <span className="data-source-badge">{dataSource} data</span> : null}
         </div>
