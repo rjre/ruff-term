@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ColorType,
+  LineStyle,
   PriceScaleMode,
   createChart,
   type IChartApi,
@@ -251,7 +252,7 @@ export function PriceChart({ ticker }: Props) {
         const line = chart.addLineSeries({
           color: BB_COLOR,
           lineWidth: 1,
-          lineStyle: 2 /* dashed */,
+          lineStyle: LineStyle.Dashed,
           priceLineVisible: false,
           lastValueVisible: false,
         });
