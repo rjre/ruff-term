@@ -39,6 +39,9 @@ export function PortfolioActivityPanel() {
           <div className="module-banner-title">Portfolio Activity</div>
           <div className="module-banner-sub">
             Week-to-date trading actions across the watchlist.
+            {snapshot
+              ? ` Week of ${new Date(snapshot.weekStart).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}.`
+              : ""}
           </div>
         </div>
       </div>

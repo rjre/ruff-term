@@ -358,7 +358,7 @@ export function Watchlist({
                     <td className="short-name-cell">{q.shortName}</td>
                     <td
                       className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
-                      title={q.currency}
+                      title={`${q.currency} · updated ${new Date(q.updatedAt).toLocaleTimeString()}`}
                     >
                       {formatPrice(q.lastPrice)}
                       {q.priceSuffix ? (

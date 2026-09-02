@@ -60,7 +60,12 @@ export function InstrumentPanelGrid({ panels, onSelectTicker }: Props) {
                   }
                 >
                   <td className="ticker-cell">{line.label}</td>
-                  <td className="num-cell">{formatLast(line)}</td>
+                  <td className="num-cell">
+                    {formatLast(line)}
+                    {!line.isRateLevel && (
+                      <span className="price-suffix"> {line.currency}</span>
+                    )}
+                  </td>
                   <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                     {formatSignedPct(line.changePct1d)}
                   </td>

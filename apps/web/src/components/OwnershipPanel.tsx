@@ -127,7 +127,11 @@ export function OwnershipPanel({ onSelectTicker }: Props) {
                           ? "Officer"
                           : "—")}
                   </td>
-                  <td>{t.transactionDate}</td>
+                  <td>
+                    <a href={t.filingUrl} target="_blank" rel="noreferrer">
+                      {t.transactionDate}
+                    </a>
+                  </td>
                   <td className={codeClass(t.acquiredDisposed)}>
                     {t.transactionCodeLabel} ({t.transactionCode})
                   </td>

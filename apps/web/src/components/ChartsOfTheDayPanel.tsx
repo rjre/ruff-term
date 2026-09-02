@@ -101,7 +101,8 @@ export function ChartsOfTheDayPanel() {
           <div className="module-banner-sub">
             Today's growth-vs-protection regime, read through Ruffer's own
             public asset-allocation categories, plus what the portfolio newsflow
-            is actually about. Refreshes every 30s.
+            is actually about. Refreshes every 30s. Last update{" "}
+            {new Date(snapshot.asOf).toLocaleTimeString()}.
           </div>
         </div>
       </div>
