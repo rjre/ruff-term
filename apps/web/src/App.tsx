@@ -200,7 +200,7 @@ export function App() {
             onTickersChange={setWatchlistTickers}
           />
           <div className="right-column">
-            <PriceChart ticker={selectedTicker} />
+            <PriceChart ticker={selectedTicker} onSelectTicker={goToMarkets} />
             <NewsFeed
               ticker={selectedTicker}
               watchlistTickers={watchlistTickers}

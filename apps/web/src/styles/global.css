@@ -589,6 +589,36 @@ body {
   font-size: 12px;
 }
 
+.recent-tickers-row {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.recent-tickers-label {
+  color: var(--text-faint);
+  margin-right: 4px;
+}
+
+.recent-ticker-chip {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.recent-ticker-chip:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 .data-source-badge {
   font-size: 10px;
   padding: 2px 6px;

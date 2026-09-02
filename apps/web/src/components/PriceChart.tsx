@@ -11,6 +11,7 @@ import {
 import type { PriceBar } from "@ruff-term/shared";
 import { fetchHistory } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
+import { addRecentTicker, getRecentTickers } from "../lib/recentTickers";
 import { cssVar } from "../lib/theme";
 
 function chartColors() {
@@ -24,6 +25,7 @@ function chartColors() {
 
 interface Props {
   ticker: string | null;
+  onSelectTicker?: (ticker: string) => void;
 }
 
 const RANGES: Array<{ label: string; days: number }> = [
@@ -100,12 +102,21 @@ function toLinePoints(bars: PriceBar[], values: (number | null)[]) {
     );
 }
 
-export function PriceChart({ ticker }: Props) {
+export function PriceChart({ ticker, onSelectTicker }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line" | "Histogram">[]>(
     [],
   );
+
+  const [recentTickers, setRecentTickers] =
+    useState<string[]>(getRecentTickers);
+
+  useEffect(() => {
+    if (!ticker) return;
+    addRecentTicker(ticker);
+    setRecentTickers(getRecentTickers());
+  }, [ticker]);
 
   const [rangeDays, setRangeDays] = useState(180);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("price");
@@ -490,7 +501,21 @@ export function PriceChart({ ticker }: Props) {
       <div className="panel-body" style={{ padding: 0 }}>
         {!ticker ? (
           <div className="empty-state">
-            Select a ticker from the watchlist to view its chart.
+            <div>Select a ticker from the watchlist to view its chart.</div>
+            {onSelectTicker && recentTickers.length > 0 && (
+              <div className="recent-tickers-row">
+                <span className="recent-tickers-label">Recently viewed:</span>
+                {recentTickers.map((t) => (
+                  <button
+                    key={t}
+                    className="recent-ticker-chip"
+                    onClick={() => onSelectTicker(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : null}
         <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
