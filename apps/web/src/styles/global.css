@@ -1047,6 +1047,33 @@ body {
   margin-bottom: 4px;
 }
 
+/* Scenario calculator */
+
+.scenario-input-row {
+  display: grid;
+  grid-template-columns: 190px 1fr 60px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.scenario-input-row label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.scenario-input-row input[type="range"] {
+  accent-color: var(--ruffer-green-light);
+}
+
+.scenario-input-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Correlation matrix */
 
 .corr-table {

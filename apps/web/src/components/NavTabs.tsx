@@ -33,6 +33,7 @@ export type View =
   | "todo"
   | "copilot"
   | "correlation"
+  | "scenario"
   | "nicPerot";
 
 const TABS: Array<{ id: View; label: string }> = [
@@ -70,6 +71,7 @@ const TABS: Array<{ id: View; label: string }> = [
   { id: "todo", label: "To Do" },
   { id: "copilot", label: "Copilot" },
   { id: "correlation", label: "Correlation Matrix" },
+  { id: "scenario", label: "Scenario Calculator" },
   { id: "nicPerot", label: "Nic Perot's Chart" },
 ];
 

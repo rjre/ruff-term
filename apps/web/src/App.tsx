@@ -31,6 +31,7 @@ import { PortfolioPanel } from "./components/PortfolioPanel";
 import { PriceChart } from "./components/PriceChart";
 import { ResearchPanel } from "./components/ResearchPanel";
 import { RnsFeedPanel } from "./components/RnsFeedPanel";
+import { ScenarioCalculatorPanel } from "./components/ScenarioCalculatorPanel";
 import { ScreenerPanel } from "./components/ScreenerPanel";
 import { ShortPositionsPanel } from "./components/ShortPositionsPanel";
 import { TickerSearch } from "./components/TickerSearch";
@@ -257,6 +258,11 @@ export function App() {
       {view === "correlation" && (
         <div className="app-body-scroll">
           <CorrelationMatrixPanel />
+        </div>
+      )}
+      {view === "scenario" && (
+        <div className="app-body-scroll">
+          <ScenarioCalculatorPanel />
         </div>
       )}
       {view === "nicPerot" && (
