@@ -1,0 +1,23 @@
+{
+  "name": "ruff-term",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ruff Term - an internal market data terminal",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@ruff-term/server & npm run dev --workspace=@ruff-term/web & wait",
+    "dev:server": "npm run dev --workspace=@ruff-term/server",
+    "dev:web": "npm run dev --workspace=@ruff-term/web",
+    "build": "npm run build --workspace=@ruff-term/server && npm run build --workspace=@ruff-term/web",
+    "typecheck": "npm run typecheck --workspace=@ruff-term/server && npm run typecheck --workspace=@ruff-term/web"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
