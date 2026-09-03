@@ -1,10 +1,14 @@
 import type {
   CentralBankBalanceSheetSnapshot,
+  CitiBrowseLevel,
+  CitiCatalog,
+  CitiInventory,
   CftcPositioningSnapshot,
   ChartsOfTheDaySnapshot,
   CorrelationMatrixSnapshot,
   DividendsSnapshot,
   FxSnapshot,
+  G10GridSnapshot,
   GlobalMarketsCalendarSnapshot,
   GlobalMarketsGuideCountry,
   HistoryResponse,
@@ -37,6 +41,22 @@ async function getJson<T>(path: string): Promise<T> {
 export function fetchWatchlist(tickers?: string[]): Promise<WatchlistQuote[]> {
   const qs = tickers && tickers.length ? `?tickers=${tickers.join(",")}` : "";
   return getJson(`/api/watchlist${qs}`);
+}
+
+export function fetchG10Grid(): Promise<G10GridSnapshot> {
+  return getJson("/api/citi/g10");
+}
+
+export function fetchCitiCatalog(): Promise<CitiCatalog> {
+  return getJson("/api/citi/catalog");
+}
+
+export function fetchCitiBrowse(prefix: string): Promise<CitiBrowseLevel> {
+  return getJson(`/api/citi/browse?prefix=${encodeURIComponent(prefix)}`);
+}
+
+export function fetchCitiInventory(prefix: string): Promise<CitiInventory> {
+  return getJson(`/api/citi/inventory?prefix=${encodeURIComponent(prefix)}`);
 }
 
 export function fetchVolSurface(

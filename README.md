@@ -83,6 +83,7 @@ markup, not guessed:
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
 | FX | G10 spot grid from Yahoo, plus a live Citi Velocity implied-vol smile — see [FX vol surface](#fx-vol-surface) |
+| Citi Data | What the Citi Velocity entitlement reaches: the full 161,380-tag inventory (free to browse) and a G10 cross-rate grid triangulated from nine spot legs — see [Citi Data](#citi-data) |
 | Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
 | Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Price alerts fire once then deactivate. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS, though an optional Notification API hook can show a real desktop notification |
@@ -221,6 +222,27 @@ One exhausted tag fails the whole batched query for that tenor. So:
 
 Widening `PAIRS` or `TENORS` in `apps/server/src/citi/volSurface.ts` spends
 more of the budget, so add deliberately.
+
+### Citi Data
+
+A showcase tab for the Citi Velocity entitlement, built around the one fact
+that governs everything here: **`/tagbrowsing` and `/taglisting` are free,
+`/data` and `/metadata` are not.**
+
+- **Tag tree explorer** — descend all 161,380 tags across the 24 FX
+  sub-categories, with Citi's own labels for every coded level. Every click is
+  an unmetered call, so browsing costs nothing. Sub-category counts are warmed
+  in the background (one free call each, rate-limited to one per second) and
+  cached for a week.
+- **G10 cross-rate grid** — the full 10×10 matrix of rates, % change and a
+  per-currency strength score. Citi publishes only the nine USD-quoted majors,
+  so every other cross is triangulated through USD: 90 crosses for **one**
+  metered call rather than 90 tags.
+
+The grid caches to disk exactly as the vol surface does, and for the same
+reason — including the *baseline* each change is measured against. Persisting
+the latest close but not the baseline leaves a restarted server holding a
+cache that looks fresh and a change grid with nothing to compare against.
 
 ## Getting started
 

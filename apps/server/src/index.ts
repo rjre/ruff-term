@@ -16,6 +16,8 @@ import { getCommoditiesSnapshot } from "./commodities.js";
 import { getCorrelationMatrix } from "./correlation.js";
 import { getDividends } from "./dividends.js";
 import { getFxSnapshot } from "./fx.js";
+import { getG10Grid } from "./citi/g10.js";
+import * as citiTags from "./citi/tags.js";
 import {
   PAIRS as VOL_PAIRS,
   TENORS as VOL_TENORS,
@@ -128,6 +130,31 @@ app.get("/api/fx/vol-surface/options", async () => ({
   pairs: VOL_PAIRS,
   tenors: VOL_TENORS,
 }));
+
+/**
+ * Citi Data tab.
+ *
+ * /catalog and /browse hit `/tagbrowsing` and `/taglisting`, the two
+ * endpoints Citi does NOT meter — so the tag tree can be explored freely.
+ * /g10 is the one metered call here, cached to disk for 12h like the vol
+ * surface.
+ */
+app.get("/api/citi/browse", async (req) => {
+  const query = req.query as { prefix?: string };
+  const prefix = (query.prefix ?? "FX").toUpperCase();
+  const level = await citiTags.browse(prefix);
+  return { prefix, ...level };
+});
+
+app.get("/api/citi/inventory", async (req) => {
+  const query = req.query as { prefix?: string };
+  const prefix = (query.prefix ?? "FX").toUpperCase();
+  return citiTags.inventory(prefix);
+});
+
+app.get("/api/citi/catalog", async () => citiTags.catalog());
+
+app.get("/api/citi/g10", async () => getG10Grid());
 
 app.get("/api/commodities", async () => getCommoditiesSnapshot());
 

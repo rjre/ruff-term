@@ -39,10 +39,17 @@ export interface CachedPoint {
   fetchedAt: string;
 }
 
+export interface BaselinePoint {
+  date: number;
+  value: number;
+}
+
 const VALUES_FILE = "tag-values.json";
+const BASELINES_FILE = "tag-baselines.json";
 const LEDGER_FILE = "call-ledger.json";
 
 let values = read<Record<string, CachedPoint>>(VALUES_FILE, {});
+let baselines = read<Record<string, BaselinePoint>>(BASELINES_FILE, {});
 const ledger = read<Record<string, number>>(LEDGER_FILE, {});
 
 export function getCachedTag(tag: string): CachedPoint | undefined {
@@ -52,6 +59,24 @@ export function getCachedTag(tag: string): CachedPoint | undefined {
 export function putCachedTags(next: Record<string, CachedPoint>): void {
   values = { ...values, ...next };
   write(VALUES_FILE, values);
+}
+
+/**
+ * The opening close of the window a tag was last fetched over, used as the
+ * comparison point for change grids.
+ *
+ * Persisted for the same reason the values are: after a restart the cached
+ * values still look fresh, so nothing refetches — and an in-memory baseline
+ * would leave the change grid permanently empty with no way to refill it
+ * short of spending another metered call.
+ */
+export function getBaseline(tag: string): BaselinePoint | undefined {
+  return baselines[tag];
+}
+
+export function putBaselines(next: Record<string, BaselinePoint>): void {
+  baselines = { ...baselines, ...next };
+  write(BASELINES_FILE, baselines);
 }
 
 /**

@@ -7,6 +7,7 @@ import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartModal } from "./components/ChartModal";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
 import { ChartsPanel } from "./components/ChartsPanel";
+import { CitiDataPanel } from "./components/CitiDataPanel";
 import { CommandPalette } from "./components/CommandPalette";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
@@ -329,6 +330,11 @@ export function App() {
       {view === "fx" && (
         <div className="app-body-scroll">
           <FxPanel onSelectTicker={goToMarkets} />
+        </div>
+      )}
+      {view === "citiData" && (
+        <div className="app-body-scroll">
+          <CitiDataPanel />
         </div>
       )}
       {view === "fmp" && (

@@ -92,10 +92,25 @@ export async function post<T>(path: string, body: unknown): Promise<T> {
     if (!res.ok) {
       throw new Error(`Citi ${path} failed: ${res.status} ${text.slice(0, 200)}`);
     }
-    const parsed = JSON.parse(text) as T & { error?: unknown };
-    // The API reports some failures with HTTP 200 and an `error` field.
-    if (parsed && typeof parsed === "object" && "error" in parsed && parsed.error) {
-      throw new Error(`Citi ${path} error: ${JSON.stringify(parsed.error).slice(0, 200)}`);
+    const parsed = JSON.parse(text) as T & {
+      error?: unknown;
+      status?: string;
+      message?: string;
+    };
+    // The API reports failures with HTTP 200 in two different shapes: an
+    // `error` object, or {"status":"ERROR","message":"Invalid Input"}. Missing
+    // the second made a rejected request look like an empty result.
+    if (parsed && typeof parsed === "object") {
+      if (parsed.error) {
+        throw new Error(
+          `Citi ${path} error: ${JSON.stringify(parsed.error).slice(0, 200)}`,
+        );
+      }
+      if (parsed.status === "ERROR") {
+        throw new Error(
+          `Citi ${path} error: ${parsed.message ?? "unspecified"}`,
+        );
+      }
     }
     return parsed;
   });

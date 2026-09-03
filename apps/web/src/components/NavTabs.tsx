@@ -15,6 +15,7 @@ export type View =
   | "aladdinExplore"
   | "jdSleeve"
   | "fx"
+  | "citiData"
   | "fmp"
   | "events"
   | "historicPricing"
@@ -56,6 +57,7 @@ export const TABS: Array<{ id: View; label: string }> = [
   { id: "aladdinExplore", label: "Aladdin Explore" },
   { id: "jdSleeve", label: "JD Sleeve" },
   { id: "fx", label: "FX" },
+  { id: "citiData", label: "Citi Data" },
   { id: "fmp", label: "FMP Market Data" },
   { id: "events", label: "Events" },
   { id: "historicPricing", label: "Historic Pricing" },

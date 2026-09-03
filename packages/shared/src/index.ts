@@ -156,6 +156,52 @@ export interface FxSnapshot {
   g10: G10Line[];
 }
 
+export interface G10GridSnapshot {
+  currencies: string[];
+  /** rates[a][b] = units of b per one unit of a. Null on the diagonal. */
+  rates: Record<string, Record<string, number | null>>;
+  /** % change in the a/b cross since baselineDate. */
+  changes: Record<string, Record<string, number | null>>;
+  /** A currency's average move against every other in the grid. */
+  strength: Record<string, number | null>;
+  asOfDate: string | null;
+  baselineDate: string | null;
+  /** The nine USD legs every cross is triangulated from. */
+  legTags: string[];
+  note: string | null;
+  callsSpent: number;
+}
+
+export interface CitiBrowseLevel {
+  prefix: string;
+  /** Citi's own name for this level — "Sub Category", "Currency", "Tenor". */
+  header: string | null;
+  /** Code to Citi's label. */
+  fields: Record<string, string>;
+  leaves: string[];
+}
+
+export interface CitiCatalogEntry {
+  code: string;
+  label: string;
+  prefix: string;
+  /** Null until this sub-category's free listing has been fetched. */
+  tagCount: number | null;
+}
+
+export interface CitiCatalog {
+  entries: CitiCatalogEntry[];
+  totalTags: number;
+  /** True while counts are still being filled in behind the scenes. */
+  warming: boolean;
+}
+
+export interface CitiInventory {
+  prefix: string;
+  tagCount: number;
+  samples: string[];
+}
+
 export interface VolSurfacePoint {
   /** Puts and calls on one increasing axis: put delta for puts, 100 - call
    * delta for calls, 50 at the money. */

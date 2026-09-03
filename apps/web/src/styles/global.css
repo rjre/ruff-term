@@ -1852,3 +1852,117 @@ body {
 .vol-legend-note {
   margin-left: auto;
 }
+
+/* --- Citi Data tab ----------------------------------------------------- */
+
+.citi-asof {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 6px 0 8px;
+}
+
+.matrix-scroll {
+  overflow-x: auto;
+}
+
+.citi-breadcrumb {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.citi-crumb-sep {
+  color: var(--text-faint);
+  margin: 0 1px;
+}
+
+.citi-level-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin: 10px 0 6px;
+}
+
+/* Auto-fill rather than a fixed count: this level can hold 24 sub-categories
+   or 52 currencies, and both should fill the width. */
+.citi-code-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 6px;
+}
+
+.citi-code-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 9px;
+  text-align: left;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.citi-code-card:hover {
+  background: var(--row-hover);
+  border-color: var(--accent);
+}
+
+.citi-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.citi-code-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.citi-samples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 10px;
+}
+
+.citi-samples-label {
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.citi-samples code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 5px;
+}
+
+.citi-code-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.citi-code-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
