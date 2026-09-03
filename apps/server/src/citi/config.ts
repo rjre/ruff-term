@@ -24,6 +24,14 @@ export const CACHE_DIR =
   process.env.CITI_CACHE_DIR ??
   path.join(process.cwd(), ".citi-cache");
 
+/**
+ * The endpoint is not printed in the User Guide's own Streaming section —
+ * it comes from the separate "Live Time Series Web Service" doc.
+ */
+export const STREAMING_WS_URL =
+  process.env.CITI_STREAMING_WS_URL ??
+  "wss://www.streamapi.citivelocity.com/markets/analytics/ws/chartingbe/ws/authed/v1";
+
 export function credentials(): { clientId: string; clientSecret: string } | null {
   const clientId = process.env.CITI_CLIENT_ID;
   const clientSecret = process.env.CITI_CLIENT_SECRET;

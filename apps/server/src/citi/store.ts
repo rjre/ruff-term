@@ -91,6 +91,28 @@ export function recordCalls(tags: string[]): void {
   write(LEDGER_FILE, ledger);
 }
 
+const CONNECTS_FILE = "stream-connects.json";
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+let connects = read<number[]>(CONNECTS_FILE, []);
+
+/**
+ * Timestamps of streaming websocket connects, persisted for the same reason
+ * the /data ledger is: Citi allows roughly 100 connects per user per 24h and
+ * only one live connection per login, and `tsx watch` restarts the server on
+ * every save. An in-memory count would reset each time and hide the drain.
+ */
+export function recordConnect(): void {
+  const cutoff = Date.now() - DAY_MS;
+  connects = [...connects.filter((t) => t > cutoff), Date.now()];
+  write(CONNECTS_FILE, connects);
+}
+
+export function connectsInLastDay(): number {
+  const cutoff = Date.now() - DAY_MS;
+  return connects.filter((t) => t > cutoff).length;
+}
+
 export function callsSpent(tag: string): number {
   return ledger[tag] ?? 0;
 }

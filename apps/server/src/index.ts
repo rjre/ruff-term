@@ -17,6 +17,8 @@ import { getCorrelationMatrix } from "./correlation.js";
 import { getDividends } from "./dividends.js";
 import { getFxSnapshot } from "./fx.js";
 import { getG10Grid } from "./citi/g10.js";
+import { TAGS as G10_TAGS } from "@ruff-term/shared";
+import { citiStream, type LiveTick } from "./citi/streaming.js";
 import * as citiTags from "./citi/tags.js";
 import {
   PAIRS as VOL_PAIRS,
@@ -155,6 +157,58 @@ app.get("/api/citi/inventory", async (req) => {
 app.get("/api/citi/catalog", async () => citiTags.catalog());
 
 app.get("/api/citi/g10", async () => getG10Grid());
+
+app.get("/api/citi/stream/status", async () => ({
+  ...citiStream.getState(),
+  ticks: [...citiStream.getLatest().values()],
+}));
+
+/**
+ * Live G10 spot ticks, pushed over Server-Sent Events.
+ *
+ * The streaming websocket does NOT draw on the per-tag /data budget, so this
+ * is the one place in the app where Citi data can update continuously. It
+ * does have its own limits — one connection per login, ~100 connects a day —
+ * so the upstream socket is opened on the first browser subscriber and closed
+ * again once the last one goes away.
+ */
+app.get("/api/citi/stream", (req, reply) => {
+  citiStream.want(G10_TAGS);
+
+  reply.raw.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    // Without this an intermediate proxy will happily buffer the whole stream.
+    "X-Accel-Buffering": "no",
+  });
+
+  function send(event: string, data: unknown): void {
+    reply.raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  }
+
+  const detach = citiStream.attach();
+  // Seed the client with whatever has already arrived, so a late joiner is
+  // not staring at an empty grid until the next minute ticks.
+  send("state", citiStream.getState());
+  send("ticks", [...citiStream.getLatest().values()]);
+
+  const onTicks = (ticks: LiveTick[]) => send("ticks", ticks);
+  const onState = (state: unknown) => send("state", state);
+  citiStream.on("ticks", onTicks);
+  citiStream.on("state", onState);
+
+  // Comment frames keep intermediaries from dropping an idle connection —
+  // MI01 means a quiet market can go a full minute with nothing to say.
+  const heartbeat = setInterval(() => reply.raw.write(": ping\n\n"), 25_000);
+
+  req.raw.on("close", () => {
+    clearInterval(heartbeat);
+    citiStream.off("ticks", onTicks);
+    citiStream.off("state", onState);
+    detach();
+  });
+});
 
 app.get("/api/commodities", async () => getCommoditiesSnapshot());
 

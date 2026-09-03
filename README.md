@@ -239,10 +239,40 @@ that governs everything here: **`/tagbrowsing` and `/taglisting` are free,
   so every other cross is triangulated through USD: 90 crosses for **one**
   metered call rather than 90 tags.
 
+- **Live spot over the streaming websocket** — the nine USD legs pushed at
+  MI01 (minutely), with the grid able to retriangulate all 90 crosses live
+  from them. Streaming does **not** draw on the per-tag `/data` budget, so
+  this is the one Citi feed in the terminal that can update continuously.
+
 The grid caches to disk exactly as the vol surface does, and for the same
 reason — including the *baseline* each change is measured against. Persisting
 the latest close but not the baseline leaves a restarted server holding a
 cache that looks fresh and a change grid with nothing to compare against.
+
+#### Streaming
+
+`apps/server/src/citi/streaming.ts` holds one websocket to
+`wss://www.streamapi.citivelocity.com/...`. Two details are easy to get wrong
+and are not in the User Guide's own Streaming section:
+
+- The `access_token` query param must be the literal string `Bearer <token>`,
+  URL-encoded — not the bare token.
+- `SUBACK` never echoes the tag back, only `id`/`status`/`subid`, so a `subid`
+  is correlated to its tag through the message `id` chosen when subscribing.
+
+Tick batches are binary: an 8-byte big-endian int64 `yyyyMMddHHmm` stamp then
+any number of 12-byte `(int32 subid, double value)` pairs. `pricePoint` on a
+SUB is `CLOSE`/`HIGH`/`LOW`/`OPEN` — *not* the `C`/`OHLC` the Historical Data
+API takes; an invalid value earns a `CONN_ERROR` that closes the connection.
+
+Streaming has its own budget rather than the per-tag one: **one live
+connection per login** and roughly **100 connects per 24h**. Since `tsx watch`
+restarts on every save, connects are written to a persistent ledger like the
+`/data` calls, the client refuses to reconnect past 80, and reconnection uses
+exponential backoff. The socket is opened on the first browser subscriber and
+closed two minutes after the last one leaves, so an unattended tab does not
+hold the single permitted connection open. The browser gets the ticks over
+Server-Sent Events at `/api/citi/stream`.
 
 ## Getting started
 

@@ -1,7 +1,7 @@
 import type { G10GridSnapshot } from "@ruff-term/shared";
 import { isConfigured, post } from "./client.js";
 import { DATA_PATH } from "./config.js";
-import { TAGS, buildGrid, usdRates } from "./crosses.js";
+import { TAGS, buildGrid, usdRates } from "@ruff-term/shared";
 import {
   getBaseline,
   getCachedTag,

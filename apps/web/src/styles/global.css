@@ -1966,3 +1966,72 @@ body {
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Streaming status --------------------------------------------------- */
+
+.stream-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.stream-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+
+.stream-live {
+  color: var(--up);
+  border-color: var(--up);
+}
+
+.stream-live .stream-dot {
+  background: var(--up);
+  /* A slow pulse reads as "connected and waiting" rather than "stalled" —
+     MI01 means a quiet minute is normal. */
+  animation: stream-pulse 2s ease-in-out infinite;
+}
+
+.stream-connecting .stream-dot,
+.stream-reconnecting .stream-dot {
+  background: var(--demo-border);
+  animation: stream-pulse 1s ease-in-out infinite;
+}
+
+.stream-unavailable,
+.stream-disconnected {
+  color: var(--down);
+  border-color: var(--down);
+}
+
+.stream-unavailable .stream-dot,
+.stream-disconnected .stream-dot {
+  background: var(--down);
+}
+
+@keyframes stream-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stream-dot {
+    animation: none !important;
+  }
+}
+
+.citi-tag-cell {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}

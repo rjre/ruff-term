@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   CitiBrowseLevel,
   CitiCatalog,
@@ -12,7 +12,14 @@ import {
   fetchG10Grid,
 } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
+import { LEGS, buildGrid, usdRates } from "@ruff-term/shared";
+import {
+  useCitiStream,
+  type CitiStream,
+  type LiveTick,
+} from "../lib/citiStream";
 import { formatSignedPct, pctClass } from "../lib/format";
+import { usePriceFlashes } from "../lib/priceFlash";
 import { PriceStamp } from "./PriceStamp";
 import { SourceFooter } from "./SourceFooter";
 
@@ -40,10 +47,32 @@ function formatRate(value: number | null): string {
   return value.toFixed(digits);
 }
 
-type Mode = "rates" | "changes";
+type Mode = "rates" | "changes" | "live";
 
-function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
+function G10Grid({
+  snapshot,
+  prices,
+  streaming,
+}: {
+  snapshot: G10GridSnapshot;
+  prices: Record<string, LiveTick>;
+  streaming: boolean;
+}) {
   const [mode, setMode] = useState<Mode>("changes");
+
+  // Every cross recomputed from whatever has ticked. Nine streamed legs give
+  // all ninety crosses by triangulation, so the live grid needs no extra
+  // subscriptions — and no metered call at all.
+  const liveRates = useMemo(() => {
+    const rates = usdRates((tag) => prices[tag]?.value);
+    return buildGrid(rates, {}).rates;
+  }, [prices]);
+
+  const liveLegs = LEGS.filter((leg) => prices[leg.tag]).length;
+  // Falling back silently would present EOD numbers as live ones.
+  const canGoLive = streaming && liveLegs === LEGS.length;
+  const effectiveMode: Mode = mode === "live" && !canGoLive ? "rates" : mode;
+
   const { currencies, rates, changes, strength } = snapshot;
 
   const maxAbs = Math.max(
@@ -75,7 +104,19 @@ function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
             className={`toggle-btn ${mode === "rates" ? "active" : ""}`}
             onClick={() => setMode("rates")}
           >
-            Cross rate
+            Cross rate (close)
+          </button>
+          <button
+            className={`toggle-btn ${mode === "live" ? "active" : ""}`}
+            onClick={() => setMode("live")}
+            disabled={!canGoLive}
+            title={
+              canGoLive
+                ? "All 90 crosses triangulated from the nine streamed legs"
+                : `Needs all ${LEGS.length} legs streaming (${liveLegs} so far)`
+            }
+          >
+            Cross rate (live)
           </button>
         </div>
         <button
@@ -86,7 +127,11 @@ function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
               ...currencies.map((a) => [
                 a,
                 ...currencies.map((b) =>
-                  mode === "rates" ? (rates[a]?.[b] ?? "") : (changes[a]?.[b] ?? ""),
+                  effectiveMode === "changes"
+                    ? (changes[a]?.[b] ?? "")
+                    : effectiveMode === "live"
+                      ? (liveRates[a]?.[b] ?? "")
+                      : (rates[a]?.[b] ?? ""),
                 ),
               ]),
             ])
@@ -95,9 +140,11 @@ function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
           Export CSV
         </button>
         <span className="vol-legend-note">
-          {mode === "changes"
+          {effectiveMode === "changes"
             ? `Change since ${snapshot.baselineDate ?? "—"}`
-            : "Units of the column currency per 1 of the row currency"}
+            : effectiveMode === "live"
+              ? "Live, triangulated from the nine streamed legs"
+              : "Units of the column currency per 1 of the row currency"}
         </span>
       </div>
 
@@ -121,20 +168,25 @@ function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
                   const change = changes[a]?.[b] ?? null;
                   const rate = rates[a]?.[b] ?? null;
                   if (a === b) return <td key={b} className="corr-cell corr-diag" />;
+                  const liveRate = liveRates[a]?.[b] ?? null;
                   return (
                     <td
                       key={b}
                       className="corr-cell"
-                      style={mode === "changes" ? changeStyle(change, maxAbs) : undefined}
+                      style={
+                        effectiveMode === "changes"
+                          ? changeStyle(change, maxAbs)
+                          : undefined
+                      }
                       title={`${a}${b} ${formatRate(rate)}${
                         change === null ? "" : ` · ${formatSignedPct(change)} since ${snapshot.baselineDate}`
                       }`}
                     >
-                      {mode === "changes"
+                      {effectiveMode === "changes"
                         ? change === null
                           ? "—"
                           : formatSignedPct(change)
-                        : formatRate(rate)}
+                        : formatRate(effectiveMode === "live" ? liveRate : rate)}
                     </td>
                   );
                 })}
@@ -172,6 +224,96 @@ function G10Grid({ snapshot }: { snapshot: G10GridSnapshot }) {
           );
         })}
       </div>
+    </>
+  );
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  idle: "Idle",
+  connecting: "Connecting…",
+  live: "Live",
+  reconnecting: "Reconnecting…",
+  unavailable: "Unavailable",
+  disconnected: "Disconnected",
+};
+
+/** Digits that make a spot rate readable: JPY crosses need fewer than EURUSD. */
+function spotDigits(value: number): number {
+  return value >= 100 ? 3 : value >= 10 ? 4 : 5;
+}
+
+/**
+ * The nine USD legs as they tick, straight off Citi's streaming websocket.
+ *
+ * This is the only continuously-updating Citi data in the terminal: streaming
+ * does not draw on the per-tag /data budget, so unlike the EOD grid above it
+ * costs nothing to leave running. Frequency is MI01 — one update a minute per
+ * leg — so a quiet minute showing no movement is the feed working, not stalled.
+ */
+function LiveSpot({ state, prices }: CitiStream) {
+  const ticks = LEGS.map((leg) => ({ leg, tick: prices[leg.tag] as LiveTick | undefined }));
+  const flashes = usePriceFlashes(
+    useMemo(
+      () =>
+        ticks
+          .filter((t) => t.tick)
+          .map((t) => ({ key: t.leg.tag, value: t.tick!.value })),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [prices],
+    ),
+  );
+
+  const live = state.status === "live";
+
+  return (
+    <>
+      <div className="screener-toolbar">
+        <span className={`stream-badge stream-${state.status}`}>
+          <span className="stream-dot" />
+          {STATUS_LABEL[state.status] ?? state.status}
+        </span>
+        <span className="vol-legend-note">
+          {state.connectBudget > 0
+            ? `${state.subscribed.length}/${LEGS.length} subscribed · ${state.connectsInLastDay} of ~${state.connectBudget} daily connects used · streaming is not metered per tag`
+            : "streaming is not metered per tag"}
+        </span>
+      </div>
+      {state.note && <div className="demo-banner">{state.note}</div>}
+
+      <table className="watchlist-table">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th className="num">Live</th>
+            <th>Tag</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ticks.map(({ leg, tick }) => {
+            const flash = flashes.get(leg.tag);
+            const pair = leg.invert ? `USD/${leg.ccy}` : `${leg.ccy}/USD`;
+            return (
+              <tr key={leg.tag}>
+                <td className="ticker-cell">{pair}</td>
+                <td
+                  className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
+                >
+                  <div>
+                    {tick ? tick.value.toFixed(spotDigits(tick.value)) : "—"}
+                  </div>
+                  <PriceStamp at={tick?.at} />
+                </td>
+                <td className="short-name-cell citi-tag-cell">{leg.tag}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {!live && state.status !== "unavailable" && (
+        <div className="empty-state">
+          Waiting for the upstream websocket…
+        </div>
+      )}
     </>
   );
 }
@@ -297,6 +439,9 @@ export function CitiDataPanel() {
   const [grid, setGrid] = useState<G10GridSnapshot | null>(null);
   const [gridFailed, setGridFailed] = useState(false);
   const [catalog, setCatalog] = useState<CitiCatalog | null>(null);
+  // One EventSource for the tab: the server holds the single upstream socket
+  // Citi permits, so opening one per component would gain nothing.
+  const stream = useCitiStream(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -379,7 +524,21 @@ export function CitiDataPanel() {
         </div>
       </div>
 
-      <h3 className="section-heading">G10 cross-rate grid</h3>
+      <h3 className="section-heading">Live spot — streaming websocket</h3>
+      <div className="note-banner">
+        Pushed over Citi's streaming websocket rather than pulled: this is the
+        one Citi feed here that updates continuously, because streaming does
+        not draw on the per-tag call budget. It has its own limits — one live
+        connection per login, ~100 connects a day — so the server opens the
+        socket when someone is watching this tab and closes it again two
+        minutes after the last viewer leaves. Frequency is MI01, so each leg
+        updates about once a minute.
+      </div>
+      <LiveSpot {...stream} />
+
+      <h3 className="section-heading" style={{ marginTop: 26 }}>
+        G10 cross-rate grid
+      </h3>
       <div className="note-banner">
         Citi publishes only the nine USD-quoted majors — there is no native
         EURJPY or GBPCHF tag. Every other cross here is triangulated through
@@ -402,7 +561,11 @@ export function CitiDataPanel() {
               Cached for 12h; not polled.
             </span>
           </div>
-          <G10Grid snapshot={grid} />
+          <G10Grid
+            snapshot={grid}
+            prices={stream.prices}
+            streaming={stream.state.status === "live"}
+          />
         </>
       )}
 

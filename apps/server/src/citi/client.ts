@@ -42,7 +42,7 @@ async function refresh(): Promise<string> {
   return token;
 }
 
-async function getToken(): Promise<string> {
+export async function getToken(): Promise<string> {
   if (token && Date.now() < expiresAt) return token;
   // Share one refresh across concurrent callers.
   refreshing ??= refresh().finally(() => {
