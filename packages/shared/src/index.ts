@@ -228,6 +228,18 @@ export interface VolSurfaceSnapshot {
   note: string | null;
   /** Metered /data calls spent on this tenor's tags, against a limit of ~10. */
   callsSpent: number;
+  /**
+   * Set while this tenor is waiting on the streaming feed to replace values
+   * /data can no longer supply. Whole-smile batches are hours apart, so this
+   * is a long patient wait rather than a retry.
+   */
+  healing: {
+    pending: string[];
+    seeded: string[];
+    expiresAt: string;
+  } | null;
+  /** How many of the seven quotes arrived over the stream, not /data. */
+  fromStream: number;
 }
 
 export interface GuideSection {

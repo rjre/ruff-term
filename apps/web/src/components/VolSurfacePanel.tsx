@@ -79,6 +79,21 @@ export function VolSurfacePanel() {
 
       {snapshot?.note && <div className="demo-banner">{snapshot.note}</div>}
 
+      {snapshot?.healing && (
+        <div className="note-banner">
+          <strong>Recovering from the stream.</strong> No further metered call
+          can help — the per-tag budget is account-level and does not reset —
+          so this tenor's {snapshot.healing.pending.length} outstanding quote
+          {snapshot.healing.pending.length === 1 ? " is" : "s are"} subscribed
+          on the streaming websocket instead, which is metered separately.
+          {snapshot.healing.seeded.length > 0 &&
+            ` ${snapshot.healing.seeded.length} already recovered.`}{" "}
+          Vol tags publish whole smiles in batches hours apart, so this is a
+          long wait rather than a retry; giving up{" "}
+          {new Date(snapshot.healing.expiresAt).toLocaleString()}.
+        </div>
+      )}
+
       {loading ? (
         <div className="empty-state">Loading vol surface…</div>
       ) : !snapshot || snapshot.curve.length === 0 ? (
@@ -125,6 +140,8 @@ export function VolSurfacePanel() {
             <span className="vol-legend-note">
               {snapshot.callsSpent} of ~10 metered calls used on this tenor's
               tags. Cached for 12h; not polled.
+              {snapshot.fromStream > 0 &&
+                ` ${snapshot.fromStream} of 7 quotes recovered from the stream.`}
             </span>
           </div>
         </>

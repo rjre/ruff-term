@@ -274,6 +274,27 @@ closed two minutes after the last one leaves, so an unattended tab does not
 hold the single permitted connection open. The browser gets the ticks over
 Server-Sent Events at `/api/citi/stream`.
 
+#### Self-healing a quota-blocked vol tenor
+
+The per-tag `/data` budget is account-level and never resets, so once a vol
+tenor's seven smile tags are spent, every further `/data` call is wasted — and
+the API names only the first offending tag, so probing costs a call per probe.
+Streaming is metered separately and carries the same tags.
+
+So when a smile fetch fails specifically with *"Exceeded max calls per tag"*,
+the server subscribes that tenor's still-missing tags on the websocket and
+waits. Arriving ticks are written into the same cache `/data` writes to,
+tagged `source: "stream"`, and the panel says how many quotes were recovered
+that way. Vol tags are derived surfaces rather than continuously quoted — the
+reference implementation saw one batch across hours of streaming, with all
+seven points arriving together — so this is a long patient wait, not a retry.
+That is precisely why it is worth automating.
+
+Only a spent budget triggers it. A transient failure is left to the next TTL
+retry rather than a six-hour subscription squatting on the one connection Citi
+permits, and the wait is bounded at six hours so a pair that simply is not
+entitled eventually lets go.
+
 ## Getting started
 
 Requires Node 20+.

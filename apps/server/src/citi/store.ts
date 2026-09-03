@@ -37,6 +37,12 @@ export interface CachedPoint {
   value: number;
   /** When we fetched it. */
   fetchedAt: string;
+  /**
+   * Where it came from. "stream" means it arrived over the websocket rather
+   * than a metered /data call — which is how a quota-blocked tenor recovers,
+   * and worth showing rather than hiding.
+   */
+  source?: "data" | "stream";
 }
 
 export interface BaselinePoint {

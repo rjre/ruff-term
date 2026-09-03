@@ -321,6 +321,11 @@ class CitiStream extends EventEmitter {
 
 export const citiStream = new CitiStream();
 
+// Each SSE viewer adds a "ticks" and a "state" listener, plus one standing
+// listener for the vol healer. Node's default cap of 10 would start warning
+// at five concurrent viewers — which is a normal number, not a leak.
+citiStream.setMaxListeners(64);
+
 // Leave the socket closed rather than letting Citi time it out: the
 // one-connection-per-login limit means a lingering socket blocks the next
 // process from connecting at all.

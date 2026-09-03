@@ -2,6 +2,7 @@ import type { VolSurfacePoint, VolSurfaceSnapshot } from "@ruff-term/shared";
 import { DATA_PATH } from "./config.js";
 import { isConfigured, post } from "./client.js";
 import { SMILE_POINTS, buildCurve } from "./smile.js";
+import { volHealer } from "./volHealRuntime.js";
 import {
   getCachedTag,
   maxCallsSpent,
@@ -21,6 +22,11 @@ export const PAIRS = ["EUR/USD", "GBP/USD", "USD/JPY", "XAU/USD"];
 function tagFor(pair: string, suffix: string, tenor: string): string {
   const [base, quote] = pair.split("/");
   return `FX.VOL.${base}.${quote}.${suffix}.${tenor}.IMPLIED.CITI`;
+}
+
+/** The seven tags making up one (pair, tenor) smile. */
+export function smileTags(pair: string, tenor: string): string[] {
+  return SMILE_POINTS.map((p) => tagFor(pair, p.suffix, tenor));
 }
 
 // --- Fetch ----------------------------------------------------------------
@@ -112,13 +118,33 @@ export async function getVolSurface(
         await fetchSmile(pair, tenor, LOOKBACK_DAYS);
       } catch (err) {
         const message = (err as Error).message;
-        note = /max calls per tag/i.test(message)
-          ? "Citi's per-tag call quota for this tenor is exhausted; showing the last values retrieved."
-          : `Citi fetch failed (${message.slice(0, 120)}); showing the last values retrieved.`;
+        const quotaBlocked = /max calls per tag/i.test(message);
+        note = quotaBlocked
+          ? "Citi's per-tag call quota for this tenor is exhausted."
+          : `Citi fetch failed (${message.slice(0, 120)}).`;
         console.warn(`[citi] ${pair} ${tenor}: ${message}`);
+
+        // Only a spent budget justifies holding the socket. It is
+        // account-level and never comes back, so no further /data call can
+        // help and the stream is the only route left. Any other failure —
+        // a network blip, a transient 5xx — is better left to the next TTL
+        // retry than to a six-hour subscription squatting on the single
+        // connection Citi permits.
+        if (quotaBlocked) {
+          volHealer.request(
+            pair,
+            tenor,
+            tags.filter((tag) => getCachedTag(tag) === undefined),
+          );
+        }
       }
     }
   }
+
+  const healing = volHealer.status(pair, tenor);
+  const fromStream = tags.filter(
+    (tag) => getCachedTag(tag)?.source === "stream",
+  ).length;
 
   const quotes: VolSurfacePoint[] = SMILE_POINTS.map((p) => {
     const cached = getCachedTag(tagFor(pair, p.suffix, tenor));
@@ -142,6 +168,8 @@ export async function getVolSurface(
         note ??
         "Citi returned too few quotes for this pair/tenor to fit a smile — it may not be entitled on these credentials.",
       callsSpent: maxCallsSpent(tags),
+      healing,
+      fromStream,
     };
   }
 
@@ -158,6 +186,8 @@ export async function getVolSurface(
     curve,
     note,
     callsSpent: maxCallsSpent(tags),
+    healing,
+    fromStream,
   };
 }
 
