@@ -24,6 +24,7 @@ import type {
   TreasuryAuctionsSnapshot,
   UkGiltYieldSnapshot,
   UstActivitySnapshot,
+  VolSurfaceSnapshot,
   WatchlistQuote,
 } from "@ruff-term/shared";
 
@@ -36,6 +37,15 @@ async function getJson<T>(path: string): Promise<T> {
 export function fetchWatchlist(tickers?: string[]): Promise<WatchlistQuote[]> {
   const qs = tickers && tickers.length ? `?tickers=${tickers.join(",")}` : "";
   return getJson(`/api/watchlist${qs}`);
+}
+
+export function fetchVolSurface(
+  pair: string,
+  tenor: string,
+): Promise<VolSurfaceSnapshot> {
+  return getJson(
+    `/api/fx/vol-surface?pair=${encodeURIComponent(pair)}&tenor=${encodeURIComponent(tenor)}`,
+  );
 }
 
 export function fetchHistory(ticker: string, days = 90): Promise<HistoryResponse> {

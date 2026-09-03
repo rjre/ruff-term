@@ -156,6 +156,32 @@ export interface FxSnapshot {
   g10: G10Line[];
 }
 
+export interface VolSurfacePoint {
+  /** Puts and calls on one increasing axis: put delta for puts, 100 - call
+   * delta for calls, 50 at the money. */
+  u: number;
+  label: string;
+  volPct: number | null;
+  /** "quoted" is a real Citi print; the rest come off the fitted spline, with
+   * the 5-delta wings extrapolated past the quoted 10-90 range. */
+  kind: "quoted" | "interpolated" | "extrapolated";
+}
+
+export interface VolSurfaceSnapshot {
+  pair: string;
+  tenor: string;
+  /** Date of the underlying prints, not of the fetch. */
+  asOfDate: string | null;
+  /** The seven points Citi actually publishes. */
+  quotes: VolSurfacePoint[];
+  /** The full 5-delta ladder fitted through them. Empty if too few quotes. */
+  curve: VolSurfacePoint[];
+  /** Set when the data is stale or unavailable, and why. */
+  note: string | null;
+  /** Metered /data calls spent on this tenor's tags, against a limit of ~10. */
+  callsSpent: number;
+}
+
 export interface GuideSection {
   label: string;
   text: string;

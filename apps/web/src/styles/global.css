@@ -1793,3 +1793,62 @@ body {
   text-align: center;
   color: var(--text);
 }
+
+/* --- Citi implied-vol smile ------------------------------------------- */
+
+.vol-table .vol-cell {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A real Citi print, versus a number the spline produced. Only the quoted
+   points are observed data; the rest are shaded progressively fainter. */
+.vol-table .vol-quoted {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.vol-table .vol-interpolated {
+  color: var(--text-dim);
+}
+
+.vol-table .vol-extrapolated {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.vol-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.vol-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.vol-swatch.vol-quoted {
+  background: var(--text);
+}
+
+.vol-swatch.vol-interpolated {
+  background: var(--text-dim);
+}
+
+.vol-swatch.vol-extrapolated {
+  background: var(--text-faint);
+}
+
+.vol-legend-note {
+  margin-left: auto;
+}

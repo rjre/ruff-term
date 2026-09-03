@@ -16,6 +16,11 @@ import { getCommoditiesSnapshot } from "./commodities.js";
 import { getCorrelationMatrix } from "./correlation.js";
 import { getDividends } from "./dividends.js";
 import { getFxSnapshot } from "./fx.js";
+import {
+  PAIRS as VOL_PAIRS,
+  TENORS as VOL_TENORS,
+  getVolSurface,
+} from "./citi/volSurface.js";
 import { getGlobalMarketsCalendar } from "./globalMarketsCalendar.js";
 import { getGlobalMarketsGuide } from "./globalMarketsGuide.js";
 import { getPortfolioImpact } from "./impact.js";
@@ -102,6 +107,27 @@ app.get("/api/charts-of-the-day", async () => getChartsOfTheDay());
 app.get("/api/ust-activity", async () => getUstActivity());
 
 app.get("/api/fx", async () => getFxSnapshot());
+
+/**
+ * Citi Velocity implied-vol smile. Fetched on demand per (pair, tenor) and
+ * cached to disk for 12h: Citi meters this endpoint at roughly ten calls per
+ * tag for the life of the account, so it is not something to poll.
+ */
+app.get("/api/fx/vol-surface", async (req, reply) => {
+  const query = req.query as { pair?: string; tenor?: string };
+  const pair = query.pair ?? VOL_PAIRS[0];
+  const tenor = query.tenor ?? "1M";
+  if (!VOL_PAIRS.includes(pair) || !VOL_TENORS.includes(tenor)) {
+    reply.code(400);
+    return { error: "unsupported pair or tenor" };
+  }
+  return getVolSurface(pair, tenor);
+});
+
+app.get("/api/fx/vol-surface/options", async () => ({
+  pairs: VOL_PAIRS,
+  tenors: VOL_TENORS,
+}));
 
 app.get("/api/commodities", async () => getCommoditiesSnapshot());
 

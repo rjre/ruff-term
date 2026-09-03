@@ -3,6 +3,7 @@ import type { FxSnapshot } from "@ruff-term/shared";
 import { fetchFx } from "../api/client";
 import { usePriceFlashes } from "../lib/priceFlash";
 import { SourceFooter } from "./SourceFooter";
+import { VolSurfacePanel } from "./VolSurfacePanel";
 import { formatSignedPct, pctClass } from "../lib/format";
 import { PriceStamp } from "./PriceStamp";
 
@@ -92,37 +93,13 @@ export function FxPanel({ onSelectTicker }: Props) {
         </table>
       )}
 
-      <div className="demo-banner" style={{ marginTop: 24 }}>
-        Vol surface: implied vol by tenor/delta lives behind Ruffer's own
-        rjre/fx-data tool (Citi Velocity's institutional FX API) — needs
-        CITI_CLIENT_ID/CITI_CLIENT_SECRET, not available in this environment.
-        Placeholder shape below, not real numbers.
+      <div style={{ marginTop: 24 }}>
+        <VolSurfacePanel />
       </div>
-      <h3 className="section-heading">Vol surface (TBC)</h3>
-      <table className="watchlist-table">
-        <thead>
-          <tr>
-            <th>Tenor</th>
-            <th className="num">25D Put</th>
-            <th className="num">ATM</th>
-            <th className="num">25D Call</th>
-          </tr>
-        </thead>
-        <tbody>
-          {["1W", "1M", "3M", "6M", "1Y"].map((tenor) => (
-            <tr key={tenor}>
-              <td className="ticker-cell">{tenor}</td>
-              <td className="num-cell">—</td>
-              <td className="num-cell">—</td>
-              <td className="num-cell">—</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
       <SourceFooter
         sources={[
           "Yahoo Finance (G10 spot, live)",
-          "Vol surface pending — intended source: rjre/fx-data (Citi Velocity)",
+          "Citi Velocity Historical Data API (implied vol, EOD close)",
         ]}
       />
     </div>

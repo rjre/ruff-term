@@ -82,6 +82,7 @@ markup, not guessed:
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
+| FX | G10 spot grid from Yahoo, plus a live Citi Velocity implied-vol smile — see [FX vol surface](#fx-vol-surface) |
 | Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
 | Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Price alerts fire once then deactivate. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS, though an optional Notification API hook can show a real desktop notification |
@@ -190,6 +191,36 @@ or range could land after a fast one and paint the wrong data. Two related
 conventions: reset-on-prop-change adjusts state during render rather than in
 an effect, and module-level stores (`recentTickers`, `tickerNames`) are read
 with `useSyncExternalStore` instead of being copied into component state.
+
+### FX vol surface
+
+The FX tab's implied-vol smile is live Citi Velocity data (`FX.VOL.<base>.
+<quote>.<strike>.<tenor>.IMPLIED.CITI`), gated behind `CITI_CLIENT_ID` /
+`CITI_CLIENT_SECRET`. Without them the panel says so and nothing else changes.
+
+Citi publishes seven points per (pair, tenor) — ATM plus 10/25/35-delta
+strike-quoted vol. The server fits a natural cubic spline through whichever
+came back and reads off a 5-delta ladder; the table shades quoted prints,
+interpolated points and the extrapolated 5-delta wings differently, because
+only the first are observed data.
+
+**The quota is the thing to be careful with.** Citi meters `/data` at roughly
+ten calls per tag, account-level, and a fresh OAuth token does not reset it.
+One exhausted tag fails the whole batched query for that tenor. So:
+
+- All seven points go out as **one** batched call per (pair, tenor).
+- Results are cached **to disk** in `.citi-cache/`, not just in memory — with
+  `tsx watch` an in-memory cache would re-spend the budget on every reload.
+  The same directory holds a ledger of calls spent per tag, surfaced in the
+  panel's footer.
+- The cache holds for 12 hours and the panel **never polls**. When a fetch
+  fails or the quota is spent, the last retrieved values are served with a
+  banner saying so.
+- Requests are serialised to one per second — Citi allows one concurrent
+  request and one per second.
+
+Widening `PAIRS` or `TENORS` in `apps/server/src/citi/volSurface.ts` spends
+more of the budget, so add deliberately.
 
 ## Getting started
 
