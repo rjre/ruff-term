@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import {
   getCachedTickerName,
   resolveTickerName,
@@ -10,22 +10,21 @@ interface Props {
   onSelectTicker?: (ticker: string) => void;
 }
 
+/**
+ * The name cache is a module-level store other components write to, which is
+ * exactly what useSyncExternalStore is for — it reads through to the cache on
+ * every render, so a cache hit needs no state of its own to copy it into.
+ */
 function useTickerName(ticker: string): string | null {
-  const [name, setName] = useState<string | null>(
+  const name = useSyncExternalStore(
+    subscribeTickerNames,
     () => getCachedTickerName(ticker) ?? null,
   );
 
+  // Kick off the lookup for a ticker the cache has never seen. Fire-and-
+  // forget: the store notifies subscribers when it lands.
   useEffect(() => {
-    const cached = getCachedTickerName(ticker);
-    if (cached !== undefined) {
-      setName(cached);
-      return;
-    }
     resolveTickerName(ticker);
-    return subscribeTickerNames(() => {
-      const v = getCachedTickerName(ticker);
-      if (v !== undefined) setName(v);
-    });
   }, [ticker]);
 
   return name;

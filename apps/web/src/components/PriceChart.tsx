@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   ColorType,
   LineStyle,
@@ -12,7 +12,11 @@ import type { PriceBar } from "@ruff-term/shared";
 import { fetchHistory } from "../api/client";
 import { addPriceAlert } from "../lib/alerts";
 import { downloadCsv } from "../lib/exportCsv";
-import { addRecentTicker, getRecentTickers } from "../lib/recentTickers";
+import {
+  addRecentTicker,
+  getRecentTickers,
+  subscribeRecentTickers,
+} from "../lib/recentTickers";
 import { cssVar } from "../lib/theme";
 
 function chartColors() {
@@ -172,6 +176,37 @@ function macd(closes: number[]): {
   return { macdLine, signal, histogram };
 }
 
+interface HistoryState {
+  /** The (ticker, range) request these bars answer. */
+  key: string;
+  bars: PriceBar[];
+  synthetic: boolean;
+}
+
+/** Stable empty array so a pending/absent request doesn't hand the chart
+ * effects a new identity every render. */
+const EMPTY_BARS: PriceBar[] = [];
+
+/** Likewise for the moving-average period sets, which are effect deps. */
+const EMPTY_PERIODS: ReadonlySet<number> = new Set<number>();
+
+function historyKey(ticker: string | null, rangeDays: number): string {
+  return ticker ? `${ticker}:${rangeDays}` : "";
+}
+
+async function loadHistory(
+  ticker: string,
+  rangeDays: number,
+): Promise<HistoryState> {
+  const key = historyKey(ticker, rangeDays);
+  try {
+    const res = await fetchHistory(ticker, rangeDays);
+    return { key, bars: res.bars, synthetic: res.synthetic ?? false };
+  } catch {
+    return { key, bars: EMPTY_BARS, synthetic: false };
+  }
+}
+
 /** Cumulative volume-weighted average price over the currently loaded range. */
 function vwap(bars: PriceBar[]): (number | null)[] {
   const out: (number | null)[] = new Array(bars.length).fill(null);
@@ -223,17 +258,20 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     [],
   );
 
-  const [recentTickers, setRecentTickers] =
-    useState<string[]>(getRecentTickers);
+  // Read through to the store rather than snapshotting into state: the list
+  // is written by this same component when the ticker changes.
+  const recentTickers = useSyncExternalStore(
+    subscribeRecentTickers,
+    getRecentTickers,
+  );
   const [alertConfirmation, setAlertConfirmation] = useState<string | null>(
     null,
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [logoBroken, setLogoBroken] = useState(false);
-
-  useEffect(() => {
-    setLogoBroken(false);
-  }, [ticker]);
+  // Which ticker's logo failed to load, rather than a boolean that then needs
+  // resetting whenever the ticker changes.
+  const [brokenLogoTicker, setBrokenLogoTicker] = useState<string | null>(null);
+  const logoBroken = brokenLogoTicker === ticker;
 
   useEffect(() => {
     if (!isFullscreen) return;
@@ -244,26 +282,37 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isFullscreen]);
 
+  // Writing to an external store (localStorage) is what effects are for; the
+  // store notifies this component back through useSyncExternalStore.
   useEffect(() => {
-    if (!ticker) return;
-    addRecentTicker(ticker);
-    setRecentTickers(getRecentTickers());
+    if (ticker) addRecentTicker(ticker);
   }, [ticker]);
 
   const [rangeDays, setRangeDays] = useState(180);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("price");
-  const [maPeriods, setMaPeriods] = useState<Set<number>>(new Set());
-  const [emaPeriods, setEmaPeriods] = useState<Set<number>>(new Set());
+  const [maPeriods, setMaPeriods] =
+    useState<ReadonlySet<number>>(EMPTY_PERIODS);
+  const [emaPeriods, setEmaPeriods] =
+    useState<ReadonlySet<number>>(EMPTY_PERIODS);
   const [showBollinger, setShowBollinger] = useState(false);
   const [showVwap, setShowVwap] = useState(false);
   const [lowerIndicator, setLowerIndicator] = useState<LowerIndicator>("none");
   const [compareInput, setCompareInput] = useState("");
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
-  const [primaryBars, setPrimaryBars] = useState<PriceBar[]>([]);
-  const [compareBars, setCompareBars] = useState<PriceBar[]>([]);
+  // History is stored with the request it answers, so the render can tell a
+  // loaded result from a stale one instead of an effect clearing state first.
+  // That also drops a race: a slow 1Y response could previously land after a
+  // fast 3M one and paint the wrong range.
+  const [primary, setPrimary] = useState<HistoryState | null>(null);
+  const [compare, setCompare] = useState<HistoryState | null>(null);
+
+  const primaryKey = historyKey(ticker, rangeDays);
+  const compareKey = historyKey(compareTicker, rangeDays);
+  const primaryBars = primary?.key === primaryKey ? primary.bars : EMPTY_BARS;
+  const compareBars = compare?.key === compareKey ? compare.bars : EMPTY_BARS;
   // Set when the server had to fabricate bars because Yahoo failed. Charting
   // invented prices unlabelled is the worst failure mode this app has.
-  const [syntheticBars, setSyntheticBars] = useState(false);
+  const syntheticBars = primary?.key === primaryKey && primary.synthetic;
 
   const comparing = compareTicker !== null;
   // Two raw-price series only make sense on a normalized scale — force one
@@ -333,51 +382,41 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     };
   }, []);
 
-  // Reset controls when the selected ticker changes.
-  useEffect(() => {
+  // Reset controls when the selected ticker changes. Done during render (the
+  // pattern React documents for adjusting state on a changed input) rather
+  // than in an effect: an effect would paint one frame of the previous
+  // ticker's overlays over the new instrument before clearing them.
+  const [controlsTicker, setControlsTicker] = useState(ticker);
+  if (ticker !== controlsTicker) {
+    setControlsTicker(ticker);
     setCompareTicker(null);
     setCompareInput("");
     setScaleMode("price");
-    setMaPeriods(new Set());
-    setEmaPeriods(new Set());
+    setMaPeriods(EMPTY_PERIODS);
+    setEmaPeriods(EMPTY_PERIODS);
     setShowBollinger(false);
     setShowVwap(false);
     setLowerIndicator("none");
-  }, [ticker]);
+  }
 
   // Fetch primary + (optional) compare history whenever inputs change.
   useEffect(() => {
-    if (!ticker) {
-      setPrimaryBars([]);
-      setSyntheticBars(false);
-      return;
-    }
+    if (!ticker) return;
     let cancelled = false;
-    fetchHistory(ticker, rangeDays)
-      .then((res) => {
-        if (cancelled) return;
-        setPrimaryBars(res.bars);
-        setSyntheticBars(res.synthetic ?? false);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setPrimaryBars([]);
-        setSyntheticBars(false);
-      });
+    loadHistory(ticker, rangeDays).then((state) => {
+      if (!cancelled) setPrimary(state);
+    });
     return () => {
       cancelled = true;
     };
   }, [ticker, rangeDays]);
 
   useEffect(() => {
-    if (!compareTicker) {
-      setCompareBars([]);
-      return;
-    }
+    if (!compareTicker) return;
     let cancelled = false;
-    fetchHistory(compareTicker, rangeDays)
-      .then((res) => !cancelled && setCompareBars(res.bars))
-      .catch(() => !cancelled && setCompareBars([]));
+    loadHistory(compareTicker, rangeDays).then((state) => {
+      if (!cancelled) setCompare(state);
+    });
     return () => {
       cancelled = true;
     };
@@ -682,7 +721,7 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
               className="chart-logo"
               src={`https://images.financialmodelingprep.com/symbol/${ticker}.png`}
               alt=""
-              onError={() => setLogoBroken(true)}
+              onError={() => setBrokenLogoTicker(ticker)}
             />
           )}
           {ticker

@@ -13,9 +13,16 @@ const ACTIVE_KEY = "ruff-term:activeWatchlist";
 const DEFAULT_LIST_NAME = "Default";
 const POLL_MS = 30_000;
 
-/** Stable empty array so `tickers` keeps its identity across renders when the
- * active list has no entry — see the memo below. */
+/** Stable empty arrays so derived values keep their identity across renders
+ * — both are memo/effect inputs. */
 const EMPTY_TICKERS: string[] = [];
+const EMPTY_QUOTES: WatchlistQuote[] = [];
+
+interface FetchedQuotes {
+  /** The comma-joined ticker list these quotes answer. */
+  key: string;
+  quotes: WatchlistQuote[];
+}
 
 function loadLists(): Record<string, string[]> {
   try {
@@ -106,8 +113,12 @@ export function Watchlist({
   const [activeList, setActiveList] = useState<string>(() =>
     loadActiveList(loadLists()),
   );
-  const [quotes, setQuotes] = useState<WatchlistQuote[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Quotes are stored with the ticker set they answer, so an empty or
+  // just-changed list reads as "loading" without an effect clearing state
+  // first — and a slow response for a previous list can't paint over a new
+  // one.
+  const [fetched, setFetched] = useState<FetchedQuotes | null>(null);
+
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDesc, setSortDesc] = useState(true);
 
@@ -118,6 +129,9 @@ export function Watchlist({
     () => lists[activeList] ?? EMPTY_TICKERS,
     [lists, activeList],
   );
+  const tickersKey = tickers.join(",");
+  const quotes = fetched?.key === tickersKey ? fetched.quotes : EMPTY_QUOTES;
+  const loading = tickers.length > 0 && fetched?.key !== tickersKey;
 
   function updateActiveTickers(next: string[]) {
     setLists((prev) => ({ ...prev, [activeList]: next }));
@@ -153,22 +167,18 @@ export function Watchlist({
   }, [tickers, onTickersChange]);
 
   useEffect(() => {
-    if (tickers.length === 0) {
-      setQuotes([]);
-      setLoading(false);
-      return;
-    }
+    if (tickers.length === 0) return;
 
     let cancelled = false;
+    const key = tickers.join(",");
 
     async function poll() {
       try {
         const data = await fetchWatchlist(tickers);
-        if (cancelled) return;
-        setQuotes(data);
-        setLoading(false);
+        if (!cancelled) setFetched({ key, quotes: data });
       } catch {
-        setLoading(false);
+        // Leave the last good quotes on screen — for a polling terminal the
+        // previous print beats a blank table — and retry on the next tick.
       }
     }
 

@@ -1,49 +1,79 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type FlashDirection = "up" | "down";
 
 const FLASH_MS = 3000;
 
-/** Bloomberg-style "flash on tick" — diffs each poll against the previous
- * one by key and returns which keys just moved, for a few seconds. */
+interface Tracked {
+  /** Identifies the price set the other two fields were derived from. */
+  signature: string;
+  values: Map<string, number>;
+  flashes: Map<string, FlashDirection>;
+}
+
+const EMPTY_FLASHES = new Map<string, FlashDirection>();
+
+const INITIAL: Tracked = {
+  signature: "",
+  values: new Map(),
+  flashes: EMPTY_FLASHES,
+};
+
+function diff(
+  previous: Map<string, number>,
+  entries: Array<{ key: string; value: number }>,
+): Tracked["flashes"] {
+  const flashes = new Map<string, FlashDirection>();
+  for (const { key, value } of entries) {
+    const before = previous.get(key);
+    // An unseen key is not a move — a row appearing shouldn't flash.
+    if (before !== undefined && before !== value) {
+      flashes.set(key, value > before ? "up" : "down");
+    }
+  }
+  return flashes;
+}
+
+/**
+ * Bloomberg-style "flash on tick" — diffs each poll against the previous one
+ * by key and returns which keys just moved, for a few seconds.
+ *
+ * The diff happens during render rather than in an effect. Callers build
+ * `entries` inline, so it is a new array on every render: keying an effect off
+ * it re-ran on the very re-render the state update caused, tearing down the
+ * clear-flash timer and leaving the class stuck on the cell — after which a
+ * second tick in the same direction never re-animated. Deriving from a
+ * signature of the values sidesteps that, and saves the extra render pass an
+ * effect would cost on every poll.
+ */
 export function usePriceFlashes(
   entries: Array<{ key: string; value: number }>,
 ): Map<string, FlashDirection> {
-  const prevValues = useRef<Map<string, number>>(new Map());
-  const initialized = useRef(false);
-  const [flashes, setFlashes] = useState<Map<string, FlashDirection>>(
-    new Map(),
-  );
+  const [tracked, setTracked] = useState<Tracked>(INITIAL);
 
-  // Callers build `entries` inline, so it is a fresh array on every render.
-  // Keying the effect off the array itself re-ran it (and tore down the
-  // clear-flash timer) on the very re-render that setFlashes caused, leaving
-  // the flash class stuck on the cell — which in turn meant a second tick in
-  // the same direction never re-triggered the CSS animation. Key off the
-  // values instead, so the effect only runs when a price actually changes.
   const signature = entries.map((e) => `${e.key}=${e.value}`).join("|");
 
+  if (signature !== tracked.signature) {
+    // Adjusting state during render, as React documents for deriving from
+    // changed inputs: pure, and re-rendered before anything is committed.
+    setTracked({
+      signature,
+      values: new Map(entries.map((e) => [e.key, e.value])),
+      // On the first run every key is unseen, so this is empty — a freshly
+      // loaded table establishes the baseline rather than flashing wholesale.
+      flashes: diff(tracked.values, entries),
+    });
+  }
+
+  const active = tracked.flashes.size > 0;
   useEffect(() => {
-    const prev = prevValues.current;
-    const next = new Map<string, FlashDirection>();
-
-    if (initialized.current) {
-      for (const { key, value } of entries) {
-        const before = prev.get(key);
-        if (before !== undefined && before !== value) {
-          next.set(key, value > before ? "up" : "down");
-        }
-      }
-    }
-    for (const { key, value } of entries) prev.set(key, value);
-    initialized.current = true;
-
-    if (next.size === 0) return;
-    setFlashes(next);
-    const timer = setTimeout(() => setFlashes(new Map()), FLASH_MS);
+    if (!active) return;
+    const timer = setTimeout(
+      () => setTracked((t) => ({ ...t, flashes: EMPTY_FLASHES })),
+      FLASH_MS,
+    );
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature]);
+  }, [tracked, active]);
 
-  return flashes;
+  return tracked.flashes;
 }

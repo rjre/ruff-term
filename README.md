@@ -171,6 +171,26 @@ panel. An unmarked invented price is worse than a blank cell: a stamp reading
 The screener reports symbols it could not price at all in `skipped`, rather
 than silently returning a shorter table.
 
+### Loading state without an effect
+
+Async panels store a result *with the request it answers*, and derive
+"loading" during render, rather than an effect blanking state before each
+fetch:
+
+```tsx
+const [loaded, setLoaded] = useState<Loaded | null>(null);
+const key = `${ticker}|${rangeDays}`;
+const data = loaded?.key === key ? loaded.data : EMPTY;
+const loading = loaded?.key !== key;
+```
+
+Besides satisfying `react-hooks/set-state-in-effect`, this drops a class of
+race that was live in several panels: a slow response for a previous ticker
+or range could land after a fast one and paint the wrong data. Two related
+conventions: reset-on-prop-change adjusts state during render rather than in
+an effect, and module-level stores (`recentTickers`, `tickerNames`) are read
+with `useSyncExternalStore` instead of being copied into component state.
+
 ## Getting started
 
 Requires Node 20+.
@@ -247,7 +267,8 @@ to CSV.
 - `npm run dev` — run server + web together
 - `npm run build` — build both apps
 - `npm run typecheck` — typecheck both apps
-- `npm run lint` — ESLint over both apps (`react-hooks/exhaustive-deps` is an
-  error; it is what catches effect-dependency bugs)
+- `npm run lint` — ESLint over both apps. The `react-hooks` rules are errors:
+  `exhaustive-deps` catches effect-dependency bugs, and `set-state-in-effect`
+  keeps async loads deriving their state in render (see below)
 - `npm run test` — Vitest unit tests (`npm run test:watch` to iterate)
 - `npm run verify` — typecheck + lint + test, the same gate CI runs

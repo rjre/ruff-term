@@ -18,21 +18,31 @@ function cellStyle(value: number): { background: string; color: string } {
   return { background, color };
 }
 
+interface LoadedMatrix {
+  rangeDays: number;
+  snapshot: CorrelationMatrixSnapshot | null;
+}
+
 interface Props {
   onSelectTicker?: (ticker: string) => void;
 }
 
 export function CorrelationMatrixPanel({ onSelectTicker }: Props) {
   const [rangeDays, setRangeDays] = useState(180);
-  const [snapshot, setSnapshot] = useState<CorrelationMatrixSnapshot | null>(
-    null,
-  );
+  // Stored with the range it answers, so switching range reads as "loading"
+  // without an effect blanking state first — and a slow 1Y response can no
+  // longer land after a fast 3M one and paint the wrong window.
+  const [loaded, setLoaded] = useState<LoadedMatrix | null>(null);
+  const snapshot = loaded?.rangeDays === rangeDays ? loaded.snapshot : null;
 
   useEffect(() => {
-    setSnapshot(null);
+    let cancelled = false;
     fetchCorrelationMatrix(rangeDays)
-      .then(setSnapshot)
-      .catch(() => setSnapshot(null));
+      .then((s) => !cancelled && setLoaded({ rangeDays, snapshot: s }))
+      .catch(() => !cancelled && setLoaded({ rangeDays, snapshot: null }));
+    return () => {
+      cancelled = true;
+    };
   }, [rangeDays]);
 
   return (

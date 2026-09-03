@@ -10,7 +10,13 @@ export function getCachedTickerName(ticker: string): string | null | undefined {
 
 export function subscribeTickerNames(cb: () => void): () => void {
   listeners.add(cb);
-  return () => listeners.delete(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+function notify(): void {
+  for (const cb of listeners) cb();
 }
 
 /** Resolves a ticker to its company/instrument name via ticker search,
@@ -26,12 +32,13 @@ export function resolveTickerName(ticker: string): Promise<string | null> {
       const name = match?.name ?? null;
       cache.set(ticker, name);
       inflight.delete(ticker);
-      for (const cb of listeners) cb();
+      notify();
       return name;
     })
     .catch(() => {
       cache.set(ticker, null);
       inflight.delete(ticker);
+      notify();
       return null;
     });
   inflight.set(ticker, promise);

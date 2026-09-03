@@ -221,12 +221,15 @@ export function App() {
           every 15s.
         </div>
       )}
-      <CommandPalette
-        open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        onSelect={setView}
-        onSelectTicker={goToMarkets}
-      />
+      {/* Mounted only while open, so each invocation starts from a clean
+          query rather than the palette resetting itself on the way in. */}
+      {paletteOpen && (
+        <CommandPalette
+          onClose={() => setPaletteOpen(false)}
+          onSelect={setView}
+          onSelectTicker={goToMarkets}
+        />
+      )}
       <ShortcutsHelp
         open={shortcutsOpen}
         onClose={() => setShortcutsOpen(false)}

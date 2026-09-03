@@ -47,13 +47,11 @@ export default tseslint.config(
       // the effect's own timer on every render.
       "react-hooks/exhaustive-deps": "error",
 
-      // Warn, not error. This rule (new in react-hooks v7) flags 13
-      // pre-existing "reset local state when the selected ticker changes"
-      // effects across PriceChart, CommandPalette, NewsFeed and others. They
-      // are a known cleanup backlog, not defects — reworking them is its own
-      // change, and failing CI on them today would just get the plugin
-      // switched off.
-      "react-hooks/set-state-in-effect": "warn",
+      // An error now that the codebase is clean of it. Async loads store
+      // their result alongside the request key so "loading" is derived in
+      // render; resets on a changed prop adjust state during render; external
+      // stores are read with useSyncExternalStore.
+      "react-hooks/set-state-in-effect": "error",
     },
   },
 

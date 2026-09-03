@@ -12,6 +12,15 @@ interface Props {
 
 type Mode = "portfolio" | "market";
 
+interface LoadedNews {
+  /** The ticker/mode/watchlist combination these items answer. */
+  key: string;
+  news: NewsItem[];
+}
+
+/** Stable empty array — `news` feeds memoized children. */
+const EMPTY_NEWS: NewsItem[] = [];
+
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const mins = Math.round(diffMs / 60_000);
@@ -23,11 +32,17 @@ function timeAgo(iso: string): string {
 
 export function NewsFeed({ ticker, watchlistTickers, onSelectTicker }: Props) {
   const [mode, setMode] = useState<Mode>("portfolio");
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Stored with the request it answers, so "loading" is derived rather than
+  // set by the effect — and a slow response for a previous ticker or mode
+  // can't overwrite the current one.
+  const [loaded, setLoaded] = useState<LoadedNews | null>(null);
+
+  const requestKey = `${ticker ?? ""}|${mode}|${watchlistTickers.join(",")}`;
+  const news = loaded?.key === requestKey ? loaded.news : EMPTY_NEWS;
+  const loading = loaded?.key !== requestKey;
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     const load = ticker
       ? fetchNews(ticker)
       : mode === "portfolio"
@@ -35,10 +50,14 @@ export function NewsFeed({ ticker, watchlistTickers, onSelectTicker }: Props) {
         : fetchNews();
 
     load
-      .then(setNews)
-      .catch(() => setNews([]))
-      .finally(() => setLoading(false));
-  }, [ticker, mode, watchlistTickers]);
+      .then((items) => !cancelled && setLoaded({ key: requestKey, news: items }))
+      .catch(
+        () => !cancelled && setLoaded({ key: requestKey, news: EMPTY_NEWS }),
+      );
+    return () => {
+      cancelled = true;
+    };
+  }, [ticker, mode, watchlistTickers, requestKey]);
 
   const title = ticker
     ? `${ticker} — News`

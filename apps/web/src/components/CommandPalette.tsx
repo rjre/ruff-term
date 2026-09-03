@@ -4,11 +4,19 @@ import { fetchSearch } from "../api/client";
 import { TABS, type View } from "./NavTabs";
 
 interface Props {
-  open: boolean;
   onClose: () => void;
   onSelect: (view: View) => void;
   onSelectTicker: (ticker: string) => void;
 }
+
+interface TickerSearchState {
+  /** The query these results answer. */
+  query: string;
+  results: SearchResult[];
+}
+
+/** Stable empty array — feeds the memoized `entries` list. */
+const NO_RESULTS: SearchResult[] = [];
 
 type Entry =
   | { kind: "tab"; id: View; label: string }
@@ -17,17 +25,21 @@ type Entry =
 /** Jump-to-tab-or-ticker overlay (Ctrl/Cmd+K) — with 38 top-level tabs the
  * nav bar itself requires horizontal scrolling, so this is the fast path to
  * any of them by name. Also searches tickers, since "/" and Ctrl+K are easy
- * to reach for interchangeably. */
-export function CommandPalette({
-  open,
-  onClose,
-  onSelect,
-  onSelectTicker,
-}: Props) {
+ * to reach for interchangeably.
+ *
+ * Mounted only while open (see App), so every open starts from fresh state
+ * rather than an effect clearing the last session's query and results. */
+export function CommandPalette({ onClose, onSelect, onSelectTicker }: Props) {
   const [query, setQuery] = useState("");
-  const [tickerResults, setTickerResults] = useState<SearchResult[]>([]);
+  const [search, setSearch] = useState<TickerSearchState | null>(null);
   const [highlighted, setHighlighted] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const trimmedQuery = query.trim();
+  // Results are shown only for the query they were fetched for, so the
+  // previous query's tickers never sit under freshly typed text.
+  const tickerResults =
+    search?.query === trimmedQuery ? search.results : NO_RESULTS;
 
   const tabMatches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -36,18 +48,14 @@ export function CommandPalette({
   }, [query]);
 
   useEffect(() => {
-    const q = query.trim();
-    if (!q) {
-      setTickerResults([]);
-      return;
-    }
+    if (!trimmedQuery) return;
     const handle = setTimeout(() => {
-      fetchSearch(q)
-        .then((r) => setTickerResults(r.slice(0, 6)))
-        .catch(() => setTickerResults([]));
+      fetchSearch(trimmedQuery)
+        .then((r) => setSearch({ query: trimmedQuery, results: r.slice(0, 6) }))
+        .catch(() => setSearch({ query: trimmedQuery, results: NO_RESULTS }));
     }, 200);
     return () => clearTimeout(handle);
-  }, [query]);
+  }, [trimmedQuery]);
 
   const entries: Entry[] = useMemo(
     () => [
@@ -61,20 +69,21 @@ export function CommandPalette({
     [tabMatches, tickerResults],
   );
 
+  // Moving DOM focus is a genuine external-system effect, unlike the state
+  // resets that used to sit alongside it.
   useEffect(() => {
-    if (open) {
-      setQuery("");
-      setTickerResults([]);
-      setHighlighted(0);
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  }, [open]);
+    const handle = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
-  useEffect(() => {
+  // Send the highlight back to the top as the query changes. Adjusting state
+  // during render, per React's documented pattern for deriving from changed
+  // input — an effect would briefly render the old index against the new list.
+  const [highlightedFor, setHighlightedFor] = useState(query);
+  if (query !== highlightedFor) {
+    setHighlightedFor(query);
     setHighlighted(0);
-  }, [query]);
-
-  if (!open) return null;
+  }
 
   function choose(index: number) {
     const entry = entries[index];
