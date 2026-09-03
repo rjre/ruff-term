@@ -2,24 +2,8 @@ import { useEffect, useState } from "react";
 import type { UstActivitySnapshot } from "@ruff-term/shared";
 import { fetchUstActivity } from "../api/client";
 import { MagnitudeBarList } from "./MagnitudeBarList";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatUpdated(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+import { formatSignedPct, pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 interface Props {
   onSelectTicker?: (ticker: string) => void;
@@ -85,7 +69,7 @@ export function UstActivityPanel({ onSelectTicker }: Props) {
               <td className="ticker-cell">{e.label}</td>
               <td className="num-cell price-cell">
                 <div>{e.lastPrice.toFixed(2)}</div>
-                <div className="price-updated">{formatUpdated(e.updatedAt)}</div>
+                <PriceStamp at={e.updatedAt} />
               </td>
               <td className={`num-cell ${pctClass(e.changePct1d)}`}>
                 {formatSignedPct(e.changePct1d)}

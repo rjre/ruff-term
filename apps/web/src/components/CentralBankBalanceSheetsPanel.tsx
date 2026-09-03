@@ -6,15 +6,10 @@ import type {
 import { fetchCentralBankBalanceSheets } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { Sparkline } from "./Sparkline";
+import { pctClass } from "../lib/format";
 
 function formatBn(valueBn: number, currency: string): string {
   return `${currency} ${valueBn.toLocaleString(undefined, { maximumFractionDigits: 0 })}bn`;
-}
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
 }
 
 function BalanceSheetCard({

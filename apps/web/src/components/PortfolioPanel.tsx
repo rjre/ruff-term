@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { PortfolioSnapshot } from "@ruff-term/shared";
 import { fetchPortfolioSnapshot } from "../api/client";
 import { MagnitudeBarList } from "./MagnitudeBarList";
+import { pctClass } from "../lib/format";
 
 // Validated categorical slots (light mode) from the dataviz palette — fixed
 // order, first three slots, all-pairs-safe: blue, orange, aqua.
@@ -14,12 +15,6 @@ const CATEGORY_ORDER = ["Inflation", "Protection", "Growth"];
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-}
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
 }
 
 function formatSignedPct(value: number): string {

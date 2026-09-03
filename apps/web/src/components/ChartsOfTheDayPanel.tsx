@@ -14,17 +14,7 @@ import {
 } from "../api/client";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 import { Sparkline } from "./Sparkline";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
+import { formatSignedPct, pctClass } from "../lib/format";
 
 function DivergingBars({ lines }: { lines: RegimeBarometerLine[] }) {
   const max = Math.max(...lines.map((l) => Math.abs(l.changePct1d)), 0.5);

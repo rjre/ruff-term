@@ -3,6 +3,19 @@ import type { PortfolioSnapshot } from "@ruff-term/shared";
 import { fetchPortfolioSnapshot } from "../api/client";
 import { SourceFooter } from "./SourceFooter";
 
+/** Rounding noise below a basis point shouldn't paint a row red or green,
+ * so this uses a dead band rather than the shared exact-zero pctClass. */
+function shockClass(value: number): string {
+  if (value > 0.01) return "pct-up";
+  if (value < -0.01) return "pct-down";
+  return "pct-flat";
+}
+
+function formatShock(value: number, unit: string, decimals = 2): string {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(decimals)}${unit}`;
+}
+
 interface SensitivityLine {
   label: string;
   weightPct: number;
@@ -100,17 +113,6 @@ export function ScenarioCalculatorPanel() {
     return { lines, totalPct, totalGBPm };
   }, [portfolio, equityShock, yieldShockBp, goldShock, creditSpreadBp, fxShock]);
 
-  function pctClass(v: number): string {
-    if (v > 0.01) return "pct-up";
-    if (v < -0.01) return "pct-down";
-    return "pct-flat";
-  }
-
-  function formatSigned(v: number, unit: string, decimals = 2): string {
-    const sign = v > 0 ? "+" : "";
-    return `${sign}${v.toFixed(decimals)}${unit}`;
-  }
-
   return (
     <div className="module-view">
       <div className="module-banner">
@@ -146,7 +148,7 @@ export function ScenarioCalculatorPanel() {
                 value={equityShock}
                 onChange={(e) => setEquityShock(Number(e.target.value))}
               />
-              <span className="scenario-input-value">{formatSigned(equityShock, "%", 0)}</span>
+              <span className="scenario-input-value">{formatShock(equityShock, "%", 0)}</span>
             </div>
             <div className="scenario-input-row">
               <label>Bond yields (nominal &amp; index-linked)</label>
@@ -158,7 +160,7 @@ export function ScenarioCalculatorPanel() {
                 value={yieldShockBp}
                 onChange={(e) => setYieldShockBp(Number(e.target.value))}
               />
-              <span className="scenario-input-value">{formatSigned(yieldShockBp, "bp", 0)}</span>
+              <span className="scenario-input-value">{formatShock(yieldShockBp, "bp", 0)}</span>
             </div>
             <div className="scenario-input-row">
               <label>Credit spreads</label>
@@ -170,7 +172,7 @@ export function ScenarioCalculatorPanel() {
                 value={creditSpreadBp}
                 onChange={(e) => setCreditSpreadBp(Number(e.target.value))}
               />
-              <span className="scenario-input-value">{formatSigned(creditSpreadBp, "bp", 0)}</span>
+              <span className="scenario-input-value">{formatShock(creditSpreadBp, "bp", 0)}</span>
             </div>
             <div className="scenario-input-row">
               <label>Gold price</label>
@@ -181,7 +183,7 @@ export function ScenarioCalculatorPanel() {
                 value={goldShock}
                 onChange={(e) => setGoldShock(Number(e.target.value))}
               />
-              <span className="scenario-input-value">{formatSigned(goldShock, "%", 0)}</span>
+              <span className="scenario-input-value">{formatShock(goldShock, "%", 0)}</span>
             </div>
             <div className="scenario-input-row">
               <label>Sterling vs. rest of world</label>
@@ -192,7 +194,7 @@ export function ScenarioCalculatorPanel() {
                 value={fxShock}
                 onChange={(e) => setFxShock(Number(e.target.value))}
               />
-              <span className="scenario-input-value">{formatSigned(fxShock, "%", 0)}</span>
+              <span className="scenario-input-value">{formatShock(fxShock, "%", 0)}</span>
             </div>
           </section>
 
@@ -213,8 +215,8 @@ export function ScenarioCalculatorPanel() {
                       }}
                     />
                   </div>
-                  <span className={`magnitude-pct ${pctClass(l.contributionPct)}`}>
-                    {formatSigned(l.contributionPct, "%")}
+                  <span className={`magnitude-pct ${shockClass(l.contributionPct)}`}>
+                    {formatShock(l.contributionPct, "%")}
                   </span>
                 </div>
               ))}
@@ -223,14 +225,14 @@ export function ScenarioCalculatorPanel() {
             <div className="kpi-row" style={{ marginTop: 20 }}>
               <div className="kpi-tile">
                 <div className="kpi-label">Total illustrative impact</div>
-                <div className={`kpi-value ${pctClass(result.totalPct)}`}>
-                  {formatSigned(result.totalPct, "%")}
+                <div className={`kpi-value ${shockClass(result.totalPct)}`}>
+                  {formatShock(result.totalPct, "%")}
                 </div>
               </div>
               <div className="kpi-tile">
                 <div className="kpi-label">≈ NAV impact</div>
-                <div className={`kpi-value ${pctClass(result.totalGBPm)}`}>
-                  {formatSigned(result.totalGBPm, "m", 1)} GBP
+                <div className={`kpi-value ${shockClass(result.totalGBPm)}`}>
+                  {formatShock(result.totalGBPm, "m", 1)} GBP
                 </div>
               </div>
             </div>

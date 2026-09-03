@@ -5,12 +5,7 @@ import type {
 } from "@ruff-term/shared";
 import { fetchCftcPositioning } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
+import { pctClass } from "../lib/format";
 
 function formatSigned(value: number): string {
   const sign = value > 0 ? "+" : "";

@@ -6,13 +6,8 @@ import type {
 import { fetchNavMonitoring } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { SourceFooter } from "./SourceFooter";
-
-function pctClass(value: number | null): string {
-  if (value === null) return "pct-flat";
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
+import { pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 type SortKey = "ticker" | "navPence" | "sharePricePence" | "discountPct";
 
@@ -132,7 +127,6 @@ export function NavMonitoringPanel({ onSelectTicker }: Props) {
                 >
                   NAV (p){sortIndicator("navPence")}
                 </th>
-                <th>NAV date</th>
                 <th
                   className="num sortable-th"
                   onClick={() => toggleSort("sharePricePence")}
@@ -163,10 +157,13 @@ export function NavMonitoringPanel({ onSelectTicker }: Props) {
                     )}
                   </td>
                   <td className="short-name-cell">{c.name}</td>
-                  <td className="num-cell">{c.navPence?.toFixed(2) ?? "—"}</td>
-                  <td className="short-name-cell">{c.navDate ?? "—"}</td>
-                  <td className="num-cell">
-                    {c.sharePricePence?.toFixed(2) ?? "—"}
+                  <td className="num-cell price-cell">
+                    <div>{c.navPence?.toFixed(2) ?? "—"}</div>
+                    <PriceStamp at={c.navDate} prefix="As of" />
+                  </td>
+                  <td className="num-cell price-cell">
+                    <div>{c.sharePricePence?.toFixed(2) ?? "—"}</div>
+                    <PriceStamp at={snapshot.lastRefreshed} />
                   </td>
                   <td className={`num-cell ${pctClass(c.discountPct)}`}>
                     {c.discountPct != null

@@ -3,26 +3,10 @@ import type { FxSnapshot } from "@ruff-term/shared";
 import { fetchFx } from "../api/client";
 import { usePriceFlashes } from "../lib/priceFlash";
 import { SourceFooter } from "./SourceFooter";
+import { formatSignedPct, pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 const POLL_MS = 20_000;
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatUpdated(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 interface Props {
   onSelectTicker?: (ticker: string) => void;
@@ -97,9 +81,7 @@ export function FxPanel({ onSelectTicker }: Props) {
                   }`}
                 >
                   <div>{line.lastPrice.toFixed(4)}</div>
-                  <div className="price-updated">
-                    {formatUpdated(line.updatedAt)}
-                  </div>
+                  <PriceStamp at={line.updatedAt} />
                 </td>
                 <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                   {formatSignedPct(line.changePct1d)}

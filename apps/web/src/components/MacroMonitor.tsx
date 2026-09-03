@@ -11,12 +11,8 @@ import {
 } from "../api/client";
 import { InstrumentPanelGrid } from "./InstrumentPanelGrid";
 import { SourceFooter } from "./SourceFooter";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
+import { pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 function GiltYieldTable({
   gilts,
@@ -36,7 +32,7 @@ function GiltYieldTable({
   return (
     <div className="macro-panel-card">
       <div className="macro-panel-title">
-        UK Gilt Yields — BoE spot curve ({gilts.asOfDate})
+        UK Gilt Yields — BoE spot curve
       </div>
       <table className="macro-table">
         <thead>
@@ -50,7 +46,10 @@ function GiltYieldTable({
           {gilts.lines.map((line) => (
             <tr key={line.tenorYears}>
               <td className="ticker-cell">{line.tenorYears}yr</td>
-              <td className="num-cell">{line.yieldPct.toFixed(3)}%</td>
+              <td className="num-cell price-cell">
+                <div>{line.yieldPct.toFixed(3)}%</div>
+                <PriceStamp at={gilts.asOfDate} prefix="As of" />
+              </td>
               <td className={`num-cell ${pctClass(line.changeBp1d)}`}>
                 {line.changeBp1d > 0 ? "+" : ""}
                 {line.changeBp1d}
@@ -97,7 +96,7 @@ function InflationExpectationsTable({
               <td className="ticker-cell">{line.label}</td>
               <td className="num-cell price-cell">
                 <div>{line.valuePct.toFixed(2)}%</div>
-                <div className="price-updated">As of {line.asOfDate}</div>
+                <PriceStamp at={line.asOfDate} prefix="As of" />
               </td>
               <td className={`num-cell ${pctClass(line.changeBp1d)}`}>
                 {line.changeBp1d > 0 ? "+" : ""}

@@ -1,16 +1,7 @@
 import type { MacroLine, MacroPanel } from "@ruff-term/shared";
 import { usePriceFlashes } from "../lib/priceFlash";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
+import { formatSignedPct, pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 function formatLast(line: MacroLine): string {
   if (line.isRateLevel) return `${line.lastPrice.toFixed(2)}%`;
@@ -20,13 +11,6 @@ function formatLast(line: MacroLine): string {
 function formatNet(line: MacroLine): string {
   const sign = line.netChange1d > 0 ? "+" : "";
   return `${sign}${line.netChange1d.toFixed(2)}`;
-}
-
-function formatUpdated(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 interface Props {
@@ -87,9 +71,7 @@ export function InstrumentPanelGrid({ panels, onSelectTicker }: Props) {
                         <span className="price-suffix"> {line.currency}</span>
                       )}
                     </div>
-                    <div className="price-updated">
-                      {formatUpdated(line.updatedAt)}
-                    </div>
+                    <PriceStamp at={line.updatedAt} />
                   </td>
                   <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                     {formatSignedPct(line.changePct1d)}

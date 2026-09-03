@@ -137,6 +137,27 @@ packages/
   shared/   TypeScript types shared between server and web
 ```
 
+### Showing prices
+
+Every price in the terminal carries its own "as of" stamp underneath it, so a
+quote that stopped ticking hours ago can't be mistaken for a live one. Render
+price cells as:
+
+```tsx
+<td className="num-cell price-cell">
+  <div>{line.lastPrice.toFixed(2)}</div>
+  <PriceStamp at={line.updatedAt} />
+</td>
+```
+
+`PriceStamp` takes either an ISO instant (live quotes — it shows the time, and
+adds the date once the quote is no longer from today) or a plain `YYYY-MM-DD`
+for series that only publish daily, in which case pass `prefix="As of"`. Use
+the source's own tick time (`updatedAt` / `asOfDate`), never the time the
+server happened to fetch it — the two diverge by hours once a market closes.
+Shared number formatting (`pctClass`, `formatSignedPct`) lives in
+`apps/web/src/lib/format.ts`; import it rather than re-declaring per panel.
+
 ## Getting started
 
 Requires Node 20+.

@@ -3,6 +3,8 @@ import type { WatchlistQuote } from "@ruff-term/shared";
 import { fetchWatchlist } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { TickerSearch } from "./TickerSearch";
+import { formatQuoteTimestamp, pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 const LEGACY_KEY = "ruff-term:watchlist";
 const LISTS_KEY = "ruff-term:watchlists";
@@ -54,19 +56,6 @@ function formatVolume(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
   return String(value);
-}
-
-function formatUpdatedTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
 }
 
 type SortKey =
@@ -424,7 +413,7 @@ export function Watchlist({
                     <td className="short-name-cell">{q.shortName}</td>
                     <td
                       className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
-                      title={`${q.currency} · updated ${formatUpdatedTime(q.updatedAt)}`}
+                      title={`${q.currency} · updated ${formatQuoteTimestamp(q.updatedAt)}`}
                     >
                       <div>
                         {formatPrice(q.lastPrice)}
@@ -432,9 +421,7 @@ export function Watchlist({
                           <span className="price-suffix">{q.priceSuffix}</span>
                         ) : null}
                       </div>
-                      <div className="price-updated">
-                        {formatUpdatedTime(q.updatedAt)}
-                      </div>
+                      <PriceStamp at={q.updatedAt} />
                     </td>
                     <td className="num-cell">{formatVolume(q.volume)}</td>
                     <td className={`num-cell ${pctClass(q.changePct1d)}`}>

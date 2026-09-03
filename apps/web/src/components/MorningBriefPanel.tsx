@@ -14,17 +14,7 @@ import {
 import { NewsTickerChips } from "./NewsTickerChips";
 import { SentimentDot } from "./SentimentDot";
 import { SourceFooter } from "./SourceFooter";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
+import { formatSignedPct, pctClass } from "../lib/format";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();

@@ -2,12 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { PodcastMentionEntity, PodcastMonitorSnapshot } from "@ruff-term/shared";
 import { fetchPodcastMonitor } from "../api/client";
 import { SourceFooter } from "./SourceFooter";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
+import { pctClass } from "../lib/format";
 
 function trendBadge(trend: string): { label: string; className: string } {
   switch (trend) {

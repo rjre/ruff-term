@@ -7,6 +7,7 @@ import {
   loadAlerts,
   saveAlerts,
 } from "../lib/alerts";
+import { formatQuoteTime } from "../lib/format";
 
 interface TriggeredEvent {
   id: string;
@@ -64,19 +65,30 @@ export function AlertsPanel() {
       const priceAlerts = current.filter(
         (a): a is PriceAlert => a.kind === "price",
       );
-      for (const alert of priceAlerts) {
+      if (priceAlerts.length > 0) {
         try {
-          const [quote] = await fetchWatchlist([alert.ticker]);
-          if (!quote) continue;
-          const hit =
-            alert.condition === "above"
-              ? quote.lastPrice >= alert.threshold
-              : quote.lastPrice <= alert.threshold;
-          if (hit) {
+          // One request for every watched ticker rather than one per alert:
+          // the endpoint already takes a list, and several alerts commonly
+          // sit on the same symbol.
+          const tickers = [...new Set(priceAlerts.map((a) => a.ticker))];
+          const quotes = await fetchWatchlist(tickers);
+          const byTicker = new Map(quotes.map((q) => [q.ticker, q]));
+
+          for (const alert of priceAlerts) {
+            const quote = byTicker.get(alert.ticker);
+            if (!quote) continue;
+            const hit =
+              alert.condition === "above"
+                ? quote.lastPrice >= alert.threshold
+                : quote.lastPrice <= alert.threshold;
+            if (!hit) continue;
             firedPriceAlertIds.add(alert.id);
             newEvents.push({
               id: `${alert.id}-${Date.now()}`,
-              message: `${alert.ticker} is ${alert.condition === "above" ? "at/above" : "at/below"} ${alert.threshold} (last ${quote.lastPrice})`,
+              // The quote's own tick time, not the time this check ran — a
+              // market that closed hours ago can still cross a threshold on
+              // the first poll after the alert is created.
+              message: `${alert.ticker} is ${alert.condition === "above" ? "at/above" : "at/below"} ${alert.threshold} (last ${quote.lastPrice} @ ${formatQuoteTime(quote.updatedAt)})`,
               triggeredAt: new Date().toISOString(),
             });
           }

@@ -3,24 +3,8 @@ import type { ScreenerRow } from "@ruff-term/shared";
 import { fetchScreener } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { SourceFooter } from "./SourceFooter";
-
-function pctClass(value: number): string {
-  if (value > 0) return "pct-up";
-  if (value < 0) return "pct-down";
-  return "pct-flat";
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatUpdated(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+import { formatSignedPct, pctClass } from "../lib/format";
+import { PriceStamp } from "./PriceStamp";
 
 type SortKey = keyof Pick<
   ScreenerRow,
@@ -228,9 +212,7 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
                 <td className="short-name-cell">{r.sector}</td>
                 <td className="num-cell price-cell">
                   <div>{r.lastPrice.toFixed(2)}</div>
-                  <div className="price-updated">
-                    {formatUpdated(r.updatedAt)}
-                  </div>
+                  <PriceStamp at={r.updatedAt} />
                 </td>
                 <td className={`num-cell ${pctClass(r.changePct1d)}`}>
                   {formatSignedPct(r.changePct1d)}
