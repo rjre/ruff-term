@@ -53,6 +53,7 @@ async function computeInstrumentLine(instrument: Instrument): Promise<MacroLine 
       netChange1d: Math.round((lastPrice - prev.close) * 10000) / 10000,
       changePctMtd: pctChange(monthBase.close, lastPrice),
       changePctYtd: pctChange(yearBase.close, lastPrice),
+      updatedAt: new Date(meta.regularMarketTime * 1000).toISOString(),
     };
   } catch (err) {
     console.warn(`[instrumentPanels] Skipping ${instrument.ticker}:`, (err as Error).message);

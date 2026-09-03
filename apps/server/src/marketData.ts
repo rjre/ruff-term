@@ -25,11 +25,21 @@ export const DEFAULT_WATCHLIST = DEFAULT_WATCHLIST_META.map((w) => w.ticker);
  * than a live tick, and gets the "c" (close) suffix real terminals use. */
 const STALE_THRESHOLD_SECONDS = 20 * 60;
 
+/** Last bar strictly before `cutoffSeconds`, from ascending-sorted bars. */
+function baseBefore(bars: PriceBar[], cutoffSeconds: number): PriceBar | null {
+  let base: PriceBar | null = null;
+  for (const b of bars) {
+    if (b.time < cutoffSeconds) base = b;
+    else break;
+  }
+  return base;
+}
+
 async function loadQuote(ticker: string): Promise<WatchlistQuote> {
   const now = new Date().toISOString();
 
   try {
-    const { meta, bars } = await yahoo.fetchChart(ticker, "10d");
+    const { meta, bars } = await yahoo.fetchChart(ticker, "1y");
     if (bars.length < 2) throw new Error("insufficient bars from Yahoo");
 
     const latest = bars[bars.length - 1];
@@ -41,6 +51,12 @@ async function loadQuote(ticker: string): Promise<WatchlistQuote> {
     const changePct2d = pctChange(prevPrev.close, prev.close);
     const isStale = Date.now() / 1000 - meta.regularMarketTime > STALE_THRESHOLD_SECONDS;
 
+    const nowMs = Date.now();
+    const weekBase = baseBefore(bars, (nowMs - 7 * 86_400_000) / 1000) ?? bars[0];
+    const monthBase = baseBefore(bars, (nowMs - 30 * 86_400_000) / 1000) ?? bars[0];
+    const sixMonthBase = baseBefore(bars, (nowMs - 182 * 86_400_000) / 1000) ?? bars[0];
+    const yearBase = baseBefore(bars, (nowMs - 365 * 86_400_000) / 1000) ?? bars[0];
+
     return {
       ticker,
       exchange: yahoo.exchangeCodeFor(ticker),
@@ -49,8 +65,15 @@ async function loadQuote(ticker: string): Promise<WatchlistQuote> {
       priceSuffix: isStale ? "c" : undefined,
       changePct1d,
       changePct2d,
+      changePct1w: pctChange(weekBase.close, lastPrice),
+      changePct1m: pctChange(monthBase.close, lastPrice),
+      changePct6m: pctChange(sixMonthBase.close, lastPrice),
+      changePct1y: pctChange(yearBase.close, lastPrice),
       currency: meta.currency,
-      updatedAt: now,
+      // The real per-quote tick time from Yahoo, not when we happened to
+      // fetch it — the two can diverge by many hours once a market closes.
+      updatedAt: new Date(meta.regularMarketTime * 1000).toISOString(),
+      volume: latest.volume,
     };
   } catch (err) {
     console.warn(`[marketData] Falling back to mock data for ${ticker}:`, (err as Error).message);
@@ -63,8 +86,13 @@ async function loadQuote(ticker: string): Promise<WatchlistQuote> {
       lastPrice: mock.lastPrice,
       changePct1d: mock.changePct1d,
       changePct2d: mock.changePct2d,
+      changePct1w: mock.changePct1w,
+      changePct1m: mock.changePct1m,
+      changePct6m: mock.changePct6m,
+      changePct1y: mock.changePct1y,
       currency: metaFallback.currency,
       updatedAt: now,
+      volume: mock.volume,
     };
   }
 }
@@ -88,12 +116,27 @@ const RANGE_BY_DAYS = (days: number): string => {
   if (days <= 100) return "6mo";
   if (days <= 200) return "1y";
   if (days <= 500) return "2y";
-  return "5y";
+  if (days <= 1300) return "5y";
+  if (days <= 2600) return "10y";
+  return "max";
+};
+
+/** "1D"/"1W" chart ranges need real intraday bar spacing — a single daily
+ * bar (or seven of them) isn't a useful chart. */
+const INTRADAY_BY_DAYS: Record<number, { range: string; interval: string }> = {
+  1: { range: "1d", interval: "5m" },
+  7: { range: "5d", interval: "30m" },
 };
 
 export async function getHistory(ticker: string, days: number): Promise<PriceBar[]> {
   return historyCache.getOrLoad(`${ticker}:${days}`, async () => {
     try {
+      const intraday = INTRADAY_BY_DAYS[days];
+      if (intraday) {
+        const { bars } = await yahoo.fetchChart(ticker, intraday.range, intraday.interval);
+        if (bars.length === 0) throw new Error("no intraday bars returned");
+        return bars;
+      }
       const { bars } = await yahoo.fetchChart(ticker, RANGE_BY_DAYS(days));
       if (bars.length === 0) throw new Error("no bars returned");
       return bars.slice(-days);

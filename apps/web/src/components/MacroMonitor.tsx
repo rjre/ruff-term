@@ -94,10 +94,11 @@ function InflationExpectationsTable({
         <tbody>
           {snapshot.lines.map((line) => (
             <tr key={line.label}>
-              <td className="ticker-cell" title={`As of ${line.asOfDate}`}>
-                {line.label}
+              <td className="ticker-cell">{line.label}</td>
+              <td className="num-cell price-cell">
+                <div>{line.valuePct.toFixed(2)}%</div>
+                <div className="price-updated">As of {line.asOfDate}</div>
               </td>
-              <td className="num-cell">{line.valuePct.toFixed(2)}%</td>
               <td className={`num-cell ${pctClass(line.changeBp1d)}`}>
                 {line.changeBp1d > 0 ? "+" : ""}
                 {line.changeBp1d}

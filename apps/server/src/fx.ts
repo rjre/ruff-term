@@ -37,6 +37,7 @@ async function loadSnapshot(): Promise<FxSnapshot> {
             ticker: p.ticker,
             lastPrice,
             changePct1d: Math.round(((lastPrice - prev.close) / prev.close) * 10000) / 100,
+            updatedAt: new Date(meta.regularMarketTime * 1000).toISOString(),
           };
         } catch (err) {
           console.warn(`[fx] Skipping ${p.ticker}:`, (err as Error).message);

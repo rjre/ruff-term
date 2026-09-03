@@ -4,7 +4,9 @@ import { AlertsPanel } from "./components/AlertsPanel";
 import { BondAuctionsPanel } from "./components/BondAuctionsPanel";
 import { CentralBankBalanceSheetsPanel } from "./components/CentralBankBalanceSheetsPanel";
 import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
+import { ChartModal } from "./components/ChartModal";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
+import { ChartsPanel } from "./components/ChartsPanel";
 import { CommandPalette } from "./components/CommandPalette";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
@@ -65,6 +67,11 @@ export function App() {
   const [backendUnreachable, setBackendUnreachable] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [modalTicker, setModalTicker] = useState<string | null>(null);
+
+  function openChartModal(ticker: string) {
+    setModalTicker(ticker);
+  }
 
   // Poll health so a "backend is down" banner both appears and clears itself
   // automatically — useful during local dev restarts, not just first load.
@@ -196,6 +203,13 @@ export function App() {
           {dataSource ? (
             <span className="data-source-badge">{dataSource} data</span>
           ) : null}
+          <button
+            className="icon-btn"
+            onClick={() => window.location.reload()}
+            title="Refresh all data on this page"
+          >
+            ⟳ Refresh
+          </button>
           <ThemeToggle />
         </div>
       </header>
@@ -216,6 +230,11 @@ export function App() {
       <ShortcutsHelp
         open={shortcutsOpen}
         onClose={() => setShortcutsOpen(false)}
+      />
+      <ChartModal
+        ticker={modalTicker}
+        onClose={() => setModalTicker(null)}
+        onSelectTicker={setModalTicker}
       />
 
       {view === "morningBrief" && (
@@ -241,6 +260,9 @@ export function App() {
           <div className="app-body-footer">Source: Yahoo Finance</div>
         </div>
       )}
+      {view === "charts" && (
+        <ChartsPanel ticker={selectedTicker} onSelectTicker={setSelectedTicker} />
+      )}
       {view === "research" && (
         <div className="app-body-scroll">
           <ResearchPanel />
@@ -258,17 +280,17 @@ export function App() {
       )}
       {view === "chartsOfTheDay" && (
         <div className="app-body-scroll">
-          <ChartsOfTheDayPanel />
+          <ChartsOfTheDayPanel onSelectTicker={goToMarkets} />
         </div>
       )}
       {view === "macro" && (
         <div className="app-body-scroll">
-          <MacroMonitor onSelectTicker={goToMarkets} />
+          <MacroMonitor onSelectTicker={openChartModal} />
         </div>
       )}
       {view === "commodities" && (
         <div className="app-body-scroll">
-          <CommoditiesPanel onSelectTicker={goToMarkets} />
+          <CommoditiesPanel onSelectTicker={openChartModal} />
         </div>
       )}
       {view === "rns" && (

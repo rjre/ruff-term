@@ -1,4 +1,5 @@
 import type { MacroLine, MacroPanel } from "@ruff-term/shared";
+import { usePriceFlashes } from "../lib/priceFlash";
 
 function pctClass(value: number): string {
   if (value > 0) return "pct-up";
@@ -21,12 +22,25 @@ function formatNet(line: MacroLine): string {
   return `${sign}${line.netChange1d.toFixed(2)}`;
 }
 
+function formatUpdated(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 interface Props {
   panels: MacroPanel[];
   onSelectTicker?: (ticker: string) => void;
 }
 
 export function InstrumentPanelGrid({ panels, onSelectTicker }: Props) {
+  const flashes = usePriceFlashes(
+    panels.flatMap((panel) =>
+      panel.lines.map((line) => ({ key: line.ticker, value: line.lastPrice })),
+    ),
+  );
+
   return (
     <div className="macro-grid">
       {panels.map((panel) => (
@@ -60,11 +74,22 @@ export function InstrumentPanelGrid({ panels, onSelectTicker }: Props) {
                   }
                 >
                   <td className="ticker-cell">{line.label}</td>
-                  <td className="num-cell">
-                    {formatLast(line)}
-                    {!line.isRateLevel && (
-                      <span className="price-suffix"> {line.currency}</span>
-                    )}
+                  <td
+                    className={`num-cell price-cell${
+                      flashes.get(line.ticker)
+                        ? ` flash-${flashes.get(line.ticker)}`
+                        : ""
+                    }`}
+                  >
+                    <div>
+                      {formatLast(line)}
+                      {!line.isRateLevel && (
+                        <span className="price-suffix"> {line.currency}</span>
+                      )}
+                    </div>
+                    <div className="price-updated">
+                      {formatUpdated(line.updatedAt)}
+                    </div>
                   </td>
                   <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                     {formatSignedPct(line.changePct1d)}

@@ -30,11 +30,16 @@ interface Props {
 }
 
 const RANGES: Array<{ label: string; days: number }> = [
+  { label: "1D", days: 1 },
+  { label: "1W", days: 7 },
   { label: "1M", days: 30 },
   { label: "3M", days: 90 },
   { label: "6M", days: 180 },
   { label: "1Y", days: 365 },
   { label: "2Y", days: 730 },
+  { label: "5Y", days: 1825 },
+  { label: "10Y", days: 3650 },
+  { label: "MAX", days: 20_000 },
 ];
 
 type ScaleMode = "price" | "log" | "index100" | "pct";
@@ -59,8 +64,19 @@ const MA_COLORS: Record<number, string> = {
   50: "#eb6834",
   200: "#8b5cf6",
 };
+const EMA_PERIODS = [12, 26] as const;
+const EMA_COLORS: Record<number, string> = {
+  12: "#0d9488",
+  26: "#be185d",
+};
 const COMPARE_COLOR = "#c9922f";
 const BB_COLOR = "#8b98d1";
+const VWAP_COLOR = "#a16207";
+const RSI_COLOR = "#7c3aed";
+const MACD_COLOR = "#2a78d6";
+const MACD_SIGNAL_COLOR = "#eb6834";
+
+type LowerIndicator = "none" | "rsi" | "macd";
 
 function sma(closes: number[], period: number): (number | null)[] {
   const out: (number | null)[] = new Array(closes.length).fill(null);
@@ -69,6 +85,103 @@ function sma(closes: number[], period: number): (number | null)[] {
     sum += closes[i];
     if (i >= period) sum -= closes[i - period];
     if (i >= period - 1) out[i] = sum / period;
+  }
+  return out;
+}
+
+/** EMA over a (possibly gappy) series — re-seeds with a plain SMA at the
+ * start of each contiguous run of non-null values, e.g. after a warm-up gap
+ * from an upstream indicator like MACD's own line. */
+function emaSeries(
+  values: (number | null)[],
+  period: number,
+): (number | null)[] {
+  const out: (number | null)[] = new Array(values.length).fill(null);
+  const k = 2 / (period + 1);
+  let prev: number | null = null;
+  let runStart = -1;
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (v === null) {
+      prev = null;
+      runStart = -1;
+      continue;
+    }
+    if (runStart === -1) runStart = i;
+    if (i - runStart + 1 < period) continue;
+    if (prev === null) {
+      let sum = 0;
+      for (let j = i - period + 1; j <= i; j++) sum += values[j] as number;
+      prev = sum / period;
+    } else {
+      prev = v * k + prev * (1 - k);
+    }
+    out[i] = prev;
+  }
+  return out;
+}
+
+function ema(closes: number[], period: number): (number | null)[] {
+  return emaSeries(closes, period);
+}
+
+/** Wilder's RSI. */
+function rsi(closes: number[], period = 14): (number | null)[] {
+  const out: (number | null)[] = new Array(closes.length).fill(null);
+  if (closes.length <= period) return out;
+  let gainSum = 0;
+  let lossSum = 0;
+  for (let i = 1; i <= period; i++) {
+    const change = closes[i] - closes[i - 1];
+    if (change > 0) gainSum += change;
+    else lossSum -= change;
+  }
+  let avgGain = gainSum / period;
+  let avgLoss = lossSum / period;
+  out[period] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+  for (let i = period + 1; i < closes.length; i++) {
+    const change = closes[i] - closes[i - 1];
+    const gain = change > 0 ? change : 0;
+    const loss = change < 0 ? -change : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+    out[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+  }
+  return out;
+}
+
+/** MACD(12,26,9) — trend line, signal line, and the histogram between them. */
+function macd(closes: number[]): {
+  macdLine: (number | null)[];
+  signal: (number | null)[];
+  histogram: (number | null)[];
+} {
+  const ema12 = ema(closes, 12);
+  const ema26 = ema(closes, 26);
+  const macdLine = closes.map((_, i) =>
+    ema12[i] !== null && ema26[i] !== null
+      ? (ema12[i] as number) - (ema26[i] as number)
+      : null,
+  );
+  const signal = emaSeries(macdLine, 9);
+  const histogram = closes.map((_, i) =>
+    macdLine[i] !== null && signal[i] !== null
+      ? (macdLine[i] as number) - (signal[i] as number)
+      : null,
+  );
+  return { macdLine, signal, histogram };
+}
+
+/** Cumulative volume-weighted average price over the currently loaded range. */
+function vwap(bars: PriceBar[]): (number | null)[] {
+  const out: (number | null)[] = new Array(bars.length).fill(null);
+  let cumPV = 0;
+  let cumVol = 0;
+  for (let i = 0; i < bars.length; i++) {
+    const typical = (bars[i].high + bars[i].low + bars[i].close) / 3;
+    cumPV += typical * bars[i].volume;
+    cumVol += bars[i].volume;
+    out[i] = cumVol > 0 ? cumPV / cumVol : null;
   }
   return out;
 }
@@ -115,6 +228,21 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
   const [alertConfirmation, setAlertConfirmation] = useState<string | null>(
     null,
   );
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [logoBroken, setLogoBroken] = useState(false);
+
+  useEffect(() => {
+    setLogoBroken(false);
+  }, [ticker]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setIsFullscreen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isFullscreen]);
 
   useEffect(() => {
     if (!ticker) return;
@@ -125,7 +253,10 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
   const [rangeDays, setRangeDays] = useState(180);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("price");
   const [maPeriods, setMaPeriods] = useState<Set<number>>(new Set());
+  const [emaPeriods, setEmaPeriods] = useState<Set<number>>(new Set());
   const [showBollinger, setShowBollinger] = useState(false);
+  const [showVwap, setShowVwap] = useState(false);
+  const [lowerIndicator, setLowerIndicator] = useState<LowerIndicator>("none");
   const [compareInput, setCompareInput] = useState("");
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
   const [primaryBars, setPrimaryBars] = useState<PriceBar[]>([]);
@@ -158,7 +289,11 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
         horzLines: { color: colors.grid },
       },
       rightPriceScale: { borderColor: colors.border },
-      timeScale: { borderColor: colors.border },
+      timeScale: {
+        borderColor: colors.border,
+        timeVisible: true,
+        secondsVisible: false,
+      },
       width: containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
     });
@@ -201,7 +336,10 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     setCompareInput("");
     setScaleMode("price");
     setMaPeriods(new Set());
+    setEmaPeriods(new Set());
     setShowBollinger(false);
+    setShowVwap(false);
+    setLowerIndicator("none");
   }, [ticker]);
 
   // Fetch primary + (optional) compare history whenever inputs change.
@@ -339,6 +477,102 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
       }
     }
 
+    for (const period of emaPeriods) {
+      const line = chart.addLineSeries({
+        color: EMA_COLORS[period],
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      line.setData(toLinePoints(primaryBars, ema(closes, period)));
+      seriesRef.current.push(line);
+    }
+
+    if (showVwap) {
+      const line = chart.addLineSeries({
+        color: VWAP_COLOR,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      line.setData(toLinePoints(primaryBars, vwap(primaryBars)));
+      seriesRef.current.push(line);
+    }
+
+    // RSI/MACD share a band pinned to the bottom of the chart, above the
+    // volume histogram (which itself only exists in candle mode).
+    const lowerBottomMargin = showCandles ? 0.15 : 0;
+    if (lowerIndicator === "rsi") {
+      const line = chart.addLineSeries({
+        color: RSI_COLOR,
+        lineWidth: 1,
+        priceScaleId: "lower",
+        priceLineVisible: false,
+        lastValueVisible: true,
+      });
+      line
+        .priceScale()
+        .applyOptions({ scaleMargins: { top: 0.65, bottom: lowerBottomMargin } });
+      line.setData(toLinePoints(primaryBars, rsi(closes, 14)));
+      line.createPriceLine({
+        price: 70,
+        color: RSI_COLOR,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        axisLabelVisible: false,
+        title: "70",
+      });
+      line.createPriceLine({
+        price: 30,
+        color: RSI_COLOR,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        axisLabelVisible: false,
+        title: "30",
+      });
+      seriesRef.current.push(line);
+    } else if (lowerIndicator === "macd") {
+      const { macdLine, signal, histogram } = macd(closes);
+
+      const histSeries = chart.addHistogramSeries({
+        priceScaleId: "lower",
+        color: "#cfd8ca",
+      });
+      histSeries
+        .priceScale()
+        .applyOptions({ scaleMargins: { top: 0.65, bottom: lowerBottomMargin } });
+      histSeries.setData(
+        toLinePoints(primaryBars, histogram).map((p) => ({
+          time: p.time,
+          value: p.value,
+          color:
+            p.value >= 0 ? "rgba(12,163,12,0.5)" : "rgba(208,59,59,0.5)",
+        })),
+      );
+      seriesRef.current.push(histSeries);
+
+      const macdSeries = chart.addLineSeries({
+        color: MACD_COLOR,
+        lineWidth: 1,
+        priceScaleId: "lower",
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      macdSeries.setData(toLinePoints(primaryBars, macdLine));
+      seriesRef.current.push(macdSeries);
+
+      const signalSeries = chart.addLineSeries({
+        color: MACD_SIGNAL_COLOR,
+        lineWidth: 1,
+        priceScaleId: "lower",
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      signalSeries.setData(toLinePoints(primaryBars, signal));
+      seriesRef.current.push(signalSeries);
+    }
+
     chart.timeScale().fitContent();
   }, [
     ticker,
@@ -347,7 +581,10 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     compareBars,
     showCandles,
     maPeriods,
+    emaPeriods,
     showBollinger,
+    showVwap,
+    lowerIndicator,
   ]);
 
   function toggleMa(period: number) {
@@ -357,6 +594,19 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
       else next.add(period);
       return next;
     });
+  }
+
+  function toggleEma(period: number) {
+    setEmaPeriods((prev) => {
+      const next = new Set(prev);
+      if (next.has(period)) next.delete(period);
+      else next.add(period);
+      return next;
+    });
+  }
+
+  function toggleLowerIndicator(indicator: LowerIndicator) {
+    setLowerIndicator((prev) => (prev === indicator ? "none" : indicator));
   }
 
   function applyCompare() {
@@ -412,13 +662,28 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
   }
 
   return (
-    <div className="panel">
+    <div className={`panel${isFullscreen ? " chart-fullscreen" : ""}`}>
       <div className="panel-header">
-        <span>
+        <span className="chart-title">
+          {ticker && !logoBroken && (
+            <img
+              className="chart-logo"
+              src={`https://images.financialmodelingprep.com/symbol/${ticker}.png`}
+              alt=""
+              onError={() => setLogoBroken(true)}
+            />
+          )}
           {ticker
             ? `${ticker}${compareTicker ? ` vs ${compareTicker}` : ""} — Price`
             : "Price Chart"}
         </span>
+        <button
+          className="icon-btn"
+          onClick={() => setIsFullscreen((v) => !v)}
+          title={isFullscreen ? "Exit full screen (Esc)" : "Full screen"}
+        >
+          {isFullscreen ? "⤡ Exit" : "⤢ Full screen"}
+        </button>
       </div>
       {ticker && (
         <div className="chart-toolbar">
@@ -476,6 +741,61 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
               title="Bollinger Bands (20-period, 2 std dev)"
             >
               BB
+            </button>
+          </div>
+          <div className="chart-toolbar-group">
+            {EMA_PERIODS.map((p) => (
+              <button
+                key={p}
+                className={`toggle-btn ${emaPeriods.has(p) ? "active" : ""}`}
+                style={
+                  emaPeriods.has(p)
+                    ? { background: EMA_COLORS[p], borderColor: EMA_COLORS[p] }
+                    : undefined
+                }
+                onClick={() => toggleEma(p)}
+                title={`${p}-period exponential moving average`}
+              >
+                EMA{p}
+              </button>
+            ))}
+            <button
+              className={`toggle-btn ${showVwap ? "active" : ""}`}
+              style={
+                showVwap
+                  ? { background: VWAP_COLOR, borderColor: VWAP_COLOR }
+                  : undefined
+              }
+              onClick={() => setShowVwap((v) => !v)}
+              title="Cumulative volume-weighted average price over the loaded range"
+            >
+              VWAP
+            </button>
+          </div>
+          <div className="chart-toolbar-group">
+            <button
+              className={`toggle-btn ${lowerIndicator === "rsi" ? "active" : ""}`}
+              style={
+                lowerIndicator === "rsi"
+                  ? { background: RSI_COLOR, borderColor: RSI_COLOR }
+                  : undefined
+              }
+              onClick={() => toggleLowerIndicator("rsi")}
+              title="Relative Strength Index (14-period)"
+            >
+              RSI
+            </button>
+            <button
+              className={`toggle-btn ${lowerIndicator === "macd" ? "active" : ""}`}
+              style={
+                lowerIndicator === "macd"
+                  ? { background: MACD_COLOR, borderColor: MACD_COLOR }
+                  : undefined
+              }
+              onClick={() => toggleLowerIndicator("macd")}
+              title="MACD (12, 26, 9)"
+            >
+              MACD
             </button>
           </div>
           <div className="chart-toolbar-group chart-compare">

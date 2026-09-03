@@ -43,11 +43,13 @@ function regimeSignal(growthAvg: number, protectionAvg: number): string {
 
 function MoverRow({
   label,
+  name,
   exchange,
   pct,
   onSelectTicker,
 }: {
   label: string;
+  name?: string;
   exchange?: string;
   pct: number;
   onSelectTicker?: (ticker: string) => void;
@@ -60,12 +62,43 @@ function MoverRow({
       <span className="ticker-cell">
         {label}
         {exchange ? <span className="ticker-exchange">{exchange}</span> : null}
+        {name ? <span className="short-name-cell brief-mover-name"> {name}</span> : null}
       </span>
       <span className={`num-cell ${pctClass(pct)}`}>
         {formatSignedPct(pct)}
       </span>
     </div>
   );
+}
+
+const INVESTOR_QUOTES: Array<{ quote: string; author: string }> = [
+  { quote: "Be fearful when others are greedy, and greedy when others are fearful.", author: "Warren Buffett" },
+  { quote: "The four most dangerous words in investing are: 'this time it's different.'", author: "Sir John Templeton" },
+  { quote: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+  { quote: "In the short run, the market is a voting machine. In the long run, it's a weighing machine.", author: "Benjamin Graham" },
+  { quote: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+  { quote: "The investor's chief problem — and even his worst enemy — is likely to be himself.", author: "Benjamin Graham" },
+  { quote: "Markets can remain irrational longer than you can remain solvent.", author: "John Maynard Keynes" },
+  { quote: "Know what you own, and know why you own it.", author: "Peter Lynch" },
+  { quote: "The big money is not in the buying and selling, but in the waiting.", author: "Charlie Munger" },
+  { quote: "It is not the strongest of the species that survives, but the one most responsive to change.", author: "Charles Darwin" },
+  { quote: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { quote: "The trend is your friend until the end when it bends.", author: "Ed Seykota" },
+  { quote: "Bull markets are born on pessimism, grow on skepticism, mature on optimism, and die on euphoria.", author: "Sir John Templeton" },
+  { quote: "Diversification is protection against ignorance. It makes little sense if you know what you are doing.", author: "Warren Buffett" },
+  { quote: "The four most expensive words in the English language are 'this time it's different.'", author: "Sir John Templeton" },
+  { quote: "Price is what you pay. Value is what you get.", author: "Warren Buffett" },
+  { quote: "The intelligent investor is a realist who sells to optimists and buys from pessimists.", author: "Benjamin Graham" },
+  { quote: "Never invest in a business you cannot understand.", author: "Warren Buffett" },
+  { quote: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+  { quote: "Every once in a while, the market does something so stupid it takes your breath away.", author: "Jim Cramer" },
+];
+
+/** Deterministic pick from the day's date, so it changes once per day and is
+ * stable across reloads/users on the same day — no server round trip. */
+function quoteOfTheDay(): { quote: string; author: string } {
+  const dayIndex = Math.floor(Date.now() / 86_400_000);
+  return INVESTOR_QUOTES[dayIndex % INVESTOR_QUOTES.length];
 }
 
 interface Props {
@@ -121,6 +154,17 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
         </div>
       </div>
 
+      {(() => {
+        const q = quoteOfTheDay();
+        return (
+          <div className="daily-quote">
+            <span className="daily-quote-mark">“</span>
+            {q.quote}
+            <span className="daily-quote-author">— {q.author}</span>
+          </div>
+        );
+      })()}
+
       {loading ? (
         <div className="empty-state">Building this morning's brief…</div>
       ) : (
@@ -166,6 +210,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
                   <MoverRow
                     key={q.ticker}
                     label={q.ticker}
+                    name={q.shortName}
                     exchange={q.exchange}
                     pct={q.changePct1d}
                     onSelectTicker={onSelectTicker}
@@ -183,6 +228,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
                   <MoverRow
                     key={r.ticker}
                     label={r.ticker}
+                    name={r.name}
                     exchange={r.exchange}
                     pct={r.changePct1d}
                     onSelectTicker={onSelectTicker}
@@ -194,6 +240,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
                   <MoverRow
                     key={r.ticker}
                     label={r.ticker}
+                    name={r.name}
                     exchange={r.exchange}
                     pct={r.changePct1d}
                     onSelectTicker={onSelectTicker}

@@ -96,12 +96,17 @@ export interface ChartData {
   bars: PriceBar[];
 }
 
-/** Daily OHLCV bars plus live-ish quote metadata for one symbol. `range` is a
- * Yahoo range token (e.g. "5d", "6mo", "1y"). */
-export async function fetchChart(symbol: string, range: string): Promise<ChartData> {
+/** OHLCV bars plus live-ish quote metadata for one symbol. `range` is a
+ * Yahoo range token (e.g. "5d", "6mo", "1y"); `interval` a Yahoo bar size
+ * (e.g. "1d", "5m", "30m") — defaults to daily bars. */
+export async function fetchChart(
+  symbol: string,
+  range: string,
+  interval = "1d"
+): Promise<ChartData> {
   const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
     symbol
-  )}?interval=1d&range=${range}`;
+  )}?interval=${interval}&range=${range}`;
   const data = await yahooGet<YahooChartResponse>(url);
   const result = data.chart.result?.[0];
   if (!result) {

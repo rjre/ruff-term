@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FxSnapshot } from "@ruff-term/shared";
 import { fetchFx } from "../api/client";
+import { usePriceFlashes } from "../lib/priceFlash";
 import { SourceFooter } from "./SourceFooter";
 
 const POLL_MS = 20_000;
@@ -14,6 +15,13 @@ function pctClass(value: number): string {
 function formatSignedPct(value: number): string {
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
+}
+
+function formatUpdated(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 interface Props {
@@ -40,6 +48,10 @@ export function FxPanel({ onSelectTicker }: Props) {
       clearInterval(interval);
     };
   }, []);
+
+  const flashes = usePriceFlashes(
+    (snapshot?.g10 ?? []).map((l) => ({ key: l.ticker, value: l.lastPrice })),
+  );
 
   return (
     <div className="module-view">
@@ -79,7 +91,16 @@ export function FxPanel({ onSelectTicker }: Props) {
                 }
               >
                 <td className="ticker-cell">{line.pair}</td>
-                <td className="num-cell">{line.lastPrice.toFixed(4)}</td>
+                <td
+                  className={`num-cell price-cell${
+                    flashes.get(line.ticker) ? ` flash-${flashes.get(line.ticker)}` : ""
+                  }`}
+                >
+                  <div>{line.lastPrice.toFixed(4)}</div>
+                  <div className="price-updated">
+                    {formatUpdated(line.updatedAt)}
+                  </div>
+                </td>
                 <td className={`num-cell ${pctClass(line.changePct1d)}`}>
                   {formatSignedPct(line.changePct1d)}
                 </td>

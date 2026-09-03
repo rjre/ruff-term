@@ -62,6 +62,7 @@ async function loadRow(entry: UniverseEntry): Promise<ScreenerRow | null> {
       changePctYtd: pctChange(yearBase.close, lastPrice),
       pctFrom52wHigh: pctChange(high52w, lastPrice),
       pctFrom52wLow: pctChange(low52w, lastPrice),
+      updatedAt: new Date(meta.regularMarketTime * 1000).toISOString(),
     };
   } catch (err) {
     console.warn(`[screener] Skipping ${entry.ticker}:`, (err as Error).message);

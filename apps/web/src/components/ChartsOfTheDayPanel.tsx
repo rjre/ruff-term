@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   ChartsOfTheDaySnapshot,
+  CorrelationMatrixSnapshot,
+  PriceBar,
   RegimeBarometerLine,
+  ScreenerRow,
 } from "@ruff-term/shared";
-import { fetchChartsOfTheDay } from "../api/client";
+import {
+  fetchChartsOfTheDay,
+  fetchCorrelationMatrix,
+  fetchHistory,
+  fetchScreener,
+} from "../api/client";
 import { MagnitudeBarList } from "./MagnitudeBarList";
+import { Sparkline } from "./Sparkline";
 
 function pctClass(value: number): string {
   if (value > 0) return "pct-up";
@@ -53,8 +62,16 @@ function regimeSignal(growthAvg: number, protectionAvg: number): string {
   return gap > 0 ? "Growth leading today" : "Protection leading today";
 }
 
-export function ChartsOfTheDayPanel() {
+interface Props {
+  onSelectTicker?: (ticker: string) => void;
+}
+
+export function ChartsOfTheDayPanel({ onSelectTicker }: Props) {
   const [snapshot, setSnapshot] = useState<ChartsOfTheDaySnapshot | null>(null);
+  const [screenerRows, setScreenerRows] = useState<ScreenerRow[] | null>(null);
+  const [moverBars, setMoverBars] = useState<PriceBar[]>([]);
+  const [correlation, setCorrelation] =
+    useState<CorrelationMatrixSnapshot | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +90,66 @@ export function ChartsOfTheDayPanel() {
       clearInterval(interval);
     };
   }, []);
+
+  // One-shot, not polled — these are "today's talking points", not live
+  // ticking data.
+  useEffect(() => {
+    fetchScreener()
+      .then((s) => setScreenerRows(s.rows))
+      .catch(() => setScreenerRows([]));
+    fetchCorrelationMatrix(90)
+      .then(setCorrelation)
+      .catch(() => setCorrelation(null));
+  }, []);
+
+  const biggestMover = useMemo(() => {
+    if (!screenerRows || screenerRows.length === 0) return null;
+    return screenerRows.reduce((a, b) =>
+      Math.abs(b.changePct1d) > Math.abs(a.changePct1d) ? b : a,
+    );
+  }, [screenerRows]);
+
+  const nearHigh = useMemo(() => {
+    if (!screenerRows || screenerRows.length === 0) return null;
+    return screenerRows.reduce((a, b) =>
+      b.pctFrom52wHigh > a.pctFrom52wHigh ? b : a,
+    );
+  }, [screenerRows]);
+
+  const nearLow = useMemo(() => {
+    if (!screenerRows || screenerRows.length === 0) return null;
+    return screenerRows.reduce((a, b) =>
+      b.pctFrom52wLow < a.pctFrom52wLow ? b : a,
+    );
+  }, [screenerRows]);
+
+  const correlationExtremes = useMemo(() => {
+    if (!correlation) return null;
+    const { labels, matrix } = correlation;
+    let maxPair: { a: string; b: string; value: number } | null = null;
+    let minPair: { a: string; b: string; value: number } | null = null;
+    for (let i = 0; i < labels.length; i++) {
+      for (let j = i + 1; j < labels.length; j++) {
+        const value = matrix[i]?.[j];
+        if (value === undefined) continue;
+        if (!maxPair || value > maxPair.value) maxPair = { a: labels[i], b: labels[j], value };
+        if (!minPair || value < minPair.value) minPair = { a: labels[i], b: labels[j], value };
+      }
+    }
+    return { maxPair, minPair };
+  }, [correlation]);
+
+  useEffect(() => {
+    if (!biggestMover) return;
+    let cancelled = false;
+    fetchHistory(biggestMover.ticker, 30)
+      .then((r) => !cancelled && setMoverBars(r.bars))
+      .catch(() => !cancelled && setMoverBars([]));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [biggestMover?.ticker]);
 
   if (!snapshot) {
     return (
@@ -125,6 +202,109 @@ export function ChartsOfTheDayPanel() {
           <div className="kpi-value">
             {regimeSignal(snapshot.growthAvgPct, snapshot.protectionAvgPct)}
           </div>
+        </div>
+      </div>
+
+      <h3 className="section-heading">Today's talking points</h3>
+      <div className="cotd-grid">
+        <div
+          className={`cotd-tile${biggestMover && onSelectTicker ? " cotd-tile-clickable" : ""}`}
+          onClick={
+            biggestMover && onSelectTicker
+              ? () => onSelectTicker(biggestMover.ticker)
+              : undefined
+          }
+        >
+          <div className="kpi-label">Biggest single-name move today</div>
+          {biggestMover ? (
+            <>
+              <div className="cotd-tile-headline">
+                {biggestMover.ticker}
+                <span
+                  className={`cotd-tile-pct ${pctClass(biggestMover.changePct1d)}`}
+                >
+                  {formatSignedPct(biggestMover.changePct1d)}
+                </span>
+              </div>
+              <div className="cotd-tile-sub">{biggestMover.name}</div>
+              {moverBars.length > 1 && (
+                <Sparkline
+                  values={moverBars.map((b) => b.close)}
+                  color={
+                    biggestMover.changePct1d >= 0
+                      ? "var(--up)"
+                      : "var(--down)"
+                  }
+                  width={280}
+                  height={44}
+                />
+              )}
+            </>
+          ) : (
+            <div className="cotd-tile-sub">Loading…</div>
+          )}
+        </div>
+
+        <div className="cotd-tile">
+          <div className="kpi-label">Flirting with 52-week extremes</div>
+          {nearHigh && nearLow ? (
+            <>
+              <div
+                className={`cotd-tile-row${onSelectTicker ? " cotd-tile-row-clickable" : ""}`}
+                onClick={
+                  onSelectTicker ? () => onSelectTicker(nearHigh.ticker) : undefined
+                }
+              >
+                <span className="cotd-tile-row-label">
+                  {nearHigh.ticker} <span className="cotd-tile-sub">{nearHigh.name}</span>
+                </span>
+                <span className="cotd-tile-row-value">
+                  {nearHigh.pctFrom52wHigh.toFixed(1)}% from 52w high
+                </span>
+              </div>
+              <div
+                className={`cotd-tile-row${onSelectTicker ? " cotd-tile-row-clickable" : ""}`}
+                onClick={
+                  onSelectTicker ? () => onSelectTicker(nearLow.ticker) : undefined
+                }
+              >
+                <span className="cotd-tile-row-label">
+                  {nearLow.ticker} <span className="cotd-tile-sub">{nearLow.name}</span>
+                </span>
+                <span className="cotd-tile-row-value">
+                  +{nearLow.pctFrom52wLow.toFixed(1)}% off 52w low
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="cotd-tile-sub">Loading…</div>
+          )}
+        </div>
+
+        <div className="cotd-tile">
+          <div className="kpi-label">Correlation extremes (90d)</div>
+          {correlationExtremes?.maxPair && correlationExtremes?.minPair ? (
+            <>
+              <div className="cotd-tile-row">
+                <span className="cotd-tile-row-label">
+                  {correlationExtremes.maxPair.a} vs {correlationExtremes.maxPair.b}
+                </span>
+                <span className="cotd-tile-row-value">
+                  most correlated, {correlationExtremes.maxPair.value.toFixed(2)}
+                </span>
+              </div>
+              <div className="cotd-tile-row">
+                <span className="cotd-tile-row-label">
+                  {correlationExtremes.minPair.a} vs {correlationExtremes.minPair.b}
+                </span>
+                <span className="cotd-tile-row-value">
+                  most divergent, {correlationExtremes.minPair.value.toFixed(2)}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="cotd-tile-sub">Loading…</div>
+          )}
         </div>
       </div>
 

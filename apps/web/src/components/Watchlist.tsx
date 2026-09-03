@@ -49,6 +49,20 @@ function formatPct(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+function formatVolume(value: number): string {
+  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return String(value);
+}
+
+function formatUpdatedTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function pctClass(value: number): string {
   if (value > 0) return "pct-up";
   if (value < 0) return "pct-down";
@@ -59,16 +73,26 @@ type SortKey =
   | "ticker"
   | "shortName"
   | "lastPrice"
+  | "volume"
   | "changePct1d"
-  | "changePct2d";
+  | "changePct2d"
+  | "changePct1w"
+  | "changePct1m"
+  | "changePct6m"
+  | "changePct1y";
 
 const SORT_ACCESSORS: Record<SortKey, (q: WatchlistQuote) => string | number> =
   {
     ticker: (q) => q.ticker,
     shortName: (q) => q.shortName,
     lastPrice: (q) => q.lastPrice,
+    volume: (q) => q.volume,
     changePct1d: (q) => q.changePct1d,
     changePct2d: (q) => q.changePct2d,
+    changePct1w: (q) => q.changePct1w,
+    changePct1m: (q) => q.changePct1m,
+    changePct6m: (q) => q.changePct6m,
+    changePct1y: (q) => q.changePct1y,
   };
 
 interface Props {
@@ -156,7 +180,7 @@ export function Watchlist({
           }
           if (nextFlashes.size > 0) {
             setFlashes(nextFlashes);
-            setTimeout(() => setFlashes(new Map()), 900);
+            setTimeout(() => setFlashes(new Map()), 3000);
           }
         }
 
@@ -277,8 +301,14 @@ export function Watchlist({
                   "Short Name",
                   "Last Price",
                   "Currency",
+                  "Volume",
                   "%1D",
                   "%2D",
+                  "%1W",
+                  "%1M",
+                  "%6M",
+                  "%1Y",
+                  "Updated",
                 ],
                 ...sortedQuotes.map((q) => [
                   q.ticker,
@@ -286,8 +316,14 @@ export function Watchlist({
                   q.shortName,
                   q.lastPrice,
                   q.currency,
+                  q.volume,
                   q.changePct1d,
                   q.changePct2d,
+                  q.changePct1w,
+                  q.changePct1m,
+                  q.changePct6m,
+                  q.changePct1y,
+                  q.updatedAt,
                 ]),
               ])
             }
@@ -327,6 +363,12 @@ export function Watchlist({
                 </th>
                 <th
                   className="num sortable-th"
+                  onClick={() => toggleSort("volume")}
+                >
+                  Volume{sortIndicator("volume")}
+                </th>
+                <th
+                  className="num sortable-th"
                   onClick={() => toggleSort("changePct1d")}
                 >
                   %1D{sortIndicator("changePct1d")}
@@ -336,6 +378,30 @@ export function Watchlist({
                   onClick={() => toggleSort("changePct2d")}
                 >
                   %2D{sortIndicator("changePct2d")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct1w")}
+                >
+                  %1W{sortIndicator("changePct1w")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct1m")}
+                >
+                  %1M{sortIndicator("changePct1m")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct6m")}
+                >
+                  %6M{sortIndicator("changePct6m")}
+                </th>
+                <th
+                  className="num sortable-th"
+                  onClick={() => toggleSort("changePct1y")}
+                >
+                  %1Y{sortIndicator("changePct1y")}
                 </th>
                 <th aria-label="remove" />
               </tr>
@@ -358,18 +424,36 @@ export function Watchlist({
                     <td className="short-name-cell">{q.shortName}</td>
                     <td
                       className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
-                      title={`${q.currency} · updated ${new Date(q.updatedAt).toLocaleTimeString()}`}
+                      title={`${q.currency} · updated ${formatUpdatedTime(q.updatedAt)}`}
                     >
-                      {formatPrice(q.lastPrice)}
-                      {q.priceSuffix ? (
-                        <span className="price-suffix">{q.priceSuffix}</span>
-                      ) : null}
+                      <div>
+                        {formatPrice(q.lastPrice)}
+                        {q.priceSuffix ? (
+                          <span className="price-suffix">{q.priceSuffix}</span>
+                        ) : null}
+                      </div>
+                      <div className="price-updated">
+                        {formatUpdatedTime(q.updatedAt)}
+                      </div>
                     </td>
+                    <td className="num-cell">{formatVolume(q.volume)}</td>
                     <td className={`num-cell ${pctClass(q.changePct1d)}`}>
                       {formatPct(q.changePct1d)}
                     </td>
                     <td className={`num-cell ${pctClass(q.changePct2d)}`}>
                       {formatPct(q.changePct2d)}
+                    </td>
+                    <td className={`num-cell ${pctClass(q.changePct1w)}`}>
+                      {formatPct(q.changePct1w)}
+                    </td>
+                    <td className={`num-cell ${pctClass(q.changePct1m)}`}>
+                      {formatPct(q.changePct1m)}
+                    </td>
+                    <td className={`num-cell ${pctClass(q.changePct6m)}`}>
+                      {formatPct(q.changePct6m)}
+                    </td>
+                    <td className={`num-cell ${pctClass(q.changePct1y)}`}>
+                      {formatPct(q.changePct1y)}
                     </td>
                     <td>
                       <button

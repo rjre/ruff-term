@@ -14,6 +14,13 @@ function formatSignedPct(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+function formatUpdated(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 interface Props {
   onSelectTicker?: (ticker: string) => void;
 }
@@ -76,7 +83,10 @@ export function UstActivityPanel({ onSelectTicker }: Props) {
               }
             >
               <td className="ticker-cell">{e.label}</td>
-              <td className="num-cell">{e.lastPrice.toFixed(2)}</td>
+              <td className="num-cell price-cell">
+                <div>{e.lastPrice.toFixed(2)}</div>
+                <div className="price-updated">{formatUpdated(e.updatedAt)}</div>
+              </td>
               <td className={`num-cell ${pctClass(e.changePct1d)}`}>
                 {formatSignedPct(e.changePct1d)}
               </td>

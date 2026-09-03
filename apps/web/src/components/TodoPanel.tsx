@@ -29,6 +29,10 @@ const ITEMS: TodoItem[] = [
     note: "FactSet/Bloomberg's =FDS(...)-style Excel formulas. Not something a free/keyless data layer can replicate — paid-provider territory, flagged honestly rather than faked.",
   },
   {
+    title: "Live estimated NAV roll-forward",
+    note: "NAV Monitoring currently shows the latest OFFICIAL NAV per company from rjre/nav-monitoring-'s committed snapshot, not a live-recomputed estimate. That repo's own roll-forward (nav_monitor.estimator) needs each company's underlying portfolio composition to reprice day-to-day — not just its own share price, which already embeds the discount/premium we're trying to measure. Faking it off share-price alone would just restate the discount, not estimate NAV. Needs the source repo's holdings data ported over, or its Streamlit app run directly.",
+  },
+  {
     title: "Sentiment indicators (AAII, CBOE put/call)",
     note: "Checked both: aaii.com returns 403 to this environment (membership-gated beyond the current week's headline number), and CBOE's put/call ratio CSV endpoints returned 403/404. Neither has an accessible free feed from here — would need a different vantage point or a paid data reseller.",
   },

@@ -15,6 +15,13 @@ function formatSignedPct(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+function formatUpdated(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 type SortKey = keyof Pick<
   ScreenerRow,
   | "changePct1d"
@@ -155,6 +162,7 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
                 "%YTD",
                 "%52wHigh",
                 "%52wLow",
+                "Updated",
               ],
               ...filtered.map((r) => [
                 r.ticker,
@@ -169,6 +177,7 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
                 r.changePctYtd,
                 r.pctFrom52wHigh,
                 r.pctFrom52wLow,
+                r.updatedAt,
               ]),
             ])
           }
@@ -217,7 +226,12 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
                 </td>
                 <td className="short-name-cell">{r.name}</td>
                 <td className="short-name-cell">{r.sector}</td>
-                <td className="num-cell">{r.lastPrice.toFixed(2)}</td>
+                <td className="num-cell price-cell">
+                  <div>{r.lastPrice.toFixed(2)}</div>
+                  <div className="price-updated">
+                    {formatUpdated(r.updatedAt)}
+                  </div>
+                </td>
                 <td className={`num-cell ${pctClass(r.changePct1d)}`}>
                   {formatSignedPct(r.changePct1d)}
                 </td>

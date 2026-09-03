@@ -54,7 +54,7 @@ app.get("/api/watchlist", async (req) => {
 app.get("/api/history/:ticker", async (req, reply) => {
   const { ticker } = req.params as { ticker: string };
   const query = req.query as { days?: string };
-  const days = Math.min(Math.max(Number(query.days ?? "90"), 5), 500);
+  const days = Math.min(Math.max(Number(query.days ?? "90"), 1), 20_000);
   if (!ticker) {
     reply.code(400);
     return { error: "ticker is required" };

@@ -33,8 +33,9 @@ export function GuideToGlobalMarketsPanel() {
   useEffect(() => {
     fetchGlobalMarketsGuide()
       .then((data) => {
-        setCountries(data);
-        if (data.length > 0) setSelected(data[0].name);
+        const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name));
+        setCountries(sorted);
+        if (sorted.length > 0) setSelected(sorted[0].name);
       })
       .catch(() => setCountries([]));
   }, []);

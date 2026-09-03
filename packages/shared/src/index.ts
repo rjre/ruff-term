@@ -9,8 +9,14 @@ export interface WatchlistQuote {
   priceSuffix?: string;
   changePct1d: number;
   changePct2d: number;
+  changePct1w: number;
+  changePct1m: number;
+  changePct6m: number;
+  changePct1y: number;
   currency: string;
   updatedAt: string;
+  /** Shares traded on the most recent session. */
+  volume: number;
 }
 
 export interface SearchResult {
@@ -91,6 +97,8 @@ export interface MacroLine {
   netChange1d: number;
   changePctMtd: number;
   changePctYtd: number;
+  /** Real quote tick time from the data source, not fetch time. */
+  updatedAt: string;
 }
 
 export interface MacroPanel {
@@ -128,6 +136,8 @@ export interface G10Line {
   ticker: string;
   lastPrice: number;
   changePct1d: number;
+  /** Real quote tick time from the data source, not fetch time. */
+  updatedAt: string;
 }
 
 export interface FxSnapshot {
@@ -219,6 +229,8 @@ export interface TreasuryEtfLine {
   changePct1d: number;
   volume: number;
   currency: string;
+  /** Real quote tick time from the data source, not fetch time. */
+  updatedAt: string;
 }
 
 export interface UstVolumeLine {
@@ -275,6 +287,8 @@ export interface ScreenerRow {
   changePctYtd: number;
   pctFrom52wHigh: number;
   pctFrom52wLow: number;
+  /** Real quote tick time from the data source, not fetch time. */
+  updatedAt: string;
 }
 
 export interface ScreenerSnapshot {

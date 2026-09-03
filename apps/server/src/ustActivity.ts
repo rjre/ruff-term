@@ -76,6 +76,7 @@ async function loadSnapshot(): Promise<UstActivitySnapshot> {
           changePct1d: Math.round(((lastPrice - prev.close) / prev.close) * 10000) / 100,
           volume: latest.volume,
           currency: meta.currency,
+          updatedAt: new Date(meta.regularMarketTime * 1000).toISOString(),
         };
       } catch (err) {
         console.warn(`[ustActivity] Skipping ${t.ticker}:`, (err as Error).message);

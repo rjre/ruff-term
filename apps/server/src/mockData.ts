@@ -113,6 +113,11 @@ export function mockQuote(ticker: string): {
   lastPrice: number;
   changePct1d: number;
   changePct2d: number;
+  changePct1w: number;
+  changePct1m: number;
+  changePct6m: number;
+  changePct1y: number;
+  volume: number;
 } {
   const rand = seededRandom(ticker + new Date().toISOString().slice(0, 10));
   const basePrice = 20 + rand() * 480;
@@ -122,6 +127,11 @@ export function mockQuote(ticker: string): {
     lastPrice: Math.round(basePrice * 100) / 100,
     changePct1d: Math.round(changePct1d * 100) / 100,
     changePct2d: Math.round(changePct2d * 100) / 100,
+    changePct1w: Math.round((rand() - 0.5) * 10 * 100) / 100,
+    changePct1m: Math.round((rand() - 0.5) * 18 * 100) / 100,
+    changePct6m: Math.round((rand() - 0.4) * 35 * 100) / 100,
+    changePct1y: Math.round((rand() - 0.3) * 55 * 100) / 100,
+    volume: Math.floor(rand() * 5_000_000) + 100_000,
   };
 }
 

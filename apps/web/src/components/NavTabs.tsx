@@ -1,6 +1,7 @@
 export type View =
   | "morningBrief"
   | "markets"
+  | "charts"
   | "research"
   | "portfolio"
   | "impact"
@@ -41,6 +42,7 @@ export type View =
 export const TABS: Array<{ id: View; label: string }> = [
   { id: "morningBrief", label: "Morning Brief" },
   { id: "markets", label: "Markets" },
+  { id: "charts", label: "Charts" },
   { id: "research", label: "Ruffer Research" },
   { id: "portfolio", label: "Ruffer Portfolio" },
   { id: "impact", label: "Ruffer Impact" },
