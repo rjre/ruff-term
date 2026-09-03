@@ -1,4 +1,15 @@
-export interface WatchlistQuote {
+/**
+ * True when a payload is fabricated fallback data rather than a real market
+ * print — the upstream feed failed and the server substituted a plausible
+ * shape so the UI keeps working. Anything carrying this MUST be labelled as
+ * simulated wherever it is shown: an unmarked invented price is worse than a
+ * blank cell.
+ */
+export interface MaybeSynthetic {
+  synthetic?: boolean;
+}
+
+export interface WatchlistQuote extends MaybeSynthetic {
   /** Primary ticker symbol, e.g. "AAPL" */
   ticker: string;
   /** Exchange/market suffix shown next to the ticker, e.g. "US", "LN", "HK" */
@@ -35,7 +46,7 @@ export interface PriceBar {
   volume: number;
 }
 
-export interface HistoryResponse {
+export interface HistoryResponse extends MaybeSynthetic {
   ticker: string;
   bars: PriceBar[];
 }
@@ -294,6 +305,10 @@ export interface ScreenerRow {
 export interface ScreenerSnapshot {
   asOf: string;
   rows: ScreenerRow[];
+  /** Universe symbols the loader could not price this run (delisted, renamed
+   * or upstream error). Surfaced so a shrinking table is visible rather than
+   * silent. */
+  skipped: string[];
 }
 
 export interface CftcPositioningLine {

@@ -1,5 +1,6 @@
 import type { FxSnapshot, G10Line } from "@ruff-term/shared";
 import { TtlCache } from "./cache.js";
+import { mapLimit, YAHOO_CONCURRENCY } from "./concurrency.js";
 import * as yahoo from "./yahoo/client.js";
 
 /** G10 currencies against USD. Real vol-surface data (implied vol by tenor
@@ -24,8 +25,10 @@ const cache = new TtlCache<FxSnapshot>(20_000);
 
 async function loadSnapshot(): Promise<FxSnapshot> {
   const g10 = (
-    await Promise.all(
-      G10_PAIRS.map(async (p): Promise<G10Line | null> => {
+    await mapLimit(
+      G10_PAIRS,
+      YAHOO_CONCURRENCY,
+      async (p): Promise<G10Line | null> => {
         try {
           const { meta, bars } = await yahoo.fetchChart(p.ticker, "5d");
           if (bars.length < 2) return null;
@@ -43,7 +46,7 @@ async function loadSnapshot(): Promise<FxSnapshot> {
           console.warn(`[fx] Skipping ${p.ticker}:`, (err as Error).message);
           return null;
         }
-      })
+      }
     )
   ).filter((l): l is G10Line => l !== null);
 

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { WatchlistQuote } from "@ruff-term/shared";
 import { fetchWatchlist } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { TickerSearch } from "./TickerSearch";
 import { formatQuoteTimestamp, pctClass } from "../lib/format";
+import { usePriceFlashes } from "../lib/priceFlash";
 import { PriceStamp } from "./PriceStamp";
 
 const LEGACY_KEY = "ruff-term:watchlist";
@@ -11,6 +12,10 @@ const LISTS_KEY = "ruff-term:watchlists";
 const ACTIVE_KEY = "ruff-term:activeWatchlist";
 const DEFAULT_LIST_NAME = "Default";
 const POLL_MS = 30_000;
+
+/** Stable empty array so `tickers` keeps its identity across renders when the
+ * active list has no entry — see the memo below. */
+const EMPTY_TICKERS: string[] = [];
 
 function loadLists(): Record<string, string[]> {
   try {
@@ -103,13 +108,16 @@ export function Watchlist({
   );
   const [quotes, setQuotes] = useState<WatchlistQuote[]>([]);
   const [loading, setLoading] = useState(true);
-  const prevPrices = useRef<Map<string, number>>(new Map());
-  const [flashes, setFlashes] = useState<Map<string, "up" | "down">>(new Map());
-  const initialized = useRef(false);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDesc, setSortDesc] = useState(true);
 
-  const tickers = lists[activeList] ?? [];
+  // Memoized because it is an effect dependency: on the `?? []` path this
+  // would otherwise be a fresh array every render, re-running the poll effect
+  // and re-firing onTickersChange indefinitely.
+  const tickers = useMemo(
+    () => lists[activeList] ?? EMPTY_TICKERS,
+    [lists, activeList],
+  );
 
   function updateActiveTickers(next: string[]) {
     setLists((prev) => ({ ...prev, [activeList]: next }));
@@ -141,7 +149,7 @@ export function Watchlist({
 
   useEffect(() => {
     onTickersChange?.(tickers);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tickers, onTickersChange]);
 
   useEffect(() => {
@@ -152,29 +160,11 @@ export function Watchlist({
     }
 
     let cancelled = false;
-    initialized.current = false;
 
     async function poll() {
       try {
         const data = await fetchWatchlist(tickers);
         if (cancelled) return;
-
-        if (initialized.current) {
-          const nextFlashes = new Map<string, "up" | "down">();
-          for (const q of data) {
-            const prev = prevPrices.current.get(q.ticker);
-            if (prev !== undefined && prev !== q.lastPrice) {
-              nextFlashes.set(q.ticker, q.lastPrice > prev ? "up" : "down");
-            }
-          }
-          if (nextFlashes.size > 0) {
-            setFlashes(nextFlashes);
-            setTimeout(() => setFlashes(new Map()), 3000);
-          }
-        }
-
-        for (const q of data) prevPrices.current.set(q.ticker, q.lastPrice);
-        initialized.current = true;
         setQuotes(data);
         setLoading(false);
       } catch {
@@ -189,6 +179,18 @@ export function Watchlist({
       clearInterval(interval);
     };
   }, [tickers]);
+
+  const flashes = usePriceFlashes(
+    useMemo(
+      () => quotes.map((q) => ({ key: q.ticker, value: q.lastPrice })),
+      [quotes],
+    ),
+  );
+
+  const syntheticQuotes = useMemo(
+    () => quotes.filter((q) => q.synthetic),
+    [quotes],
+  );
 
   const sortedQuotes = useMemo(() => {
     if (!sortKey) return quotes;
@@ -298,6 +300,7 @@ export function Watchlist({
                   "%6M",
                   "%1Y",
                   "Updated",
+                  "Simulated",
                 ],
                 ...sortedQuotes.map((q) => [
                   q.ticker,
@@ -313,6 +316,7 @@ export function Watchlist({
                   q.changePct6m,
                   q.changePct1y,
                   q.updatedAt,
+                  q.synthetic ? "yes" : "no",
                 ]),
               ])
             }
@@ -322,6 +326,14 @@ export function Watchlist({
         </div>
       </div>
       <div className="panel-body">
+        {syntheticQuotes.length > 0 && (
+          <div className="demo-banner">
+            Yahoo did not return a price for{" "}
+            {syntheticQuotes.map((q) => q.ticker).join(", ")} — the row
+            {syntheticQuotes.length === 1 ? " below shows" : "s below show"}{" "}
+            simulated values, not real market prints.
+          </div>
+        )}
         {loading && quotes.length === 0 ? (
           <div className="empty-state">Loading quotes…</div>
         ) : quotes.length === 0 ? (
@@ -413,7 +425,11 @@ export function Watchlist({
                     <td className="short-name-cell">{q.shortName}</td>
                     <td
                       className={`num-cell price-cell${flash ? ` flash-${flash}` : ""}`}
-                      title={`${q.currency} · updated ${formatQuoteTimestamp(q.updatedAt)}`}
+                      title={
+                        q.synthetic
+                          ? `${q.ticker}: upstream price feed unavailable — simulated value, not a real market print`
+                          : `${q.currency} · updated ${formatQuoteTimestamp(q.updatedAt)}`
+                      }
                     >
                       <div>
                         {formatPrice(q.lastPrice)}
@@ -421,7 +437,7 @@ export function Watchlist({
                           <span className="price-suffix">{q.priceSuffix}</span>
                         ) : null}
                       </div>
-                      <PriceStamp at={q.updatedAt} />
+                      <PriceStamp at={q.updatedAt} synthetic={q.synthetic} />
                     </td>
                     <td className="num-cell">{formatVolume(q.volume)}</td>
                     <td className={`num-cell ${pctClass(q.changePct1d)}`}>

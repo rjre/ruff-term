@@ -59,8 +59,8 @@ app.get("/api/history/:ticker", async (req, reply) => {
     reply.code(400);
     return { error: "ticker is required" };
   }
-  const bars = await getHistory(ticker.toUpperCase(), days);
-  return { ticker: ticker.toUpperCase(), bars };
+  const { bars, synthetic } = await getHistory(ticker.toUpperCase(), days);
+  return { ticker: ticker.toUpperCase(), bars, synthetic };
 });
 
 app.get("/api/search", async (req) => {

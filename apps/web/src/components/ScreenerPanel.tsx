@@ -33,6 +33,7 @@ interface Props {
 
 export function ScreenerPanel({ onSelectTicker }: Props) {
   const [rows, setRows] = useState<ScreenerRow[] | null>(null);
+  const [skipped, setSkipped] = useState<string[]>([]);
   const [sector, setSector] = useState<string>("All");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("changePctYtd");
@@ -40,7 +41,10 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
 
   useEffect(() => {
     fetchScreener()
-      .then((data) => setRows(data.rows))
+      .then((data) => {
+        setRows(data.rows);
+        setSkipped(data.skipped ?? []);
+      })
       .catch(() => setRows([]));
   }, []);
 
@@ -81,6 +85,15 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
           </div>
         </div>
       </div>
+
+      {skipped.length > 0 && (
+        <div className="note-banner">
+          {skipped.length} universe symbol{skipped.length === 1 ? "" : "s"}{" "}
+          could not be priced this run and {skipped.length === 1 ? "is" : "are"}{" "}
+          missing from the table below: {skipped.join(", ")}. Usually a delisted
+          or renamed ticker in the universe file.
+        </div>
+      )}
 
       <div className="screener-toolbar">
         <input

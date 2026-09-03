@@ -1,17 +1,48 @@
 import type { NewsItem, PriceBar, SearchResult } from "@ruff-term/shared";
+import { TtlCache } from "../cache.js";
 
 // Yahoo Finance's public (unofficial, keyless) endpoints. No API key needed,
 // but Yahoo's edge blocks requests without a browser-like User-Agent.
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
+/** Cap on a single upstream request. Without one, a hung connection hangs
+ * the API request behind it indefinitely — and because TtlCache shares one
+ * in-flight load per key, it would hang every caller waiting on that key. */
+const REQUEST_TIMEOUT_MS = 10_000;
+
+const MAX_RETRIES = 2;
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/** Exponential backoff with full jitter. A flat delay is worse than useless
+ * for a rate limit: a burst of symbols all sleep the same 400ms and then
+ * collide again on the retry. */
+function backoffMs(attempt: number): number {
+  return Math.round(Math.random() * 400 * 2 ** attempt);
+}
+
 async function yahooGet<T>(url: string, attempt = 0): Promise<T> {
-  const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "application/json" } });
-  if (res.status === 429 && attempt < 2) {
-    await sleep(400 * (attempt + 1));
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": UA, Accept: "application/json" },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (err) {
+    const isTimeout = (err as Error).name === "TimeoutError";
+    if (isTimeout && attempt < MAX_RETRIES) {
+      await sleep(backoffMs(attempt));
+      return yahooGet<T>(url, attempt + 1);
+    }
+    throw isTimeout
+      ? new Error(`Yahoo request timed out after ${REQUEST_TIMEOUT_MS}ms`)
+      : (err as Error);
+  }
+
+  if (res.status === 429 && attempt < MAX_RETRIES) {
+    await sleep(backoffMs(attempt));
     return yahooGet<T>(url, attempt + 1);
   }
   if (!res.ok) {
@@ -96,6 +127,23 @@ export interface ChartData {
   bars: PriceBar[];
 }
 
+/**
+ * Shared per-symbol chart cache.
+ *
+ * Snapshot modules each cache their own finished payload, but several ask
+ * Yahoo for the same symbol independently — EURUSD=X, GBPUSD=X, USDJPY=X and
+ * AUDUSD=X are each fetched by both macro.ts and fx.ts, and the watchlist and
+ * screener overlap too. Caching one layer lower collapses those into a single
+ * upstream request, and TtlCache's in-flight sharing means simultaneous
+ * callers wait on it rather than racing.
+ *
+ * The TTL sits just under the tightest snapshot TTL in the app (fx, 20s), so
+ * nothing renders staler than it would have. Entries are shared by reference:
+ * callers must treat `bars` and `meta` as read-only.
+ */
+const CHART_TTL_MS = 15_000;
+const chartCache = new TtlCache<ChartData>(CHART_TTL_MS);
+
 /** OHLCV bars plus live-ish quote metadata for one symbol. `range` is a
  * Yahoo range token (e.g. "5d", "6mo", "1y"); `interval` a Yahoo bar size
  * (e.g. "1d", "5m", "30m") — defaults to daily bars. */
@@ -103,6 +151,16 @@ export async function fetchChart(
   symbol: string,
   range: string,
   interval = "1d"
+): Promise<ChartData> {
+  return chartCache.getOrLoad(`${symbol}|${range}|${interval}`, () =>
+    loadChart(symbol, range, interval)
+  );
+}
+
+async function loadChart(
+  symbol: string,
+  range: string,
+  interval: string
 ): Promise<ChartData> {
   const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
     symbol

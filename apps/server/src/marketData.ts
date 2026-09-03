@@ -10,12 +10,13 @@ import {
   mockSearch,
   NEWS_QUERIES,
 } from "./mockData.js";
+import { baseBeforeOrFirst, daysAgoSeconds, pctChange } from "./series.js";
 import { includesWord } from "./textMatch.js";
 import * as yahoo from "./yahoo/client.js";
 import type { PriceBar } from "@ruff-term/shared";
 
 const quoteCache = new TtlCache<WatchlistQuote>(20_000);
-const historyCache = new TtlCache<PriceBar[]>(5 * 60_000);
+const historyCache = new TtlCache<HistoryResult>(5 * 60_000);
 const searchCache = new TtlCache<SearchResult[]>(5 * 60_000);
 const newsCache = new TtlCache<NewsItem[]>(2 * 60_000);
 
@@ -24,16 +25,6 @@ export const DEFAULT_WATCHLIST = DEFAULT_WATCHLIST_META.map((w) => w.ticker);
 /** A bar older than this is treated as a stale/closed-market close rather
  * than a live tick, and gets the "c" (close) suffix real terminals use. */
 const STALE_THRESHOLD_SECONDS = 20 * 60;
-
-/** Last bar strictly before `cutoffSeconds`, from ascending-sorted bars. */
-function baseBefore(bars: PriceBar[], cutoffSeconds: number): PriceBar | null {
-  let base: PriceBar | null = null;
-  for (const b of bars) {
-    if (b.time < cutoffSeconds) base = b;
-    else break;
-  }
-  return base;
-}
 
 async function loadQuote(ticker: string): Promise<WatchlistQuote> {
   const now = new Date().toISOString();
@@ -51,11 +42,10 @@ async function loadQuote(ticker: string): Promise<WatchlistQuote> {
     const changePct2d = pctChange(prevPrev.close, prev.close);
     const isStale = Date.now() / 1000 - meta.regularMarketTime > STALE_THRESHOLD_SECONDS;
 
-    const nowMs = Date.now();
-    const weekBase = baseBefore(bars, (nowMs - 7 * 86_400_000) / 1000) ?? bars[0];
-    const monthBase = baseBefore(bars, (nowMs - 30 * 86_400_000) / 1000) ?? bars[0];
-    const sixMonthBase = baseBefore(bars, (nowMs - 182 * 86_400_000) / 1000) ?? bars[0];
-    const yearBase = baseBefore(bars, (nowMs - 365 * 86_400_000) / 1000) ?? bars[0];
+    const weekBase = baseBeforeOrFirst(bars, daysAgoSeconds(7));
+    const monthBase = baseBeforeOrFirst(bars, daysAgoSeconds(30));
+    const sixMonthBase = baseBeforeOrFirst(bars, daysAgoSeconds(182));
+    const yearBase = baseBeforeOrFirst(bars, daysAgoSeconds(365));
 
     return {
       ticker,
@@ -93,13 +83,9 @@ async function loadQuote(ticker: string): Promise<WatchlistQuote> {
       currency: metaFallback.currency,
       updatedAt: now,
       volume: mock.volume,
+      synthetic: true,
     };
   }
-}
-
-function pctChange(from: number, to: number): number {
-  if (from === 0) return 0;
-  return Math.round(((to - from) / from) * 10000) / 100;
 }
 
 export async function getQuote(ticker: string): Promise<WatchlistQuote> {
@@ -128,21 +114,27 @@ const INTRADAY_BY_DAYS: Record<number, { range: string; interval: string }> = {
   7: { range: "5d", interval: "30m" },
 };
 
-export async function getHistory(ticker: string, days: number): Promise<PriceBar[]> {
+export interface HistoryResult {
+  bars: PriceBar[];
+  /** True when `bars` are fabricated because the upstream fetch failed. */
+  synthetic: boolean;
+}
+
+export async function getHistory(ticker: string, days: number): Promise<HistoryResult> {
   return historyCache.getOrLoad(`${ticker}:${days}`, async () => {
     try {
       const intraday = INTRADAY_BY_DAYS[days];
       if (intraday) {
         const { bars } = await yahoo.fetchChart(ticker, intraday.range, intraday.interval);
         if (bars.length === 0) throw new Error("no intraday bars returned");
-        return bars;
+        return { bars, synthetic: false };
       }
       const { bars } = await yahoo.fetchChart(ticker, RANGE_BY_DAYS(days));
       if (bars.length === 0) throw new Error("no bars returned");
-      return bars.slice(-days);
+      return { bars: bars.slice(-days), synthetic: false };
     } catch (err) {
       console.warn(`[marketData] History fallback to mock for ${ticker}:`, (err as Error).message);
-      return mockHistory(ticker, days);
+      return { bars: mockHistory(ticker, days), synthetic: true };
     }
   });
 }

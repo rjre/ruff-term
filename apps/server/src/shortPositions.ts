@@ -51,7 +51,7 @@ async function fetchCsv(url: string): Promise<string[][]> {
   const res = await fetch(url, { headers: { "User-Agent": UA } });
   if (!res.ok) throw new Error(`FCA CSV fetch failed: ${res.status}`);
   const text = await res.text();
-  const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim().length > 0);
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim().length > 0);
   return lines.slice(1).map(parseCsvLine);
 }
 

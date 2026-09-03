@@ -539,6 +539,14 @@ body {
   white-space: nowrap;
 }
 
+/* Fabricated fallback data. Shares the orange the DEMO DATA banners use, so
+   "this number is not real" reads the same everywhere in the terminal. */
+.price-updated-synthetic {
+  color: var(--demo-text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .pct-up {
   color: var(--up);
 }

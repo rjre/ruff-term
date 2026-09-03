@@ -54,7 +54,7 @@
   { "ticker": "SIE.DE", "name": "Siemens AG", "sector": "Industrials" },
   { "ticker": "NESN.SW", "name": "Nestle SA", "sector": "Consumer Staples" },
   { "ticker": "NOVN.SW", "name": "Novartis AG", "sector": "Health Care" },
-  { "ticker": "ROG.SW", "name": "Roche Holding", "sector": "Health Care" },
+  { "ticker": "RO.SW", "name": "Roche Holding", "sector": "Health Care" },
   { "ticker": "7203.T", "name": "Toyota Motor Corp", "sector": "Consumer Discretionary" },
   { "ticker": "6758.T", "name": "Sony Group Corp", "sector": "Consumer Discretionary" },
   { "ticker": "9984.T", "name": "SoftBank Group", "sector": "Communication Services" },

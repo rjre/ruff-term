@@ -1,6 +1,13 @@
 import type { ScreenerRow, ScreenerSnapshot } from "@ruff-term/shared";
 import universe from "./data/screenerUniverse.json" with { type: "json" };
 import { TtlCache } from "./cache.js";
+import { mapLimit, YAHOO_CONCURRENCY } from "./concurrency.js";
+import {
+  baseBeforeOrFirst,
+  daysAgoSeconds,
+  pctChange,
+  yearStartSeconds,
+} from "./series.js";
 import * as yahoo from "./yahoo/client.js";
 
 interface UniverseEntry {
@@ -11,20 +18,6 @@ interface UniverseEntry {
 
 const cache = new TtlCache<ScreenerSnapshot>(15 * 60_000);
 
-function pctChange(from: number, to: number): number {
-  if (!from) return 0;
-  return Math.round(((to - from) / from) * 10000) / 100;
-}
-
-function baseBefore(bars: { time: number; close: number }[], cutoffSeconds: number) {
-  let base: { time: number; close: number } | null = null;
-  for (const b of bars) {
-    if (b.time < cutoffSeconds) base = b;
-    else break;
-  }
-  return base;
-}
-
 async function loadRow(entry: UniverseEntry): Promise<ScreenerRow | null> {
   try {
     const { meta, bars } = await yahoo.fetchChart(entry.ticker, "1y");
@@ -34,16 +27,10 @@ async function loadRow(entry: UniverseEntry): Promise<ScreenerRow | null> {
     const lastPrice = meta.regularMarketPrice ?? latest.close;
     const prev = bars[bars.length - 2];
 
-    const now = Date.now();
-    const weekAgo = (now - 7 * 86_400_000) / 1000;
-    const monthAgo = (now - 30 * 86_400_000) / 1000;
-    const threeMonthAgo = (now - 90 * 86_400_000) / 1000;
-    const yearStart = Date.UTC(new Date().getUTCFullYear(), 0, 1) / 1000;
-
-    const weekBase = baseBefore(bars, weekAgo) ?? bars[0];
-    const monthBase = baseBefore(bars, monthAgo) ?? bars[0];
-    const threeMonthBase = baseBefore(bars, threeMonthAgo) ?? bars[0];
-    const yearBase = baseBefore(bars, yearStart) ?? bars[0];
+    const weekBase = baseBeforeOrFirst(bars, daysAgoSeconds(7));
+    const monthBase = baseBeforeOrFirst(bars, daysAgoSeconds(30));
+    const threeMonthBase = baseBeforeOrFirst(bars, daysAgoSeconds(90));
+    const yearBase = baseBeforeOrFirst(bars, yearStartSeconds());
 
     const high52w = Math.max(...bars.map((b) => b.high));
     const low52w = Math.min(...bars.map((b) => b.low));
@@ -71,10 +58,20 @@ async function loadRow(entry: UniverseEntry): Promise<ScreenerRow | null> {
 }
 
 async function loadSnapshot(): Promise<ScreenerSnapshot> {
-  const rows = (await Promise.all((universe as UniverseEntry[]).map(loadRow))).filter(
-    (r): r is ScreenerRow => r !== null
-  );
-  return { asOf: new Date().toISOString(), rows };
+  const entries = universe as UniverseEntry[];
+  const results = await mapLimit(entries, YAHOO_CONCURRENCY, loadRow);
+
+  const rows: ScreenerRow[] = [];
+  const skipped: string[] = [];
+  results.forEach((row, i) => {
+    if (row) rows.push(row);
+    else skipped.push(entries[i].ticker);
+  });
+
+  if (skipped.length > 0) {
+    console.warn(`[screener] ${skipped.length} symbol(s) unpriced: ${skipped.join(", ")}`);
+  }
+  return { asOf: new Date().toISOString(), rows, skipped };
 }
 
 export async function getScreenerSnapshot(): Promise<ScreenerSnapshot> {

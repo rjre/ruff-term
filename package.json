@@ -13,10 +13,24 @@
     "dev:web": "npm run dev --workspace=@ruff-term/web",
     "build": "npm run build --workspace=@ruff-term/server && npm run build --workspace=@ruff-term/web",
     "typecheck": "npm run typecheck --workspace=@ruff-term/server && npm run typecheck --workspace=@ruff-term/web",
-    "refresh:external": "node scripts/refresh-external-snapshots.mjs"
+    "refresh:external": "node scripts/refresh-external-snapshots.mjs",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run typecheck && npm run lint && npm run test"
   },
   "devDependencies": {
-    "typescript": "^5.6.3"
+    "@eslint/js": "^9.39.5",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
+    "@vitest/coverage-v8": "^2.1.9",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "jsdom": "^30.0.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^2.1.9"
   },
   "engines": {
     "node": ">=20"

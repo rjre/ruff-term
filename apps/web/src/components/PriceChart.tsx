@@ -261,6 +261,9 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
   const [primaryBars, setPrimaryBars] = useState<PriceBar[]>([]);
   const [compareBars, setCompareBars] = useState<PriceBar[]>([]);
+  // Set when the server had to fabricate bars because Yahoo failed. Charting
+  // invented prices unlabelled is the worst failure mode this app has.
+  const [syntheticBars, setSyntheticBars] = useState(false);
 
   const comparing = compareTicker !== null;
   // Two raw-price series only make sense on a normalized scale — force one
@@ -346,12 +349,21 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
   useEffect(() => {
     if (!ticker) {
       setPrimaryBars([]);
+      setSyntheticBars(false);
       return;
     }
     let cancelled = false;
     fetchHistory(ticker, rangeDays)
-      .then((res) => !cancelled && setPrimaryBars(res.bars))
-      .catch(() => !cancelled && setPrimaryBars([]));
+      .then((res) => {
+        if (cancelled) return;
+        setPrimaryBars(res.bars);
+        setSyntheticBars(res.synthetic ?? false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setPrimaryBars([]);
+        setSyntheticBars(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -685,6 +697,12 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
           {isFullscreen ? "⤡ Exit" : "⤢ Full screen"}
         </button>
       </div>
+      {syntheticBars && (
+        <div className="demo-banner">
+          SIMULATED DATA — Yahoo returned no history for {ticker}, so the chart
+          below is generated, not real prices. Do not trade or quote from it.
+        </div>
+      )}
       {ticker && (
         <div className="chart-toolbar">
           <div className="chart-toolbar-group">

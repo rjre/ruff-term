@@ -158,6 +158,19 @@ server happened to fetch it — the two diverge by hours once a market closes.
 Shared number formatting (`pctClass`, `formatSignedPct`) lives in
 `apps/web/src/lib/format.ts`; import it rather than re-declaring per panel.
 
+### Simulated data must say so
+
+When an upstream fetch fails, the server substitutes fabricated but
+plausible-looking numbers so the UI keeps working. Those payloads carry
+`synthetic: true` (`WatchlistQuote`, `HistoryResponse`), and **anything
+rendering them must label them** — pass `synthetic` to `PriceStamp`, which
+prints "simulated" in place of a timestamp, and show a `demo-banner` on the
+panel. An unmarked invented price is worse than a blank cell: a stamp reading
+"as of now" is exactly what a real live tick looks like.
+
+The screener reports symbols it could not price at all in `skipped`, rather
+than silently returning a shorter table.
+
 ## Getting started
 
 Requires Node 20+.
@@ -171,8 +184,10 @@ This starts the API on `http://localhost:4000` and the web app on
 `http://localhost:5173` (which proxies `/api` to the server). Open the web
 app — no configuration or API keys needed for the core experience.
 
-The header badge shows the active data source (`yahoo`; falls back to mock
-per-request if a Yahoo call fails).
+The header badge shows the configured data source (`yahoo`). Individual
+requests still fall back to simulated data if a Yahoo call fails — those are
+flagged in the payload and labelled in the UI, see
+[Simulated data must say so](#simulated-data-must-say-so).
 
 ## Watchlist
 
@@ -232,3 +247,7 @@ to CSV.
 - `npm run dev` — run server + web together
 - `npm run build` — build both apps
 - `npm run typecheck` — typecheck both apps
+- `npm run lint` — ESLint over both apps (`react-hooks/exhaustive-deps` is an
+  error; it is what catches effect-dependency bugs)
+- `npm run test` — Vitest unit tests (`npm run test:watch` to iterate)
+- `npm run verify` — typecheck + lint + test, the same gate CI runs
