@@ -39,7 +39,12 @@ async function loadSnapshot(): Promise<TreasuryAuctionsSnapshot> {
     }))
     .sort((a, b) => a.auctionDate.localeCompare(b.auctionDate));
 
-  return { asOf: new Date().toISOString(), auctions };
+  return {
+    asOf: new Date().toISOString(),
+    auctions,
+    sourceLabel: "TreasuryDirect — upcoming auctions",
+    sourceUrl: "https://www.treasurydirect.gov/auctions/upcoming/",
+  };
 }
 
 export async function getTreasuryAuctions(): Promise<TreasuryAuctionsSnapshot> {

@@ -31,6 +31,7 @@ async function loadLine(series: { id: string; label: string }): Promise<Inflatio
       valuePct: latest.value,
       changeBp1d: prev ? Math.round((latest.value - prev.value) * 100) : 0,
       asOfDate: latest.date,
+      sourceUrl: `https://fred.stlouisfed.org/series/${series.id}`,
     };
   } catch (err) {
     console.warn(`[inflationExpectations] Skipping ${series.label}:`, (err as Error).message);

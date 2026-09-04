@@ -52,7 +52,9 @@ export function CommoditiesPanel({ onSelectTicker }: Props) {
           onSelectTicker={onSelectTicker}
         />
       )}
-      <SourceFooter sources={["Yahoo Finance (live futures prices)"]} />
+      <SourceFooter
+        sources={[{ label: "Yahoo Finance (live futures prices)", url: "https://finance.yahoo.com" }]}
+      />
     </div>
   );
 }

@@ -505,6 +505,7 @@ export interface InflationExpectationLine {
   valuePct: number;
   changeBp1d: number;
   asOfDate: string;
+  sourceUrl: string;
 }
 
 export interface InflationExpectationsSnapshot {
@@ -541,6 +542,8 @@ export interface TreasuryAuctionLine {
 export interface TreasuryAuctionsSnapshot {
   asOf: string;
   auctions: TreasuryAuctionLine[];
+  sourceLabel: string;
+  sourceUrl: string;
 }
 
 export interface CorrelationMatrixSnapshot {

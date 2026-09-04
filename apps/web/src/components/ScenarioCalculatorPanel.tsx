@@ -242,7 +242,9 @@ export function ScenarioCalculatorPanel() {
 
       <SourceFooter
         sources={[
-          "Ruffer Portfolio snapshot (ruffer.co.uk) for allocation weights",
+          portfolio
+            ? { label: `${portfolio.sourceLabel} — allocation weights`, url: portfolio.sourceUrl }
+            : "Ruffer Portfolio snapshot (ruffer.co.uk) for allocation weights",
           "Sensitivity assumptions: illustrative, not disclosed by the fund",
         ]}
       />

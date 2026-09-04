@@ -204,7 +204,11 @@ export function CreditHistoricPanel() {
         </>
       )}
 
-      <SourceFooter sources={["Citi Velocity Historical Data API (Markit composite CDS spreads, EOD)"]} />
+      <SourceFooter
+        sources={[
+          { label: "Citi Velocity (Markit composite CDS spreads, EOD)", url: "https://velocity.citi.com" },
+        ]}
+      />
     </>
   );
 }

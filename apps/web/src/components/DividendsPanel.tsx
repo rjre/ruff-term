@@ -122,7 +122,9 @@ export function DividendsPanel({ onSelectTicker }: Props) {
       )}
 
       <SourceFooter
-        sources={["Yahoo Finance (real dividend event history, live)"]}
+        sources={[
+          { label: "Yahoo Finance (real dividend event history, live)", url: "https://finance.yahoo.com" },
+        ]}
       />
     </div>
   );

@@ -69,8 +69,8 @@ export function ImpactPanel({ onSelectTicker }: Props) {
       )}
       <SourceFooter
         sources={[
-          "Yahoo Finance (news)",
-          "Ruffer Portfolio snapshot (ruffer.co.uk)",
+          { label: "Yahoo Finance (news)", url: "https://finance.yahoo.com" },
+          { label: "Ruffer Portfolio snapshot", url: "https://www.ruffer.co.uk/en/funds/tm-ruffer-portfolio" },
           "impact text: rule-based heuristic",
         ]}
       />

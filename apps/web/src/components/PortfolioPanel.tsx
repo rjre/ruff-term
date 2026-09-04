@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { PortfolioSnapshot } from "@ruff-term/shared";
 import { fetchPortfolioSnapshot } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 import { pctClass } from "../lib/format";
 
@@ -132,13 +133,12 @@ export function PortfolioPanel() {
         </section>
       </div>
 
-      <div className="source-footer">
-        Source:{" "}
-        <a href={snapshot.sourceUrl} target="_blank" rel="noreferrer">
-          {snapshot.sourceLabel}
-        </a>
-        . Manually refreshed snapshot — not a live feed.
-      </div>
+      <SourceFooter
+        sources={[
+          { label: snapshot.sourceLabel, url: snapshot.sourceUrl },
+          "Manually refreshed snapshot — not a live feed",
+        ]}
+      />
     </div>
   );
 }

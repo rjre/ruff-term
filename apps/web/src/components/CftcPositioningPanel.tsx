@@ -4,6 +4,7 @@ import type {
   CftcPositioningSnapshot,
 } from "@ruff-term/shared";
 import { fetchCftcPositioning } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 import { downloadCsv } from "../lib/exportCsv";
 import { pctClass } from "../lib/format";
 
@@ -146,12 +147,7 @@ export function CftcPositioningPanel() {
         Friday) — not live intraday.
       </div>
 
-      <div className="source-footer">
-        Source:{" "}
-        <a href={snapshot.sourceUrl} target="_blank" rel="noreferrer">
-          {snapshot.sourceLabel}
-        </a>
-      </div>
+      <SourceFooter sources={[{ label: snapshot.sourceLabel, url: snapshot.sourceUrl }]} />
     </div>
   );
 }

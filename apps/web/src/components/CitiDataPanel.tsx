@@ -574,7 +574,10 @@ export function CitiDataPanel() {
 
       <SourceFooter
         sources={[
-          "Citi Velocity Historical Data API — /tagbrowsing and /taglisting (free), /data (metered, EOD close)",
+          {
+            label: "Citi Velocity — /tagbrowsing and /taglisting (free), /data (metered, EOD close)",
+            url: "https://velocity.citi.com",
+          },
         ]}
       />
     </div>

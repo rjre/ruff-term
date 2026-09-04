@@ -180,9 +180,19 @@ export function MacroMonitor({ onSelectTicker }: Props) {
       </div>
       <SourceFooter
         sources={[
-          "Yahoo Finance (live futures/indices/FX/US rates, UK gilt ETF proxies)",
-          "Bank of England (real UK gilt spot yields, updated daily)",
-          "FRED (US TIPS breakeven inflation, updated daily)",
+          {
+            label: "Yahoo Finance (live futures/indices/FX/US rates, UK gilt ETF proxies)",
+            url: "https://finance.yahoo.com",
+          },
+          gilts && gilts !== "error"
+            ? { label: gilts.sourceLabel, url: gilts.sourceUrl }
+            : "Bank of England (real UK gilt spot yields, updated daily)",
+          ...(inflation && inflation !== "error"
+            ? inflation.lines.map((line) => ({
+                label: `FRED — ${line.label}`,
+                url: line.sourceUrl,
+              }))
+            : ["FRED (US TIPS breakeven inflation, updated daily)"]),
         ]}
       />
     </div>

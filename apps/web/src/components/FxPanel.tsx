@@ -212,8 +212,8 @@ export function FxPanel({ onSelectTicker }: Props) {
       </div>
       <SourceFooter
         sources={[
-          "Yahoo Finance (G10 spot, live)",
-          "Citi Velocity Historical Data API (implied vol, EOD close)",
+          { label: "Yahoo Finance (G10 spot, live)", url: "https://finance.yahoo.com" },
+          { label: "Citi Velocity (implied vol, EOD close)", url: "https://velocity.citi.com" },
         ]}
       />
     </div>

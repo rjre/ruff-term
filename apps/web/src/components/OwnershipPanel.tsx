@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { OwnershipSnapshot } from "@ruff-term/shared";
 import { fetchOwnership } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 import { downloadCsv } from "../lib/exportCsv";
 
 function codeClass(acquiredDisposed: "A" | "D"): string {
@@ -149,12 +150,7 @@ export function OwnershipPanel({ onSelectTicker }: Props) {
         </>
       )}
 
-      <div className="source-footer">
-        Source:{" "}
-        <a href={snapshot.sourceUrl} target="_blank" rel="noreferrer">
-          {snapshot.sourceLabel}
-        </a>
-      </div>
+      <SourceFooter sources={[{ label: snapshot.sourceLabel, url: snapshot.sourceUrl }]} />
     </div>
   );
 }

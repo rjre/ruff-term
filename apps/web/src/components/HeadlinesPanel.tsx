@@ -89,7 +89,7 @@ export function HeadlinesPanel({ onSelectTicker }: Props) {
           ))}
         </ul>
       )}
-      <SourceFooter sources={["Yahoo Finance"]} />
+      <SourceFooter sources={[{ label: "Yahoo Finance", url: "https://finance.yahoo.com" }]} />
     </div>
   );
 }

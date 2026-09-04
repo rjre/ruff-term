@@ -17,7 +17,7 @@ export function IframeEmbedPanel({ title, subtitle, src, repoLabel }: Props) {
           <div className="module-banner-title">{title}</div>
           <div className="module-banner-sub">{subtitle}</div>
         </div>
-        <SourceFooter sources={[`${repoLabel} (embedded live)`]} />
+        <SourceFooter sources={[{ label: `${repoLabel} (embedded live)`, url: src }]} />
       </div>
       <iframe src={src} title={title} className="iframe-embed-frame" />
     </div>

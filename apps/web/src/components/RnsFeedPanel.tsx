@@ -93,7 +93,9 @@ export function RnsFeedPanel({ onSelectTicker }: Props) {
         </ul>
       )}
       <SourceFooter
-        sources={["Yahoo Finance (company news, not official RNS)"]}
+        sources={[
+          { label: "Yahoo Finance (company news, not official RNS)", url: "https://finance.yahoo.com" },
+        ]}
       />
     </div>
   );

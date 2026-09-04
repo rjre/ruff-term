@@ -177,7 +177,12 @@ export function NavMonitoringPanel({ onSelectTicker }: Props) {
         </>
       )}
       <SourceFooter
-        sources={["rjre/nav-monitoring- (static snapshot of committed data)"]}
+        sources={[
+          {
+            label: "rjre/nav-monitoring- (static snapshot of committed data)",
+            url: "https://github.com/rjre/nav-monitoring-",
+          },
+        ]}
       />
     </div>
   );

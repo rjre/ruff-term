@@ -7,6 +7,7 @@ import { fetchCentralBankBalanceSheets } from "../api/client";
 import { downloadCsv } from "../lib/exportCsv";
 import { Sparkline } from "./Sparkline";
 import { pctClass } from "../lib/format";
+import { SourceFooter } from "./SourceFooter";
 
 function formatBn(valueBn: number, currency: string): string {
   return `${currency} ${valueBn.toLocaleString(undefined, { maximumFractionDigits: 0 })}bn`;
@@ -110,17 +111,12 @@ export function CentralBankBalanceSheetsPanel() {
         than approximated.
       </div>
 
-      <div className="source-footer">
-        Source: FRED (Federal Reserve Bank of St. Louis) —{" "}
-        {snapshot.series.map((s, i) => (
-          <span key={s.bank}>
-            {i > 0 && " · "}
-            <a href={s.sourceUrl} target="_blank" rel="noreferrer">
-              {s.bank}
-            </a>
-          </span>
-        ))}
-      </div>
+      <SourceFooter
+        sources={snapshot.series.map((s) => ({
+          label: `FRED — ${s.bank}`,
+          url: s.sourceUrl,
+        }))}
+      />
     </div>
   );
 }

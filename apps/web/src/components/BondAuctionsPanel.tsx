@@ -102,7 +102,13 @@ export function BondAuctionsPanel() {
         directly.
       </div>
 
-      <SourceFooter sources={["TreasuryDirect (live, official, keyless)"]} />
+      <SourceFooter
+        sources={[
+          snapshot && snapshot !== "error"
+            ? { label: snapshot.sourceLabel, url: snapshot.sourceUrl }
+            : "TreasuryDirect (live, official, keyless)",
+        ]}
+      />
     </div>
   );
 }

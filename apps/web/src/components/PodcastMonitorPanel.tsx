@@ -226,7 +226,14 @@ export function PodcastMonitorPanel() {
           </div>
         </>
       )}
-      <SourceFooter sources={["rjre/podcast-monitor (static snapshot of committed aggregates.json)"]} />
+      <SourceFooter
+        sources={[
+          {
+            label: "rjre/podcast-monitor (static snapshot of committed aggregates.json)",
+            url: "https://github.com/rjre/podcast-monitor",
+          },
+        ]}
+      />
     </div>
   );
 }

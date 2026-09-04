@@ -106,7 +106,12 @@ configured and the rest of the app is unaffected.
 
 Anything marked "demo" or "placeholder" is clearly labeled in the UI itself,
 not just here. Every tab also shows a "Source(s):" line at the bottom stating
-exactly what powers it.
+exactly what powers it — and where that's a real external source (an
+official publication, a series page, a public feed), the label is a link to
+it, not just a name. A source only stays plain text when there's genuinely
+nothing to link to: a demo/placeholder panel, or a note about this app's own
+logic (e.g. "impact text: rule-based heuristic") rather than an external
+source.
 
 ### Keeping the GH-repo snapshots fresh
 

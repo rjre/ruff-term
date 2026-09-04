@@ -162,8 +162,8 @@ export function CreditIntradayPanel() {
 
       <SourceFooter
         sources={[
-          "Citi Velocity streaming API (live ticks, when available)",
-          "Citi Velocity Historical Data API (latest/prior EOD close)",
+          { label: "Citi Velocity (live ticks, when available)", url: "https://velocity.citi.com" },
+          { label: "Citi Velocity (latest/prior EOD close)", url: "https://velocity.citi.com" },
         ]}
       />
     </>

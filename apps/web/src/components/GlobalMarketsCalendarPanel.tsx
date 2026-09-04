@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { GlobalMarketsCalendarSnapshot } from "@ruff-term/shared";
 import { fetchGlobalMarketsCalendar } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 
 function formatDate(iso: string): string {
   return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
@@ -62,17 +63,18 @@ export function GlobalMarketsCalendarPanel() {
           </tbody>
         </table>
       )}
-      <div className="source-footer">
-        Source:{" "}
-        {snapshot ? (
-          <a href={snapshot.sourceUrl} target="_blank" rel="noreferrer">
-            {snapshot.sourceLabel}
-          </a>
-        ) : (
-          "UBS"
-        )}
-        {snapshot && !snapshot.live ? " (bundled 2026 snapshot)" : ""}
-      </div>
+      <SourceFooter
+        sources={[
+          snapshot
+            ? {
+                label: snapshot.live
+                  ? snapshot.sourceLabel
+                  : `${snapshot.sourceLabel} (bundled 2026 snapshot)`,
+                url: snapshot.sourceUrl,
+              }
+            : "UBS",
+        ]}
+      />
     </div>
   );
 }

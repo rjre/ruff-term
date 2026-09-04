@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ShortPositionsSnapshot } from "@ruff-term/shared";
 import { fetchShortPositions } from "../api/client";
+import { SourceFooter } from "./SourceFooter";
 import { downloadCsv } from "../lib/exportCsv";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 
@@ -115,12 +116,7 @@ export function ShortPositionsPanel() {
         </table>
       )}
 
-      <div className="source-footer">
-        Source:{" "}
-        <a href={snapshot.sourceUrl} target="_blank" rel="noreferrer">
-          {snapshot.sourceLabel}
-        </a>
-      </div>
+      <SourceFooter sources={[{ label: snapshot.sourceLabel, url: snapshot.sourceUrl }]} />
     </div>
   );
 }

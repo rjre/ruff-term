@@ -255,7 +255,9 @@ export function ScreenerPanel({ onSelectTicker }: Props) {
       )}
 
       <SourceFooter
-        sources={["Yahoo Finance (live prices, curated universe)"]}
+        sources={[
+          { label: "Yahoo Finance (live prices, curated universe)", url: "https://finance.yahoo.com" },
+        ]}
       />
     </div>
   );

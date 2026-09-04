@@ -142,7 +142,9 @@ export function CorrelationMatrixPanel({ onSelectTicker }: Props) {
         holds.
       </div>
 
-      <SourceFooter sources={["Yahoo Finance (daily closes, live)"]} />
+      <SourceFooter
+        sources={[{ label: "Yahoo Finance (daily closes, live)", url: "https://finance.yahoo.com" }]}
+      />
     </div>
   );
 }

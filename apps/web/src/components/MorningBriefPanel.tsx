@@ -265,7 +265,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
 
       <SourceFooter
         sources={[
-          "Yahoo Finance (prices, news)",
+          { label: "Yahoo Finance (prices, news)", url: "https://finance.yahoo.com" },
           "Regime signal from Charts of the Day (live ETF proxies)",
         ]}
       />
