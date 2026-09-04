@@ -5,10 +5,11 @@ import { fetchSearch } from "../api/client";
 interface Props {
   onSelect: (ticker: string) => void;
   compact?: boolean;
+  placeholder?: string;
 }
 
 export const TickerSearch = forwardRef<HTMLInputElement, Props>(
-  function TickerSearch({ onSelect, compact }, forwardedRef) {
+  function TickerSearch({ onSelect, compact, placeholder }, forwardedRef) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [open, setOpen] = useState(false);
@@ -54,7 +55,7 @@ export const TickerSearch = forwardRef<HTMLInputElement, Props>(
           ref={forwardedRef}
           className="search-input"
           placeholder={
-            compact ? "Add ticker…" : "Search ticker or company… (press / )"
+            placeholder ?? (compact ? "Add ticker…" : "Search ticker or company… (press / )")
           }
           value={query}
           onChange={(e) => setQuery(e.target.value)}

@@ -18,6 +18,7 @@ import {
   subscribeRecentTickers,
 } from "../lib/recentTickers";
 import { cssVar } from "../lib/theme";
+import { TickerSearch } from "./TickerSearch";
 
 function chartColors() {
   return {
@@ -305,7 +306,6 @@ export function PriceChart({ ticker, onSelectTicker, refreshToken }: Props) {
   const [showBollinger, setShowBollinger] = useState(false);
   const [showVwap, setShowVwap] = useState(false);
   const [lowerIndicator, setLowerIndicator] = useState<LowerIndicator>("none");
-  const [compareInput, setCompareInput] = useState("");
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
   // History is stored with the request it answers, so the render can tell a
   // loaded result from a stale one instead of an effect clearing state first.
@@ -398,7 +398,6 @@ export function PriceChart({ ticker, onSelectTicker, refreshToken }: Props) {
   if (ticker !== controlsTicker) {
     setControlsTicker(ticker);
     setCompareTicker(null);
-    setCompareInput("");
     setScaleMode("price");
     setMaPeriods(EMPTY_PERIODS);
     setEmaPeriods(EMPTY_PERIODS);
@@ -669,11 +668,6 @@ export function PriceChart({ ticker, onSelectTicker, refreshToken }: Props) {
     setLowerIndicator((prev) => (prev === indicator ? "none" : indicator));
   }
 
-  function applyCompare() {
-    const t = compareInput.trim().toUpperCase();
-    if (t) setCompareTicker(t);
-  }
-
   function exportPng() {
     const canvas = chartRef.current?.takeScreenshot();
     if (!canvas) return;
@@ -879,19 +873,9 @@ export function PriceChart({ ticker, onSelectTicker, refreshToken }: Props) {
                 </button>
               </span>
             ) : (
-              <>
-                <input
-                  className="search-input"
-                  placeholder="Compare vs…"
-                  value={compareInput}
-                  onChange={(e) => setCompareInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && applyCompare()}
-                  style={{ maxWidth: 130, fontSize: 11 }}
-                />
-                <button className="icon-btn" onClick={applyCompare}>
-                  Compare
-                </button>
-              </>
+              <div style={{ maxWidth: 160 }}>
+                <TickerSearch onSelect={setCompareTicker} compact placeholder="Compare vs…" />
+              </div>
             )}
           </div>
           <div className="chart-toolbar-group">

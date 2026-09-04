@@ -142,9 +142,11 @@ export async function getHistory(ticker: string, days: number): Promise<HistoryR
 export async function search(query: string): Promise<SearchResult[]> {
   return searchCache.getOrLoad(query.toLowerCase(), async () => {
     try {
-      const results = await yahoo.searchTickers(query);
-      if (results.length === 0) return mockSearch(query);
-      return results;
+      // Zero real matches is Yahoo working correctly on a query that just
+      // doesn't exist — that should read as "no results", not summon a
+      // fabricated "(mock result)" entry a user could select and unwittingly
+      // chart. Mock only stands in for Yahoo actually being unreachable.
+      return await yahoo.searchTickers(query);
     } catch (err) {
       console.warn(`[marketData] Search fallback to mock for "${query}":`, (err as Error).message);
       return mockSearch(query);
