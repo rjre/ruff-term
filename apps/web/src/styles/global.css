@@ -326,6 +326,7 @@ body {
 .chart-modal-bar {
   display: flex;
   justify-content: flex-end;
+  gap: 6px;
   padding: 6px 8px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;

@@ -247,6 +247,8 @@ export function App() {
         ticker={modalTicker}
         onClose={() => setModalTicker(null)}
         onSelectTicker={setModalTicker}
+        refreshToken={refreshKey}
+        onRefresh={refreshData}
       />
 
       <div key={`${view}-${refreshKey}`} style={{ display: "contents" }}>

@@ -31,6 +31,14 @@ function chartColors() {
 interface Props {
   ticker: string | null;
   onSelectTicker?: (ticker: string) => void;
+  /**
+   * Bumped by the header's Refresh button. Unlike every other panel, the
+   * chart modal sits outside the per-view wrapper that remounts on refresh
+   * (so an open chart isn't reset to its default range/indicators just
+   * because the user switched tabs and back) — so it needs its own signal
+   * to re-fetch instead of relying on a fresh mount.
+   */
+  refreshToken?: number;
 }
 
 const RANGES: Array<{ label: string; days: number }> = [
@@ -251,7 +259,7 @@ function toLinePoints(bars: PriceBar[], values: (number | null)[]) {
     );
 }
 
-export function PriceChart({ ticker, onSelectTicker }: Props) {
+export function PriceChart({ ticker, onSelectTicker, refreshToken }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line" | "Histogram">[]>(
@@ -399,7 +407,8 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     setLowerIndicator("none");
   }
 
-  // Fetch primary + (optional) compare history whenever inputs change.
+  // Fetch primary + (optional) compare history whenever inputs change, or
+  // the header's Refresh button bumps refreshToken.
   useEffect(() => {
     if (!ticker) return;
     let cancelled = false;
@@ -409,7 +418,7 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [ticker, rangeDays]);
+  }, [ticker, rangeDays, refreshToken]);
 
   useEffect(() => {
     if (!compareTicker) return;
@@ -420,7 +429,7 @@ export function PriceChart({ ticker, onSelectTicker }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [compareTicker, rangeDays]);
+  }, [compareTicker, rangeDays, refreshToken]);
 
   // Apply the scale mode to the shared right price scale.
   useEffect(() => {
