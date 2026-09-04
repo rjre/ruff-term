@@ -876,6 +876,52 @@ body {
   margin-left: 4px;
 }
 
+/*
+ * Morning Brief is the page users land on first, so it's worth being
+ * denser than the rest of the app — scoped overrides rather than editing
+ * the shared rules above, since .kpi-row/.kpi-tile/.portfolio-grid/
+ * .news-item/.news-list are all used by several other tabs too.
+ */
+.morning-brief-page .module-banner {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+}
+
+.morning-brief-page .daily-quote {
+  margin-bottom: 12px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.morning-brief-page .kpi-row {
+  margin-bottom: 12px;
+}
+
+.morning-brief-page .kpi-tile {
+  padding: 7px 14px;
+}
+
+.morning-brief-page .portfolio-grid {
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.morning-brief-page .section-heading {
+  margin-bottom: 6px;
+}
+
+.morning-brief-page .brief-mover-row {
+  padding: 4px 10px;
+}
+
+.morning-brief-page .news-item {
+  padding: 5px 12px;
+}
+
+.morning-brief-page .news-meta {
+  margin-top: 2px;
+}
+
 .demo-banner {
   background: var(--demo-bg);
   border: 1px solid var(--demo-border);

@@ -132,7 +132,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
     : [];
 
   return (
-    <div className="module-view">
+    <div className="module-view morning-brief-page">
       <div className="module-banner">
         <div>
           <div className="module-banner-title">Morning Brief</div>
@@ -240,7 +240,7 @@ export function MorningBriefPanel({ onSelectTicker }: Props) {
             </section>
           </div>
 
-          <h3 className="section-heading" style={{ marginTop: 24 }}>
+          <h3 className="section-heading" style={{ marginTop: 16 }}>
             Top headlines
           </h3>
           <ul className="news-list">
