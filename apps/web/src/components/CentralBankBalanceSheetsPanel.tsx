@@ -4,7 +4,9 @@ import type {
   CentralBankBalanceSheetSnapshot,
 } from "@ruff-term/shared";
 import { fetchCentralBankBalanceSheets } from "../api/client";
+import { ChartExplodeModal } from "./ChartExplodeModal";
 import { downloadCsv } from "../lib/exportCsv";
+import { HistorySeriesChart } from "./HistorySeriesChart";
 import { Sparkline } from "./Sparkline";
 import { pctClass } from "../lib/format";
 import { SourceFooter } from "./SourceFooter";
@@ -15,8 +17,10 @@ function formatBn(valueBn: number, currency: string): string {
 
 function BalanceSheetCard({
   series,
+  onExplode,
 }: {
   series: CentralBankBalanceSheetSeries;
+  onExplode: (series: CentralBankBalanceSheetSeries) => void;
 }) {
   const latest = series.points[series.points.length - 1];
   const yearAgo = series.points[Math.max(0, series.points.length - 53)];
@@ -42,10 +46,16 @@ function BalanceSheetCard({
         {changePct > 0 ? "+" : ""}
         {changePct.toFixed(1)}% vs 1Y ago
       </div>
-      <Sparkline
-        values={series.points.map((p) => p.valueBn)}
-        color="var(--ruffer-green-light)"
-      />
+      <button
+        className="chart-explode-trigger"
+        onClick={() => onExplode(series)}
+        title={`See ${series.bank}'s full history`}
+      >
+        <Sparkline
+          values={series.points.map((p) => p.valueBn)}
+          color="var(--ruffer-green-light)"
+        />
+      </button>
       <div className="kpi-label" style={{ marginTop: 8 }}>
         As of {latest.date}
       </div>
@@ -56,6 +66,7 @@ function BalanceSheetCard({
 export function CentralBankBalanceSheetsPanel() {
   const [snapshot, setSnapshot] =
     useState<CentralBankBalanceSheetSnapshot | null>(null);
+  const [exploded, setExploded] = useState<CentralBankBalanceSheetSeries | null>(null);
 
   useEffect(() => {
     fetchCentralBankBalanceSheets()
@@ -101,7 +112,7 @@ export function CentralBankBalanceSheetsPanel() {
 
       <div className="macro-grid">
         {snapshot.series.map((s) => (
-          <BalanceSheetCard key={s.bank} series={s} />
+          <BalanceSheetCard key={s.bank} series={s} onExplode={setExploded} />
         ))}
       </div>
 
@@ -117,6 +128,19 @@ export function CentralBankBalanceSheetsPanel() {
           url: s.sourceUrl,
         }))}
       />
+
+      {exploded && (
+        <ChartExplodeModal
+          title={exploded.bank}
+          subtitle={`${exploded.points[0]?.date} to ${exploded.points[exploded.points.length - 1]?.date} · ${formatBn(exploded.points[exploded.points.length - 1].valueBn, exploded.currency)} latest`}
+          onClose={() => setExploded(null)}
+        >
+          <HistorySeriesChart
+            points={exploded.points.map((p) => ({ date: p.date, value: p.valueBn }))}
+            color="#4e9a33"
+          />
+        </ChartExplodeModal>
+      )}
     </div>
   );
 }

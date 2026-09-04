@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ShortPositionsSnapshot } from "@ruff-term/shared";
 import { fetchShortPositions } from "../api/client";
+import { ChartExplodeModal } from "./ChartExplodeModal";
 import { SourceFooter } from "./SourceFooter";
 import { downloadCsv } from "../lib/exportCsv";
+import { HistorySeriesChart } from "./HistorySeriesChart";
 import { MagnitudeBarList } from "./MagnitudeBarList";
 import { Sparkline } from "./Sparkline";
 
 export function ShortPositionsPanel() {
   const [snapshot, setSnapshot] = useState<ShortPositionsSnapshot | null>(null);
   const [selected, setSelected] = useState<string>("");
+  const [exploded, setExploded] = useState(false);
 
   useEffect(() => {
     fetchShortPositions()
@@ -113,12 +116,18 @@ export function ShortPositionsPanel() {
         </div>
       ) : (
         <>
-          <Sparkline
-            values={history.map((h) => h.netShortPct)}
-            color="var(--down)"
-            width={480}
-            height={90}
-          />
+          <button
+            className="chart-explode-trigger"
+            onClick={() => setExploded(true)}
+            title={`See ${selectedName}'s full history as a chart`}
+          >
+            <Sparkline
+              values={history.map((h) => h.netShortPct)}
+              color="var(--down)"
+              width={480}
+              height={90}
+            />
+          </button>
           <div className="vol-legend-note" style={{ margin: "6px 0 14px" }}>
             {history[0].positionDate} to {history[history.length - 1].positionDate}
             {reconstructedCount > 0 && officialCount > 0
@@ -159,6 +168,19 @@ export function ShortPositionsPanel() {
       )}
 
       <SourceFooter sources={sources} />
+
+      {exploded && (
+        <ChartExplodeModal
+          title={`${selectedName} — net short %`}
+          subtitle={`${history[0]?.positionDate} to ${history[history.length - 1]?.positionDate}`}
+          onClose={() => setExploded(false)}
+        >
+          <HistorySeriesChart
+            points={history.map((h) => ({ date: h.positionDate, value: h.netShortPct }))}
+            color="#d03b3b"
+          />
+        </ChartExplodeModal>
+      )}
     </div>
   );
 }
