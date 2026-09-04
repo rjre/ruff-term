@@ -6,6 +6,7 @@ import { TickerSearch } from "./TickerSearch";
 import { formatQuoteTimestamp, pctClass } from "../lib/format";
 import { usePriceFlashes } from "../lib/priceFlash";
 import { PriceStamp } from "./PriceStamp";
+import { WatchlistHeatmap } from "./WatchlistHeatmap";
 
 const LEGACY_KEY = "ruff-term:watchlist";
 const LISTS_KEY = "ruff-term:watchlists";
@@ -96,6 +97,23 @@ const SORT_ACCESSORS: Record<SortKey, (q: WatchlistQuote) => string | number> =
     changePct1y: (q) => q.changePct1y,
   };
 
+type ChangePeriod =
+  | "changePct1d"
+  | "changePct2d"
+  | "changePct1w"
+  | "changePct1m"
+  | "changePct6m"
+  | "changePct1y";
+
+const CHANGE_PERIODS: Array<{ key: ChangePeriod; label: string }> = [
+  { key: "changePct1d", label: "1D" },
+  { key: "changePct2d", label: "2D" },
+  { key: "changePct1w", label: "1W" },
+  { key: "changePct1m", label: "1M" },
+  { key: "changePct6m", label: "6M" },
+  { key: "changePct1y", label: "1Y" },
+];
+
 interface Props {
   selectedTicker: string | null;
   onSelectTicker: (ticker: string) => void;
@@ -121,6 +139,8 @@ export function Watchlist({
 
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDesc, setSortDesc] = useState(true);
+  const [viewMode, setViewMode] = useState<"table" | "heatmap">("table");
+  const [heatmapPeriod, setHeatmapPeriod] = useState<ChangePeriod>("changePct1d");
 
   // Memoized because it is an effect dependency: on the `?? []` path this
   // would otherwise be a fresh array every render, re-running the poll effect
@@ -200,6 +220,22 @@ export function Watchlist({
   const syntheticQuotes = useMemo(
     () => quotes.filter((q) => q.synthetic),
     [quotes],
+  );
+
+  // Log-scaled volume for tile sizing: raw volume across a watchlist can
+  // span several orders of magnitude, and a linear treemap weight would let
+  // the single most-traded name swallow the map while everything else
+  // collapses to slivers.
+  const heatTiles = useMemo(
+    () =>
+      quotes.map((q) => ({
+        key: q.ticker,
+        ticker: q.ticker,
+        shortName: q.shortName,
+        weight: Math.log10(Math.max(q.volume, 0) + 10),
+        changePct: q[heatmapPeriod],
+      })),
+    [quotes, heatmapPeriod],
   );
 
   const sortedQuotes = useMemo(() => {
@@ -287,6 +323,33 @@ export function Watchlist({
           </button>
         </div>
         <div className="watchlist-toolbar">
+          <div className="chart-toolbar-group">
+            <button
+              className={`toggle-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+            >
+              Table
+            </button>
+            <button
+              className={`toggle-btn ${viewMode === "heatmap" ? "active" : ""}`}
+              onClick={() => setViewMode("heatmap")}
+            >
+              Heatmap
+            </button>
+          </div>
+          {viewMode === "heatmap" && (
+            <div className="chart-toolbar-group">
+              {CHANGE_PERIODS.map((p) => (
+                <button
+                  key={p.key}
+                  className={`toggle-btn ${heatmapPeriod === p.key ? "active" : ""}`}
+                  onClick={() => setHeatmapPeriod(p.key)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="search-box">
             <TickerSearch onSelect={addTicker} compact />
           </div>
@@ -339,9 +402,9 @@ export function Watchlist({
         {syntheticQuotes.length > 0 && (
           <div className="demo-banner">
             Yahoo did not return a price for{" "}
-            {syntheticQuotes.map((q) => q.ticker).join(", ")} — the row
-            {syntheticQuotes.length === 1 ? " below shows" : "s below show"}{" "}
-            simulated values, not real market prints.
+            {syntheticQuotes.map((q) => q.ticker).join(", ")} —{" "}
+            {syntheticQuotes.length === 1 ? "it shows" : "they show"} a
+            simulated value, not a real market print.
           </div>
         )}
         {loading && quotes.length === 0 ? (
@@ -350,6 +413,8 @@ export function Watchlist({
           <div className="empty-state">
             No tickers yet — search above to add one.
           </div>
+        ) : viewMode === "heatmap" ? (
+          <WatchlistHeatmap tiles={heatTiles} onSelect={onSelectTicker} />
         ) : (
           <table className="watchlist-table">
             <thead>
