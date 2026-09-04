@@ -1,5 +1,5 @@
 import type { TreasuryEtfLine, UstActivitySnapshot, UstVolumeLine } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 import * as yahoo from "./yahoo/client.js";
 
 /** Real, live proxies for UST trading activity: the major Treasury ETFs by
@@ -58,7 +58,12 @@ function demoVolumes(daySeed: string): { bySubtype: UstVolumeLine[]; byMaturity:
   };
 }
 
-const cache = new TtlCache<UstActivitySnapshot>(60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing. Safe to always fetch live:
+// all six ETFs go through fetchChart, which has its own 15s per-symbol
+// cache and comfortably tolerates six concurrent requests.
+const cache = new LiveCache<UstActivitySnapshot>();
 
 async function loadSnapshot(): Promise<UstActivitySnapshot> {
   const etfResults = await Promise.all(
@@ -99,5 +104,5 @@ async function loadSnapshot(): Promise<UstActivitySnapshot> {
 }
 
 export async function getUstActivity(): Promise<UstActivitySnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

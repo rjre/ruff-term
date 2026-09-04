@@ -1,5 +1,5 @@
 import type { CorrelationMatrixSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 import * as yahoo from "./yahoo/client.js";
 
 /**
@@ -24,7 +24,13 @@ const INSTRUMENTS: Array<{ ticker: string; label: string }> = [
 
 const RANGE_MAP: Record<number, string> = { 90: "3mo", 180: "6mo", 365: "1y" };
 
-const cache = new TtlCache<CorrelationMatrixSnapshot>(60 * 60_000);
+// Fetched only on mount (tab visit, a range-toggle click, or the header's
+// Refresh button, which fully remounts the active view), never polled — a
+// TTL cache here would just make Refresh look like it does nothing. Safe to
+// always fetch live: each of the 11 instruments goes through fetchChart,
+// which has its own 15s per-symbol cache and comfortably tolerates this many
+// concurrent requests (the screener does 65 at once, paced, without issue).
+const cache = new LiveCache<CorrelationMatrixSnapshot>();
 
 function dailyLogReturns(closes: number[]): number[] {
   const out: number[] = [];
@@ -82,5 +88,5 @@ async function loadSnapshot(rangeDays: number): Promise<CorrelationMatrixSnapsho
 
 export async function getCorrelationMatrix(rangeDays: number): Promise<CorrelationMatrixSnapshot> {
   const key = RANGE_MAP[rangeDays] ? String(rangeDays) : "180";
-  return cache.getOrLoad(key, () => loadSnapshot(RANGE_MAP[rangeDays] ? rangeDays : 180));
+  return cache.get(key, () => loadSnapshot(RANGE_MAP[rangeDays] ? rangeDays : 180));
 }

@@ -1,5 +1,6 @@
 import type { NewsItem } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
+import { mapLimit, YAHOO_CONCURRENCY } from "./concurrency.js";
 import { includesWord } from "./textMatch.js";
 import * as yahoo from "./yahoo/client.js";
 
@@ -39,11 +40,18 @@ function filterRelevant(items: NewsItem[], name: string): NewsItem[] {
   return items.filter((item) => keywords.some((k) => includesWord(item.headline, k)));
 }
 
-const cache = new TtlCache<NewsItem[]>(2 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing. `fetchNews` has no cache of
+// its own (unlike fetchChart's 15s one), so this paces the 15 companies
+// through YAHOO_CONCURRENCY rather than firing them all at once.
+const cache = new LiveCache<NewsItem[]>();
 
 async function loadFeed(): Promise<NewsItem[]> {
-  const perCompany = await Promise.all(
-    UK_LISTED_COMPANIES.map(async (c): Promise<NewsItem[]> => {
+  const perCompany = await mapLimit(
+    UK_LISTED_COMPANIES,
+    YAHOO_CONCURRENCY,
+    async (c): Promise<NewsItem[]> => {
       try {
         const news = await yahoo.fetchNews(c.name);
         return filterRelevant(news, c.name).map((n) => ({ ...n, tickers: [c.ticker] }));
@@ -51,7 +59,7 @@ async function loadFeed(): Promise<NewsItem[]> {
         console.warn(`[rns] Skipping ${c.name}:`, (err as Error).message);
         return [];
       }
-    })
+    },
   );
 
   const merged = perCompany.flat();
@@ -66,5 +74,5 @@ async function loadFeed(): Promise<NewsItem[]> {
 }
 
 export async function getRnsFeed(): Promise<NewsItem[]> {
-  return cache.getOrLoad("feed", loadFeed);
+  return cache.get("feed", loadFeed);
 }

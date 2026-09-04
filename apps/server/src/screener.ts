@@ -1,6 +1,6 @@
 import type { ScreenerRow, ScreenerSnapshot } from "@ruff-term/shared";
 import universe from "./data/screenerUniverse.json" with { type: "json" };
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 import { mapLimit, YAHOO_CONCURRENCY } from "./concurrency.js";
 import {
   baseBeforeOrFirst,
@@ -16,7 +16,13 @@ interface UniverseEntry {
   sector: string;
 }
 
-const cache = new TtlCache<ScreenerSnapshot>(15 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing. Safe to always fetch live:
+// mapLimit + YAHOO_CONCURRENCY already pace the 65-symbol universe to 8
+// in flight at a time, and fetchChart itself has its own 15s per-symbol
+// cache — this cache was redundant with both, not an extra safety net.
+const cache = new LiveCache<ScreenerSnapshot>();
 
 async function loadRow(entry: UniverseEntry): Promise<ScreenerRow | null> {
   try {
@@ -75,5 +81,5 @@ async function loadSnapshot(): Promise<ScreenerSnapshot> {
 }
 
 export async function getScreenerSnapshot(): Promise<ScreenerSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

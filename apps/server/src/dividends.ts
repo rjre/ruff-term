@@ -1,9 +1,16 @@
 import type { DividendHistoryLine, DividendsSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
+import { mapLimit, YAHOO_CONCURRENCY } from "./concurrency.js";
 import { KNOWN_NAMES } from "./mockData.js";
 import * as yahoo from "./yahoo/client.js";
 
-const cache = new TtlCache<DividendsSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing. Safe to always fetch live:
+// fetchDividends has no cache of its own (unlike fetchChart's 15s one), so
+// this now paces requests the same way the screener does rather than firing
+// one per watchlist ticker at once.
+const cache = new LiveCache<DividendsSnapshot>();
 
 function isoDate(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
@@ -42,12 +49,12 @@ async function loadLine(ticker: string): Promise<DividendHistoryLine | null> {
 }
 
 async function loadSnapshot(tickers: string[]): Promise<DividendsSnapshot> {
-  const lines = (await Promise.all(tickers.map(loadLine))).filter(
+  const lines = (await mapLimit(tickers, YAHOO_CONCURRENCY, loadLine)).filter(
     (l): l is DividendHistoryLine => l !== null
   );
   return { asOf: new Date().toISOString(), lines };
 }
 
 export async function getDividends(tickers: string[]): Promise<DividendsSnapshot> {
-  return cache.getOrLoad(tickers.slice().sort().join(","), () => loadSnapshot(tickers));
+  return cache.get(tickers.slice().sort().join(","), () => loadSnapshot(tickers));
 }
