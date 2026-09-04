@@ -70,7 +70,6 @@ markup, not guessed:
 | Dividends & Corp Actions | Real dividend payment history (last 6 payments + a rough "next expected" projection) for the default watchlist names, live via Yahoo's chart endpoint. This is the watchlist's own history, not Ruffer's actual holdings calendar — that still needs Aladdin |
 | Aladdin Explore | Placeholder for portfolio views/attribution/holdings charts, for users without Aladdin Explore access |
 | JD Sleeve | Demo sleeve holdings with fabricated weights/values |
-| FX | Live G10 spot grid; vol surface is a placeholder (needs Citi Velocity credentials via `rjre/fx-data`) |
 | FMP Market Data | Catalog of data categories available under Ruffer's existing FMP subscription |
 | Events | Placeholder for earnings/trading statements/calls |
 | Historic Pricing | Dummy MSFT chart back to Nov 2021 — intended source: Aladdin |
@@ -82,7 +81,7 @@ markup, not guessed:
 | Fed Statement | `rjre/fed-statement`, embedded live via iframe (already deployed to GitHub Pages) |
 | Global Markets Calendar | UK/global market holidays; tries a live UBS CSV first, falls back to a bundled snapshot with a visible banner if UBS is unreachable |
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
-| FX | G10 spot grid from Yahoo, plus a live Citi Velocity implied-vol smile — see [FX vol surface](#fx-vol-surface) |
+| FX | G10 spot grid from Yahoo as a %1D heatmap, a derived currency-strength ranking (each currency's move vs USD, with USD's own broad move as the mirror of the G9 average), plus a live Citi Velocity implied-vol smile — see [FX vol surface](#fx-vol-surface) |
 | Citi Data | What the Citi Velocity entitlement reaches: the full 161,380-tag inventory (free to browse) and a G10 cross-rate grid triangulated from nine spot legs — see [Citi Data](#citi-data) |
 | Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
@@ -90,6 +89,7 @@ markup, not guessed:
 | Short Position Data | UK aggregate net short position disclosures at/above the 0.5% threshold, live via the FCA's public CSVs (current + historic) |
 | Ownership & Insider | Section 16 insider transactions (Form 4) for the US-listed watchlist names, live via SEC EDGAR. Foreign private issuers (SFL, South Bow) are exempt and show no rows |
 | Central Bank Balance Sheets | Fed / ECB / BoJ total assets, live via FRED. BoE omitted — no equivalent free machine-readable weekly series found |
+| Central Bank Meetings | Fed / ECB / BoE / BoJ rate-decision calendar for 2026 — next-meeting cards with a countdown, plus a month grid. A manually curated schedule transcribed from each bank's own published dates (none publish a machine-readable calendar), with source links per bank |
 | Correlation Matrix | Pairwise Pearson correlation of daily log returns across 11 cross-asset instruments (equities, rates, gold, oil, USD, VIX), live via Yahoo, 3M/6M/1Y lookback, CSV export |
 | Scenario Calculator | Shock sliders (equities/yields/credit/gold/FX) mapped onto the real disclosed Ruffer Portfolio allocation via assumed durations — explicitly an illustrative linear approximation, not a risk model |
 | Bond Auctions | Upcoming US Treasury auctions, live via TreasuryDirect's own API. No equivalent free feed found for UK DMO gilt auctions (links out to DMO's site instead) |
@@ -97,9 +97,10 @@ markup, not guessed:
 | Copilot | Placeholder — intended to embed Ruffer's internal M&E Market Commentary Agent |
 | Nic Perot's Chart | Placeholder (TBC) |
 
-`rjre/fx-data` (Citi Velocity FX data tool) informs the FX tab's vol-surface
-placeholder — it needs Citi credentials this environment doesn't have, so
-it isn't embedded live like the two Fed tabs.
+`rjre/fx-data` (Citi Velocity FX data tool) is what the FX tab's vol surface
+and the Citi Data tab now talk to directly, gated behind `CITI_CLIENT_ID` /
+`CITI_CLIENT_SECRET`. Without those the vol smile reports that it isn't
+configured and the rest of the app is unaffected.
 
 Anything marked "demo" or "placeholder" is clearly labeled in the UI itself,
 not just here. Every tab also shows a "Source(s):" line at the bottom stating

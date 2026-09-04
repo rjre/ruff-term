@@ -1,5 +1,6 @@
 import type {
   CentralBankBalanceSheetSnapshot,
+  CentralBankMeetingsSnapshot,
   CitiBrowseLevel,
   CitiCatalog,
   CitiInventory,
@@ -173,6 +174,10 @@ export function fetchOwnership(): Promise<OwnershipSnapshot> {
 
 export function fetchCentralBankBalanceSheets(): Promise<CentralBankBalanceSheetSnapshot> {
   return getJson("/api/central-bank-balance-sheets");
+}
+
+export function fetchCentralBankMeetings(): Promise<CentralBankMeetingsSnapshot> {
+  return getJson("/api/central-bank-meetings");
 }
 
 export function fetchCorrelationMatrix(days: number): Promise<CorrelationMatrixSnapshot> {

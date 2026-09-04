@@ -33,6 +33,7 @@ export type View =
   | "shortPositions"
   | "ownership"
   | "centralBankBalanceSheets"
+  | "centralBankMeetings"
   | "todo"
   | "copilot"
   | "correlation"
@@ -75,6 +76,7 @@ export const TABS: Array<{ id: View; label: string }> = [
   { id: "shortPositions", label: "Short Position Data" },
   { id: "ownership", label: "Ownership & Insider" },
   { id: "centralBankBalanceSheets", label: "Central Bank Balance Sheets" },
+  { id: "centralBankMeetings", label: "Central Bank Meetings" },
   { id: "todo", label: "To Do" },
   { id: "copilot", label: "Copilot" },
   { id: "correlation", label: "Correlation Matrix" },

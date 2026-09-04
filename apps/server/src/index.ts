@@ -10,6 +10,7 @@ import {
   search,
 } from "./marketData.js";
 import { getCentralBankBalanceSheets } from "./centralBankBalanceSheets.js";
+import { getCentralBankMeetings } from "./centralBankMeetings.js";
 import { getCftcPositioning } from "./cftcPositioning.js";
 import { getChartsOfTheDay } from "./chartsOfTheDay.js";
 import { getCommoditiesSnapshot } from "./commodities.js";
@@ -253,6 +254,8 @@ app.get("/api/short-positions", async (_req, reply) => {
 app.get("/api/ownership", async () => getOwnershipSnapshot(OWNERSHIP_TICKERS));
 
 app.get("/api/central-bank-balance-sheets", async () => getCentralBankBalanceSheets());
+
+app.get("/api/central-bank-meetings", async () => getCentralBankMeetings());
 
 app.get("/api/treasury-auctions", async (_req, reply) => {
   try {

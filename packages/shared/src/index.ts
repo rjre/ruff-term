@@ -242,6 +242,29 @@ export interface VolSurfaceSnapshot {
   fromStream: number;
 }
 
+export interface CentralBankMeeting {
+  bank: "Federal Reserve" | "European Central Bank" | "Bank of England" | "Bank of Japan";
+  code: "FED" | "ECB" | "BOE" | "BOJ";
+  committee: string;
+  /** Both YYYY-MM-DD. Equal for single-day meetings (ECB, BOE). */
+  startDate: string;
+  endDate: string;
+  /** Fed-only: meeting includes the Summary of Economic Projections. */
+  hasProjections?: boolean;
+}
+
+export interface CentralBankMeetingsSource {
+  bank: string;
+  label: string;
+  url: string;
+}
+
+export interface CentralBankMeetingsSnapshot {
+  asOf: string;
+  meetings: CentralBankMeeting[];
+  sources: CentralBankMeetingsSource[];
+}
+
 export interface GuideSection {
   label: string;
   text: string;

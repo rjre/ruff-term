@@ -3,6 +3,7 @@ import { AladdinExplorePanel } from "./components/AladdinExplorePanel";
 import { AlertsPanel } from "./components/AlertsPanel";
 import { BondAuctionsPanel } from "./components/BondAuctionsPanel";
 import { CentralBankBalanceSheetsPanel } from "./components/CentralBankBalanceSheetsPanel";
+import { CentralBankMeetingsPanel } from "./components/CentralBankMeetingsPanel";
 import { CftcPositioningPanel } from "./components/CftcPositioningPanel";
 import { ChartModal } from "./components/ChartModal";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
@@ -69,6 +70,11 @@ export function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [modalTicker, setModalTicker] = useState<string | null>(null);
+  // Bumped by the header refresh button. Threaded onto the active view's
+  // wrapper as part of its `key`, so bumping it remounts just that panel and
+  // re-runs its own data-fetching effects — no full page reload, and no need
+  // to touch every individual panel component.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   function openChartModal(ticker: string) {
     setModalTicker(ticker);
@@ -76,29 +82,29 @@ export function App() {
 
   // Poll health so a "backend is down" banner both appears and clears itself
   // automatically — useful during local dev restarts, not just first load.
+  function checkHealth() {
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((data) => {
+        setDataSource(data.dataSource);
+        setBackendUnreachable(false);
+      })
+      .catch(() => {
+        setDataSource(null);
+        setBackendUnreachable(true);
+      });
+  }
+
   useEffect(() => {
-    let cancelled = false;
-    function checkHealth() {
-      fetch("/api/health")
-        .then((r) => r.json())
-        .then((data) => {
-          if (cancelled) return;
-          setDataSource(data.dataSource);
-          setBackendUnreachable(false);
-        })
-        .catch(() => {
-          if (cancelled) return;
-          setDataSource(null);
-          setBackendUnreachable(true);
-        });
-    }
     checkHealth();
     const interval = setInterval(checkHealth, 15_000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
+
+  function refreshData() {
+    checkHealth();
+    setRefreshKey((k) => k + 1);
+  }
 
   // Keep the URL shareable: #view for the active tab, ?t= for the selected
   // ticker while on Markets. Uses replaceState so switching tabs doesn't
@@ -206,8 +212,8 @@ export function App() {
           ) : null}
           <button
             className="icon-btn"
-            onClick={() => window.location.reload()}
-            title="Refresh all data on this page"
+            onClick={refreshData}
+            title="Refresh data on this page"
           >
             ⟳ Refresh
           </button>
@@ -241,6 +247,7 @@ export function App() {
         onSelectTicker={setModalTicker}
       />
 
+      <div key={`${view}-${refreshKey}`} style={{ display: "contents" }}>
       {view === "morningBrief" && (
         <div className="app-body-scroll">
           <MorningBriefPanel onSelectTicker={goToMarkets} />
@@ -428,6 +435,11 @@ export function App() {
           <CentralBankBalanceSheetsPanel />
         </div>
       )}
+      {view === "centralBankMeetings" && (
+        <div className="app-body-scroll">
+          <CentralBankMeetingsPanel />
+        </div>
+      )}
       {view === "todo" && (
         <div className="app-body-scroll">
           <TodoPanel />
@@ -458,6 +470,7 @@ export function App() {
           <PlaceholderPanel title="Nic Perot's Chart" />
         </div>
       )}
+      </div>
     </div>
   );
 }

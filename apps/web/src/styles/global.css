@@ -2035,3 +2035,172 @@ body {
   font-size: 10px;
   color: var(--text-faint);
 }
+
+/* Central Bank Meetings calendar */
+
+.cb-fed {
+  --cb-color: #2f6fed;
+}
+.cb-ecb {
+  --cb-color: #8b5cf6;
+}
+.cb-boe {
+  --cb-color: #d6336c;
+}
+.cb-boj {
+  --cb-color: #0f9b8e;
+}
+
+.cb-summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cb-summary-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cb-color);
+  border-radius: 5px;
+  padding: 10px 12px;
+}
+
+.cb-summary-code {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--cb-color);
+}
+
+.cb-summary-bank {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 1px;
+}
+
+.cb-summary-date {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 6px;
+}
+
+.cb-summary-countdown {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.cb-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.cb-month-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 130px;
+}
+
+.cb-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.cb-weekday {
+  background: var(--header-bg);
+  color: var(--text-faint);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 0;
+}
+
+.cb-day {
+  background: var(--panel-bg);
+  min-height: 74px;
+  padding: 5px 6px;
+}
+
+.cb-day-outside {
+  background: var(--bg);
+}
+
+.cb-day-today {
+  background: var(--note-bg);
+  box-shadow: inset 0 0 0 1px var(--note-border);
+}
+
+.cb-day-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.cb-day-today .cb-day-number {
+  color: var(--note-text);
+  font-weight: 700;
+}
+
+.cb-day-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.cb-chip {
+  background: color-mix(in srgb, var(--cb-color) 20%, var(--panel-bg));
+  color: var(--cb-color);
+  border: 1px solid var(--cb-color);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 1px 4px;
+  cursor: default;
+}
+
+.cb-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.cb-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cb-legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--cb-color);
+}
+
+.cb-legend-dot {
+  color: var(--text-faint);
+  font-weight: 700;
+}
