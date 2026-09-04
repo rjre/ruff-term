@@ -1,7 +1,6 @@
 import AdmZip from "adm-zip";
 import type { UkGiltYieldLine, UkGiltYieldSnapshot } from "@ruff-term/shared";
 import * as XLSX from "xlsx";
-import { TtlCache } from "./cache.js";
 
 /**
  * Real UK gilt spot yields from the Bank of England's own daily yield-curve
@@ -16,7 +15,18 @@ const ZIP_ENTRY = "GLC Nominal daily data current month.xlsx";
 const SHEET_NAME = "4. spot curve";
 const TENORS = [2, 5, 10, 30];
 
-const cache = new TtlCache<UkGiltYieldSnapshot>(4 * 60 * 60_000);
+/**
+ * No TTL cache here on purpose: this panel only ever fetches on mount (tab
+ * visit or the header's Refresh button, which fully remounts the active
+ * view) rather than on a poll, so every call already represents a genuine
+ * "get me the current curve" moment — a time-gated cache would just be a
+ * reason for Refresh to visibly do nothing. `lastGood` is a fail-open
+ * fallback for when BoE is unreachable, not a freshness gate; `inFlight`
+ * only dedupes genuinely concurrent callers (React StrictMode's double
+ * effect invocation in dev, or more than one browser tab loading at once).
+ */
+let lastGood: UkGiltYieldSnapshot | undefined;
+let inFlight: Promise<UkGiltYieldSnapshot> | undefined;
 
 async function loadSnapshot(): Promise<UkGiltYieldSnapshot> {
   const res = await fetch(BOE_ZIP_URL, {
@@ -63,5 +73,21 @@ async function loadSnapshot(): Promise<UkGiltYieldSnapshot> {
 }
 
 export async function getUkGiltYields(): Promise<UkGiltYieldSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  if (inFlight) return inFlight;
+  inFlight = loadSnapshot()
+    .then((value) => {
+      lastGood = value;
+      return value;
+    })
+    .catch((err) => {
+      // BoE hiccup: serve the last real curve rather than an error banner —
+      // it's still yesterday's actual print, not stale in a misleading way
+      // since gilts only move once a business day regardless.
+      if (lastGood) return lastGood;
+      throw err;
+    })
+    .finally(() => {
+      inFlight = undefined;
+    });
+  return inFlight;
 }
