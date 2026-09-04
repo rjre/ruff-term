@@ -2204,3 +2204,66 @@ body {
   color: var(--text-faint);
   font-weight: 700;
 }
+
+/* Citi Credit tabs */
+
+.credit-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.credit-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 5px;
+  padding: 10px 12px;
+}
+
+.credit-region-us {
+  border-left-color: #2f6fed;
+}
+
+.credit-region-eu {
+  border-left-color: #8b5cf6;
+}
+
+.credit-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.credit-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.credit-card-tenor {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.credit-card-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.credit-card-change {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.credit-curve {
+  margin-bottom: 16px;
+  overflow-x: auto;
+}

@@ -127,3 +127,33 @@ export function callsSpent(tag: string): number {
 export function maxCallsSpent(tags: string[]): number {
   return tags.reduce((max, tag) => Math.max(max, callsSpent(tag)), 0);
 }
+
+export interface CachedSeriesPoint {
+  /** yyyyMMdd of the observation. */
+  date: number;
+  value: number;
+}
+
+export interface CachedSeries {
+  points: CachedSeriesPoint[];
+  fetchedAt: string;
+}
+
+/**
+ * Full historic time series per tag, as opposed to `values` above which only
+ * ever holds the single latest point. Used by the credit historic panel,
+ * which wants years of daily closes from one metered call rather than just a
+ * level and a baseline.
+ */
+const SERIES_FILE = "tag-series.json";
+
+let series = read<Record<string, CachedSeries>>(SERIES_FILE, {});
+
+export function getCachedSeries(tag: string): CachedSeries | undefined {
+  return series[tag];
+}
+
+export function putCachedSeries(next: Record<string, CachedSeries>): void {
+  series = { ...series, ...next };
+  write(SERIES_FILE, series);
+}

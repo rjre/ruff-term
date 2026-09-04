@@ -21,6 +21,8 @@ export interface StreamState {
   note: string | null;
   connectedAt: string | null;
   subscribed: string[];
+  /** Tags Citi has explicitly refused a live subscription for, keyed by tag, with why. */
+  rejected: Record<string, string>;
   connectsInLastDay: number;
   connectBudget: number;
 }
@@ -30,8 +32,18 @@ const INITIAL: StreamState = {
   note: null,
   connectedAt: null,
   subscribed: [],
+  rejected: {},
   connectsInLastDay: 0,
   connectBudget: 0,
+};
+
+export const STATUS_LABEL: Record<string, string> = {
+  idle: "Idle",
+  connecting: "Connecting…",
+  live: "Live",
+  reconnecting: "Reconnecting…",
+  unavailable: "Unavailable",
+  disconnected: "Disconnected",
 };
 
 export interface CitiStream {
@@ -48,13 +60,16 @@ export interface CitiStream {
  * listening. EventSource reconnects on its own, so there is no retry logic
  * here — but each browser reconnect is cheap, unlike the upstream one.
  */
-export function useCitiStream(enabled: boolean): CitiStream {
+export function useCitiStream(
+  enabled: boolean,
+  endpoint = "/api/citi/stream",
+): CitiStream {
   const [state, setState] = useState<StreamState>(INITIAL);
   const [prices, setPrices] = useState<Record<string, LiveTick>>({});
 
   useEffect(() => {
     if (!enabled) return;
-    const source = new EventSource("/api/citi/stream");
+    const source = new EventSource(endpoint);
 
     source.addEventListener("state", (event) => {
       try {
@@ -84,7 +99,7 @@ export function useCitiStream(enabled: boolean): CitiStream {
     };
 
     return () => source.close();
-  }, [enabled]);
+  }, [enabled, endpoint]);
 
   return { state, prices };
 }

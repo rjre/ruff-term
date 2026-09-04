@@ -9,6 +9,8 @@ import { ChartModal } from "./components/ChartModal";
 import { ChartsOfTheDayPanel } from "./components/ChartsOfTheDayPanel";
 import { ChartsPanel } from "./components/ChartsPanel";
 import { CitiDataPanel } from "./components/CitiDataPanel";
+import { CreditHistoricPanel } from "./components/CreditHistoricPanel";
+import { CreditIntradayPanel } from "./components/CreditIntradayPanel";
 import { CommandPalette } from "./components/CommandPalette";
 import { CommoditiesPanel } from "./components/CommoditiesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
@@ -342,6 +344,16 @@ export function App() {
       {view === "citiData" && (
         <div className="app-body-scroll">
           <CitiDataPanel />
+        </div>
+      )}
+      {view === "creditHistoric" && (
+        <div className="app-body-scroll">
+          <CreditHistoricPanel />
+        </div>
+      )}
+      {view === "creditIntraday" && (
+        <div className="app-body-scroll">
+          <CreditIntradayPanel />
         </div>
       )}
       {view === "fmp" && (

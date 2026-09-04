@@ -14,6 +14,7 @@ import {
 import { downloadCsv } from "../lib/exportCsv";
 import { LEGS, buildGrid, usdRates } from "@ruff-term/shared";
 import {
+  STATUS_LABEL,
   useCitiStream,
   type CitiStream,
   type LiveTick,
@@ -227,15 +228,6 @@ function G10Grid({
     </>
   );
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  idle: "Idle",
-  connecting: "Connecting…",
-  live: "Live",
-  reconnecting: "Reconnecting…",
-  unavailable: "Unavailable",
-  disconnected: "Disconnected",
-};
 
 /** Digits that make a spot rate readable: JPY crosses need fewer than EURUSD. */
 function spotDigits(value: number): number {

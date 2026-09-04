@@ -1,4 +1,5 @@
 export * from "./crosses.js";
+export * from "./credit.js";
 
 /**
  * True when a payload is fabricated fallback data rather than a real market

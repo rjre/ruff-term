@@ -7,6 +7,7 @@ import type {
   CftcPositioningSnapshot,
   ChartsOfTheDaySnapshot,
   CorrelationMatrixSnapshot,
+  CreditHistoricSnapshot,
   DividendsSnapshot,
   FxSnapshot,
   G10GridSnapshot,
@@ -46,6 +47,10 @@ export function fetchWatchlist(tickers?: string[]): Promise<WatchlistQuote[]> {
 
 export function fetchG10Grid(): Promise<G10GridSnapshot> {
   return getJson("/api/citi/g10");
+}
+
+export function fetchCreditHistoric(): Promise<CreditHistoricSnapshot> {
+  return getJson("/api/citi/credit/historic");
 }
 
 export function fetchCitiCatalog(): Promise<CitiCatalog> {

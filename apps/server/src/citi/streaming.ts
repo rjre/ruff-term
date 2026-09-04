@@ -68,6 +68,9 @@ class CitiStream extends EventEmitter {
   private subs = new Map<number, Subscription>();
   private bySubId = new Map<number, string>();
   private latest = new Map<string, LiveTick>();
+  /** Tags Citi has explicitly refused a live subscription for, with why — as
+   * opposed to a tag that simply hasn't ticked yet, this never will. */
+  private rejected = new Map<string, string>();
 
   private msgIdCounter = 1;
   private subscribers = 0;
@@ -92,6 +95,7 @@ class CitiStream extends EventEmitter {
       note: this.note,
       connectedAt: this.connectedAt,
       subscribed: [...this.bySubId.values()],
+      rejected: Object.fromEntries(this.rejected),
       connectsInLastDay: connectsInLastDay(),
       connectBudget: CONNECT_BUDGET,
     };
@@ -205,7 +209,16 @@ class CitiStream extends EventEmitter {
         this.sendPendingSubs();
         break;
       case "SUBACK": {
-        if (payload.status !== "OK") break;
+        if (payload.status !== "OK") {
+          const sub = this.subs.get(Number(payload.id));
+          const reason = String(payload.message ?? "rejected");
+          if (sub) {
+            this.rejected.set(sub.tag, reason);
+            this.emit("state", this.getState());
+          }
+          console.warn(`[citi-stream] SUB rejected for ${sub?.tag ?? `id ${payload.id}`}: ${reason}`);
+          break;
+        }
         // SUBACK does not echo the tag — correlate through the message id we
         // chose when sending the SUB.
         const sub = this.subs.get(Number(payload.id));
@@ -213,6 +226,7 @@ class CitiStream extends EventEmitter {
         if (sub && Number.isFinite(subId)) {
           sub.subId = subId;
           this.bySubId.set(subId, sub.tag);
+          this.rejected.delete(sub.tag);
           this.emit("state", this.getState());
         }
         break;

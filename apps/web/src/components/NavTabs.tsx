@@ -16,6 +16,8 @@ export type View =
   | "jdSleeve"
   | "fx"
   | "citiData"
+  | "creditHistoric"
+  | "creditIntraday"
   | "fmp"
   | "events"
   | "historicPricing"
@@ -59,6 +61,8 @@ export const TABS: Array<{ id: View; label: string }> = [
   { id: "jdSleeve", label: "JD Sleeve" },
   { id: "fx", label: "FX" },
   { id: "citiData", label: "Citi Data" },
+  { id: "creditHistoric", label: "Citi - Credit Historic" },
+  { id: "creditIntraday", label: "Citi - Credit Intraday" },
   { id: "fmp", label: "FMP Market Data" },
   { id: "events", label: "Events" },
   { id: "historicPricing", label: "Historic Pricing" },

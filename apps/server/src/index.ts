@@ -18,7 +18,8 @@ import { getCorrelationMatrix } from "./correlation.js";
 import { getDividends } from "./dividends.js";
 import { getFxSnapshot } from "./fx.js";
 import { getG10Grid } from "./citi/g10.js";
-import { TAGS as G10_TAGS } from "@ruff-term/shared";
+import { getCreditHistoric } from "./citi/credit.js";
+import { TAGS as G10_TAGS, CREDIT_STREAM_TAGS } from "@ruff-term/shared";
 import { citiStream, type LiveTick } from "./citi/streaming.js";
 import * as citiTags from "./citi/tags.js";
 import {
@@ -201,6 +202,49 @@ app.get("/api/citi/stream", (req, reply) => {
 
   // Comment frames keep intermediaries from dropping an idle connection —
   // MI01 means a quiet market can go a full minute with nothing to say.
+  const heartbeat = setInterval(() => reply.raw.write(": ping\n\n"), 25_000);
+
+  req.raw.on("close", () => {
+    clearInterval(heartbeat);
+    citiStream.off("ticks", onTicks);
+    citiStream.off("state", onState);
+    detach();
+  });
+});
+
+/**
+ * Citi Credit tabs.
+ *
+ * /historic pulls a long daily-close history in one metered /data call per
+ * tag (cached to disk for 24h — see citi/credit.ts). /stream reuses the same
+ * streaming websocket as the FX tab: one connection per login, so credit tags
+ * are added to the same wanted set rather than opening a second socket.
+ */
+app.get("/api/citi/credit/historic", async () => getCreditHistoric());
+
+app.get("/api/citi/credit/stream", (req, reply) => {
+  citiStream.want(CREDIT_STREAM_TAGS);
+
+  reply.raw.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "X-Accel-Buffering": "no",
+  });
+
+  function send(event: string, data: unknown): void {
+    reply.raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  }
+
+  const detach = citiStream.attach();
+  send("state", citiStream.getState());
+  send("ticks", [...citiStream.getLatest().values()]);
+
+  const onTicks = (ticks: LiveTick[]) => send("ticks", ticks);
+  const onState = (state: unknown) => send("state", state);
+  citiStream.on("ticks", onTicks);
+  citiStream.on("state", onState);
+
   const heartbeat = setInterval(() => reply.raw.write(": ping\n\n"), 25_000);
 
   req.raw.on("close", () => {

@@ -83,6 +83,8 @@ markup, not guessed:
 | Guide to Global Markets | Country-by-country trading hours/conventions/exchange reference, extracted from UBS's 2025 Guide to Global Markets PDF |
 | FX | G10 spot grid from Yahoo as a %1D heatmap, a derived currency-strength ranking (each currency's move vs USD, with USD's own broad move as the mirror of the G9 average), plus a live Citi Velocity implied-vol smile — see [FX vol surface](#fx-vol-surface) |
 | Citi Data | What the Citi Velocity entitlement reaches: the full 161,380-tag inventory (free to browse) and a G10 cross-rate grid triangulated from nine spot legs — see [Citi Data](#citi-data) |
+| Citi - Credit Historic | 10 years of daily CDX/iTraxx CDS index spreads and their term structures, plus a 9-country Europe/US sovereign CDS board with core-vs-periphery curves (Germany, Italy) — live via Citi Velocity's Historical Data API, Markit composite spreads |
+| Citi - Credit Intraday | Citi's Credit content is end-of-day only — confirmed against the live streaming API, which rejects every CDS tag tested with "No intraday data for this tag" (FX is the only Citi feed on this account that streams). Shows latest-vs-prior-close for the headline indices instead, and keeps a real (permanently empty) subscription running in case that ever changes |
 | Screener | Momentum screener (price, %1D/1W/1M/3M/YTD, %52w high/low) over a curated ~65-name liquid large-cap universe, live via Yahoo, with CSV export. No P/E, market cap or dividend yield — Yahoo's fundamentals endpoints now require an auth crumb this environment can't obtain |
 | CFTC Positioning | Weekly speculative net positioning (Commitments of Traders, Legacy Futures Only) in key equity index/rates/FX/commodity futures, live via CFTC's free Socrata API |
 | Alerts | Price and news-keyword alerts, checked every 30s while the tab is open. Price alerts fire once then deactivate. Per-browser only — stored in `localStorage`, no server-side account or push/email/SMS, though an optional Notification API hook can show a real desktop notification |
@@ -334,7 +336,7 @@ to CSV.
 - Press **/** anywhere to jump into the ticker search (same convention as
   Slack/Linear/GitHub), or **?** to see the full shortcuts list.
 - Press **Ctrl/Cmd+K** (or click "Jump to tab" in the header) to open a
-  fuzzy-filterable command palette listing all 38 top-level tabs — the fast
+  fuzzy-filterable command palette listing all 43 top-level tabs — the fast
   path since the nav bar itself needs horizontal scrolling to reach the
   later tabs. It also searches tickers (same results as the "/" search box),
   so it doubles as a single do-anything launcher.
