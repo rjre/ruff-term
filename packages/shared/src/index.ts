@@ -449,6 +449,14 @@ export interface ShortPositionLine {
 export interface ShortPositionHistoryPoint {
   netShortPct: number;
   positionDate: string;
+  /**
+   * True for a point reconstructed from individual holder-level disclosures
+   * under the pre-2026 regime (each holder's latest disclosed position,
+   * summed as of that date) rather than FCA's own official aggregate
+   * figure. Point-in-time-equivalent, but self-computed — worth telling
+   * apart from the figures FCA publishes directly.
+   */
+  reconstructed?: boolean;
 }
 
 export interface ShortPositionsSnapshot {
@@ -457,6 +465,12 @@ export interface ShortPositionsSnapshot {
   history: Record<string, ShortPositionHistoryPoint[]>;
   sourceLabel: string;
   sourceUrl: string;
+  /** The archived individual-disclosure regime that extends `history`
+   * further back than the current aggregate feed alone covers. Null when
+   * that archive was unavailable this load — `history` still works, just
+   * without the older reconstructed points. */
+  individualRegimeSourceLabel: string | null;
+  individualRegimeSourceUrl: string | null;
 }
 
 export interface InsiderTransaction {

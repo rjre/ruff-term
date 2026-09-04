@@ -342,6 +342,13 @@ body {
   flex: 1;
 }
 
+.chart-explode-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px 20px;
+}
+
 .chart-title {
   display: flex;
   align-items: center;
@@ -1238,6 +1245,26 @@ body {
   grid-template-columns: 160px 1fr 56px;
   align-items: center;
   gap: 8px;
+}
+
+.magnitude-row-clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0 -4px;
+}
+
+.magnitude-row-clickable:hover {
+  background: var(--row-hover);
+}
+
+.magnitude-row-selected {
+  background: var(--row-hover);
+}
+
+.magnitude-row-selected .magnitude-label {
+  color: var(--ruffer-green-light);
+  font-weight: 600;
 }
 
 .magnitude-label {
@@ -2267,4 +2294,26 @@ body {
 .credit-curve {
   margin-bottom: 16px;
   overflow-x: auto;
+}
+
+/* Anything that pops a small chart into ChartExplodeModal on click. */
+.chart-explode-trigger {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+}
+
+.chart-explode-trigger:hover {
+  background: var(--row-hover);
+}
+
+button.chart-explode-trigger {
+  width: auto;
 }
