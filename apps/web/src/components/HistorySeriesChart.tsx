@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ColorType, createChart } from "lightweight-charts";
+import { ColorType, createChart, type ISeriesApi } from "lightweight-charts";
 import { cssVar } from "../lib/theme";
 
 interface CompareSeries {
@@ -28,10 +28,12 @@ interface Props {
  * trend line. */
 export function HistorySeriesChart({ points, color, compare }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const tooltip = tooltipRef.current;
+    if (!container || !tooltip) return;
 
     const borderColor = cssVar("--border") || "#e2e6e0";
     const resolvedColor = color ?? (cssVar("--ruffer-green-light") || "#4e9a33");
@@ -65,9 +67,10 @@ export function HistorySeriesChart({ points, color, compare }: Props) {
         .map((p) => ({ time: p.date, value: p.value })),
     );
 
+    let compareLine: ISeriesApi<"Line"> | undefined;
+    const compareColor = compare?.color ?? "#c9922f";
     if (compare) {
-      const compareColor = compare.color ?? "#c9922f";
-      const compareLine = chart.addLineSeries({
+      compareLine = chart.addLineSeries({
         color: compareColor,
         lineWidth: 2,
         priceScaleId: "left",
@@ -81,6 +84,45 @@ export function HistorySeriesChart({ points, color, compare }: Props) {
     }
 
     chart.timeScale().fitContent();
+
+    chart.subscribeCrosshairMove((param) => {
+      if (!param.time || !param.point || param.point.x < 0 || param.point.y < 0) {
+        tooltip.style.display = "none";
+        return;
+      }
+
+      const primary = param.seriesData.get(series) as { value?: number } | undefined;
+      const secondary = compareLine
+        ? (param.seriesData.get(compareLine) as { value?: number } | undefined)
+        : undefined;
+
+      const rows: string[] = [`<div class="chart-tooltip-date">${param.time}</div>`];
+      if (primary?.value !== undefined) {
+        rows.push(
+          `<div style="color:${resolvedColor}">${primary.value.toFixed(2)}</div>`,
+        );
+      }
+      if (secondary?.value !== undefined) {
+        rows.push(
+          `<div style="color:${compareColor}">${compare!.label}: ${secondary.value.toFixed(2)}</div>`,
+        );
+      }
+      tooltip.innerHTML = rows.join("");
+      tooltip.style.display = "block";
+
+      const tooltipWidth = tooltip.offsetWidth;
+      const margin = 12;
+      let left = param.point.x + margin;
+      if (left + tooltipWidth > container.clientWidth) {
+        left = param.point.x - tooltipWidth - margin;
+      }
+      let top = param.point.y + margin;
+      if (top + tooltip.offsetHeight > container.clientHeight) {
+        top = param.point.y - tooltip.offsetHeight - margin;
+      }
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    });
 
     function onResize() {
       if (!container) return;
@@ -107,7 +149,10 @@ export function HistorySeriesChart({ points, color, compare }: Props) {
           </span>
         </div>
       )}
-      <div ref={containerRef} style={{ width: "100%", height: "100%", minHeight: 360 }} />
+      <div style={{ position: "relative", width: "100%", height: "100%", minHeight: 360 }}>
+        <div ref={containerRef} style={{ width: "100%", height: "100%", minHeight: 360 }} />
+        <div ref={tooltipRef} className="chart-tooltip" style={{ display: "none" }} />
+      </div>
     </div>
   );
 }

@@ -388,6 +388,26 @@ body {
   margin-bottom: 8px;
 }
 
+.chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.chart-tooltip-date {
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--text-dim);
+}
+
 .charts-page {
   display: flex;
   flex-direction: column;
