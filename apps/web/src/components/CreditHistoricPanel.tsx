@@ -144,6 +144,18 @@ export function CreditHistoricPanel() {
   const [snapshot, setSnapshot] = useState<CreditHistoricSnapshot | null>(null);
   const [explodedInstrument, setExplodedInstrument] = useState<CreditSeriesResult | null>(null);
   const [explodedCurve, setExplodedCurve] = useState<Curve | null>(null);
+  const [compareInstrumentKey, setCompareInstrumentKey] = useState("");
+  const [compareCurveKey, setCompareCurveKey] = useState("");
+
+  function explodeInstrument(instrument: CreditSeriesResult): void {
+    setExplodedInstrument(instrument);
+    setCompareInstrumentKey("");
+  }
+
+  function explodeCurve(curve: Curve): void {
+    setExplodedCurve(curve);
+    setCompareCurveKey("");
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -186,7 +198,7 @@ export function CreditHistoricPanel() {
           </div>
           <div className="credit-board">
             {snapshot.indices.map((i) => (
-              <InstrumentCard key={i.key} instrument={i} onExplode={setExplodedInstrument} />
+              <InstrumentCard key={i.key} instrument={i} onExplode={explodeInstrument} />
             ))}
           </div>
 
@@ -196,7 +208,7 @@ export function CreditHistoricPanel() {
           {snapshot.curves
             .filter((c) => c.key === "CDX_NA_IG_CURVE" || c.key === "ITRAXX_MAIN_CURVE")
             .map((c) => (
-              <CurveTable key={c.key} curve={c} onExplode={setExplodedCurve} />
+              <CurveTable key={c.key} curve={c} onExplode={explodeCurve} />
             ))}
 
           <div className="screener-toolbar" style={{ marginTop: 24 }}>
@@ -212,7 +224,7 @@ export function CreditHistoricPanel() {
           </div>
           <div className="credit-board">
             {snapshot.sovereigns.map((i) => (
-              <InstrumentCard key={i.key} instrument={i} onExplode={setExplodedInstrument} />
+              <InstrumentCard key={i.key} instrument={i} onExplode={explodeInstrument} />
             ))}
           </div>
 
@@ -222,7 +234,7 @@ export function CreditHistoricPanel() {
           {snapshot.curves
             .filter((c) => c.key === "SOV_DE_CURVE" || c.key === "SOV_IT_CURVE")
             .map((c) => (
-              <CurveTable key={c.key} curve={c} onExplode={setExplodedCurve} />
+              <CurveTable key={c.key} curve={c} onExplode={explodeCurve} />
             ))}
 
           <div className="vol-legend" style={{ marginTop: 18 }}>
@@ -240,32 +252,90 @@ export function CreditHistoricPanel() {
         ]}
       />
 
-      {explodedInstrument && (
-        <ChartExplodeModal
-          title={`${explodedInstrument.label} — ${explodedInstrument.tenor}`}
-          subtitle={`${explodedInstrument.series[0]?.date} to ${explodedInstrument.series[explodedInstrument.series.length - 1]?.date} · ${formatBp(explodedInstrument.latest)} as of ${explodedInstrument.latestDate}`}
-          onClose={() => setExplodedInstrument(null)}
-        >
-          <HistorySeriesChart
-            points={explodedInstrument.series}
-            color={
-              (changeOverLookback(explodedInstrument.series, 365) ?? 0) >= 0
-                ? cssVar("--down")
-                : cssVar("--up")
-            }
-          />
-        </ChartExplodeModal>
-      )}
+      {snapshot && explodedInstrument && (() => {
+        const allInstruments = [...snapshot.indices, ...snapshot.sovereigns];
+        const compareInstrument = allInstruments.find((i) => i.key === compareInstrumentKey) ?? null;
+        return (
+          <ChartExplodeModal
+            title={`${explodedInstrument.label} — ${explodedInstrument.tenor}`}
+            subtitle={`${explodedInstrument.series[0]?.date} to ${explodedInstrument.series[explodedInstrument.series.length - 1]?.date} · ${formatBp(explodedInstrument.latest)} as of ${explodedInstrument.latestDate}`}
+            onClose={() => setExplodedInstrument(null)}
+          >
+            <div className="screener-toolbar" style={{ marginBottom: 10 }}>
+              <label className="guide-select-label" htmlFor="credit-compare-instrument">
+                Compare vs
+              </label>
+              <select
+                id="credit-compare-instrument"
+                className="search-input"
+                style={{ maxWidth: 220 }}
+                value={compareInstrumentKey}
+                onChange={(e) => setCompareInstrumentKey(e.target.value)}
+              >
+                <option value="">None</option>
+                {allInstruments
+                  .filter((i) => i.key !== explodedInstrument.key)
+                  .map((i) => (
+                    <option key={i.key} value={i.key}>
+                      {i.label} ({i.region})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <HistorySeriesChart
+              points={explodedInstrument.series}
+              color={
+                (changeOverLookback(explodedInstrument.series, 365) ?? 0) >= 0
+                  ? cssVar("--down")
+                  : cssVar("--up")
+              }
+              compare={
+                compareInstrument
+                  ? { label: compareInstrument.label, points: compareInstrument.series }
+                  : undefined
+              }
+            />
+          </ChartExplodeModal>
+        );
+      })()}
 
-      {explodedCurve && (
-        <ChartExplodeModal
-          title={explodedCurve.label}
-          subtitle={explodedCurve.asOfDate ? `As of ${explodedCurve.asOfDate}` : undefined}
-          onClose={() => setExplodedCurve(null)}
-        >
-          <CurveChart points={explodedCurve.points} />
-        </ChartExplodeModal>
-      )}
+      {snapshot && explodedCurve && (() => {
+        const compareCurve = snapshot.curves.find((c) => c.key === compareCurveKey) ?? null;
+        return (
+          <ChartExplodeModal
+            title={explodedCurve.label}
+            subtitle={explodedCurve.asOfDate ? `As of ${explodedCurve.asOfDate}` : undefined}
+            onClose={() => setExplodedCurve(null)}
+          >
+            <div className="screener-toolbar" style={{ marginBottom: 10 }}>
+              <label className="guide-select-label" htmlFor="credit-compare-curve">
+                Compare vs
+              </label>
+              <select
+                id="credit-compare-curve"
+                className="search-input"
+                style={{ maxWidth: 220 }}
+                value={compareCurveKey}
+                onChange={(e) => setCompareCurveKey(e.target.value)}
+              >
+                <option value="">None</option>
+                {snapshot.curves
+                  .filter((c) => c.key !== explodedCurve.key)
+                  .map((c) => (
+                    <option key={c.key} value={c.key}>
+                      {c.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <CurveChart
+              points={explodedCurve.points}
+              label={explodedCurve.label}
+              compare={compareCurve ? { label: compareCurve.label, points: compareCurve.points } : undefined}
+            />
+          </ChartExplodeModal>
+        );
+      })()}
     </>
   );
 }
