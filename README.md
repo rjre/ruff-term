@@ -298,6 +298,42 @@ retry rather than a six-hour subscription squatting on the one connection Citi
 permits, and the wait is bounded at six hours so a pair that simply is not
 entitled eventually lets go.
 
+#### Credit
+
+`CREDIT` is the other root Citi's tag tree has alongside `FX` — found by
+browsing the empty prefix, same as everything else here, not documented
+anywhere. It bottoms out two different ways:
+`CREDIT.CDX`/`CREDIT.ITRAXX.<index>.OTR.<tenor>.<field>` for index spreads,
+and `CREDIT.SOV_CDS.<country>.<ccy>.SNRFOR.CR.<tenor>.BLENDED` for sovereign
+CDS. `OTR` ("on the run") is Citi's roll-adjusted continuous series id — the
+one that carries a multi-year history instead of resetting every six months
+when the index rolls to a new series number.
+
+The `<field>` leaf under an index/tenor offers six choices —
+`CITI_SPREAD` (Citi's own book), `COMPOSITE_SPREAD`/`COMPOSITE_PRICE`
+(Markit's blended figure), `MODEL_SPREAD`/`MODEL_PRICE`, `SPREAD_SKEW` — and
+which one to use depends on the tab:
+
+- **Historic** uses `COMPOSITE_SPREAD`, Markit's blended figure and the
+  standard "the market's spread" reference for a proper multi-year chart.
+- **Intraday** tried `CITI_SPREAD` instead — Citi's own live-updating book,
+  the one that should stream if anything does. It doesn't: subscribing to
+  either field, for any index or sovereign tag, gets rejected with an
+  explicit `"No intraday data for this tag"` SUBACK. The Historical Data
+  endpoint agrees — asking for `MINUTE`, `INTRADAY` or `HOURLY` frequency
+  doesn't error, it just silently returns the same daily closes `DAILY`
+  would. Confirmed against the live API both ways, not inferred from a
+  missing field: Credit is EOD-only on this account, and FX remains the only
+  content here with a live tick feed. `SUBACK`'s rejection reason previously
+  vanished into a console warning; `CitiStream` now tracks it per tag so a
+  page can show *why* a tag isn't live rather than leave it looking stuck on
+  "waiting for the first tick."
+
+One structural surprise: `CREDIT.SOV_CDS.UKIN` browses `EUR`/`GBP`/`JPY`/`USD`
+as valid currencies, but only `GBP` — the UK's own currency — has no
+quotes behind it. `USD` does, which is also the more usual sovereign CDS
+quoting currency internationally, and is what the sovereign board uses.
+
 ## Getting started
 
 Requires Node 20+.
