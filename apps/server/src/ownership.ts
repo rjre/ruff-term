@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import type { InsiderTransaction, OwnershipSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache, TtlCache } from "./cache.js";
 
 /**
  * Section 16 insider transactions (Form 4) straight from SEC EDGAR — free,
@@ -24,8 +24,14 @@ const TRANSACTION_CODE_LABELS: Record<string, string> = {
   X: "Option exercise (in-the-money)",
 };
 
+// The ticker→CIK map is genuinely static reference data, not "the data" a
+// user is refreshing to see — a day's TTL is appropriate here.
 const cikCache = new TtlCache<Record<string, { cik: number; title: string }>>(24 * 60 * 60_000);
-const snapshotCache = new TtlCache<OwnershipSnapshot>(60 * 60_000);
+// The transactions themselves are fetched only on mount (tab visit or the
+// header's Refresh button, which fully remounts the active view), never
+// polled — a TTL cache here would just make Refresh look like it does
+// nothing.
+const snapshotCache = new LiveCache<OwnershipSnapshot>();
 
 const xmlParser = new XMLParser({ ignoreAttributes: true, isArray: (name) => name === "nonDerivativeTransaction" || name === "derivativeTransaction" });
 
@@ -162,5 +168,5 @@ async function loadSnapshot(tickers: string[]): Promise<OwnershipSnapshot> {
 }
 
 export async function getOwnershipSnapshot(tickers: string[]): Promise<OwnershipSnapshot> {
-  return snapshotCache.getOrLoad(tickers.join(","), () => loadSnapshot(tickers));
+  return snapshotCache.get(tickers.join(","), () => loadSnapshot(tickers));
 }

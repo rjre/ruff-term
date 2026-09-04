@@ -1,5 +1,5 @@
 import type { BalanceSheetPoint, CentralBankBalanceSheetSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 import { fetchFredSeries } from "./fred.js";
 
 /**
@@ -15,7 +15,10 @@ const SERIES: Array<{ bank: string; id: string; currency: string; divisor: numbe
   { bank: "Bank of Japan", id: "JPNASSETS", currency: "JPY", divisor: 10 },
 ];
 
-const cache = new TtlCache<CentralBankBalanceSheetSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing.
+const cache = new LiveCache<CentralBankBalanceSheetSnapshot>();
 
 async function fetchSeries(id: string, divisor: number): Promise<BalanceSheetPoint[]> {
   const points = await fetchFredSeries(id);
@@ -44,5 +47,5 @@ async function loadSnapshot(): Promise<CentralBankBalanceSheetSnapshot> {
 }
 
 export async function getCentralBankBalanceSheets(): Promise<CentralBankBalanceSheetSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

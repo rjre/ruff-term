@@ -1,6 +1,6 @@
 import type { GlobalMarketsCalendarSnapshot, MarketHolidayDay } from "@ruff-term/shared";
 import fallbackDays from "./data/ubsFxCalendar2026.json" with { type: "json" };
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 
 const CSV_URL =
   "https://www.ubs.com/content/dam/content-fragments/html-custom-code/investment-bank/global-markets-calendar/data/foreign-exchange.csv";
@@ -58,7 +58,12 @@ function parseCsv(text: string): MarketHolidayDay[] {
   return days;
 }
 
-const cache = new TtlCache<GlobalMarketsCalendarSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing. loadSnapshot() already
+// catches its own fetch failure and falls back to the bundled snapshot, so
+// this rarely needs LiveCache's own fail-open fallback in practice.
+const cache = new LiveCache<GlobalMarketsCalendarSnapshot>();
 
 async function loadSnapshot(): Promise<GlobalMarketsCalendarSnapshot> {
   try {
@@ -82,5 +87,5 @@ async function loadSnapshot(): Promise<GlobalMarketsCalendarSnapshot> {
 }
 
 export async function getGlobalMarketsCalendar(): Promise<GlobalMarketsCalendarSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

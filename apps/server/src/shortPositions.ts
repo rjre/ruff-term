@@ -1,5 +1,5 @@
 import type { ShortPositionHistoryPoint, ShortPositionLine, ShortPositionsSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 
 /**
  * UK aggregate net short position disclosures — the FCA's own public
@@ -10,7 +10,10 @@ const CURRENT_CSV_URL = "https://www.fca.org.uk/publication/documents/aggregated
 const HISTORIC_CSV_URL = "https://www.fca.org.uk/publication/documents/aggregated-historic-net-short-positions.csv";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
-const cache = new TtlCache<ShortPositionsSnapshot>(60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing.
+const cache = new LiveCache<ShortPositionsSnapshot>();
 
 /** Minimal CSV line parser handling quoted fields with embedded commas. */
 function parseCsvLine(line: string): string[] {
@@ -98,5 +101,5 @@ async function loadSnapshot(): Promise<ShortPositionsSnapshot> {
 }
 
 export async function getShortPositions(): Promise<ShortPositionsSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

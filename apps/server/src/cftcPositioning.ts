@@ -1,5 +1,5 @@
 import type { CftcPositioningLine, CftcPositioningSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 
 /**
  * Weekly speculative (non-commercial) net positioning in key financial and
@@ -22,7 +22,10 @@ const CONTRACTS: Array<{ label: string; code: string }> = [
   { label: "VIX Futures", code: "1170E1" },
 ];
 
-const cache = new TtlCache<CftcPositioningSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing.
+const cache = new LiveCache<CftcPositioningSnapshot>();
 
 interface CftcRow {
   report_date_as_yyyy_mm_dd: string;
@@ -87,5 +90,5 @@ async function loadSnapshot(): Promise<CftcPositioningSnapshot> {
 }
 
 export async function getCftcPositioning(): Promise<CftcPositioningSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

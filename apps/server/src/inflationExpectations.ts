@@ -1,5 +1,5 @@
 import type { InflationExpectationLine, InflationExpectationsSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 import { fetchFredSeries } from "./fred.js";
 
 /**
@@ -15,7 +15,10 @@ const SERIES: Array<{ id: string; label: string }> = [
   { id: "DFII10", label: "10Y TIPS Real Yield" },
 ];
 
-const cache = new TtlCache<InflationExpectationsSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing.
+const cache = new LiveCache<InflationExpectationsSnapshot>();
 
 async function loadLine(series: { id: string; label: string }): Promise<InflationExpectationLine | null> {
   try {
@@ -43,5 +46,5 @@ async function loadSnapshot(): Promise<InflationExpectationsSnapshot> {
 }
 
 export async function getInflationExpectations(): Promise<InflationExpectationsSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }

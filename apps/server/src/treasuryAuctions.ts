@@ -1,5 +1,5 @@
 import type { TreasuryAuctionLine, TreasuryAuctionsSnapshot } from "@ruff-term/shared";
-import { TtlCache } from "./cache.js";
+import { LiveCache } from "./cache.js";
 
 /**
  * Upcoming US Treasury auctions — TreasuryDirect's own free, keyless public
@@ -9,7 +9,10 @@ import { TtlCache } from "./cache.js";
  */
 const UPCOMING_URL = "https://www.treasurydirect.gov/TA_WS/securities/upcoming?format=json";
 
-const cache = new TtlCache<TreasuryAuctionsSnapshot>(6 * 60 * 60_000);
+// Fetched only on mount (tab visit or the header's Refresh button, which
+// fully remounts the active view), never polled — a TTL cache here would
+// just make Refresh look like it does nothing.
+const cache = new LiveCache<TreasuryAuctionsSnapshot>();
 
 interface RawAuction {
   securityType: string;
@@ -40,5 +43,5 @@ async function loadSnapshot(): Promise<TreasuryAuctionsSnapshot> {
 }
 
 export async function getTreasuryAuctions(): Promise<TreasuryAuctionsSnapshot> {
-  return cache.getOrLoad("snapshot", loadSnapshot);
+  return cache.get("snapshot", loadSnapshot);
 }
